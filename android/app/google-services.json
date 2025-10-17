@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "998655450144",
+    "firebase_url": "https://tstappmobil-8edc6-default-rtdb.firebaseio.com",
+    "project_id": "tstappmobil-8edc6",
+    "storage_bucket": "tstappmobil-8edc6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998655450144:android:bea28c535c9b78efd37045",
+        "android_client_info": {
+          "package_name": "com.pasport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMoOoPhxaGbfsKusBJnytaiXVerzKOzp8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

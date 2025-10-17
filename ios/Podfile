@@ -1,0 +1,92 @@
+def node_require(script)
+   # Resolve script with node to allow for hoisting
+   require Pod::Executable.execute_command('node', ['-p',
+     "require.resolve(
+      '#{script}',
+      {paths: [process.argv[1]]},
+     )", __dir__]).strip
+ end
+
+node_require('react-native/scripts/react_native_pods.rb')
+node_require('react-native-permissions/scripts/setup.rb')
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+setup_permissions([
+  # 'AppTrackingTransparency',
+  # 'Bluetooth',
+  # 'Calendars',
+  # 'CalendarsWriteOnly',
+   'Camera',
+  # 'Contacts',
+  # 'FaceID',
+  # 'LocationAccuracy',
+  # 'LocationAlways',
+  # 'LocationWhenInUse',
+   'MediaLibrary',
+  # 'Microphone',
+  # 'Motion',
+  # 'Notifications',
+   'PhotoLibrary',
+  'PhotoLibraryAddOnly'
+  # 'Reminders',
+  # 'Siri',
+  # 'SpeechRecognition',
+  # 'StoreKit',
+])
+
+target 'Pasport' do
+  config = use_native_modules!
+
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+  :hermes_enabled => false,
+
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseMessaging', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+  pod 'lottie-react-native', :path => '../node_modules/lottie-react-native'
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
+
+
+
+  target 'TSTAppTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+       installer.pods_project.targets.each do |target|
+          # Fix for BoringSSL-GRPC issues with unsupported flags
+          if target.name == 'BoringSSL-GRPC'
+            target.build_configurations.each do |config|
+              config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'NO'
+            end
+            target.source_build_phase.files.each do |file|
+              if file.settings && file.settings['COMPILER_FLAGS']
+                flags = file.settings['COMPILER_FLAGS'].split
+                # Remove the unsupported '-G' flag or any other unwanted flags
+                flags.reject! { |flag| flag.include?('-G') }
+                file.settings['COMPILER_FLAGS'] = flags.join(' ')
+              end
+            end
+        end
+    end
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+
+  end
+end

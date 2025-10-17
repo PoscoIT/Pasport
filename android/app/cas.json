@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "92163963504",
+    "firebase_url": "https://healthyfuturecas.firebaseio.com",
+    "project_id": "healthyfuturecas",
+    "storage_bucket": "healthyfuturecas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92163963504:android:f97fd700c03771a59152b5",
+        "android_client_info": {
+          "package_name": "com.tstapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92163963504-vd9kvjsmcbcicl0jfc11klcn8jp2h3hm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmAIReSIMuPdCFCjQj4WdHVIreKGt8Cj4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "92163963504-vd9kvjsmcbcicl0jfc11klcn8jp2h3hm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

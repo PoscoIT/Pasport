@@ -1,0 +1,9 @@
+-keep class com.facebook.react.** { *; }
+-keep class com.facebook.hermes.** { *; }
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+-keep class com.mrousavy.camera.** { *; }
+-keep class com.facebook.react.** { *; }
+-dontwarn com.mrousavy.camera.**
+-dontwarn com.google.mlkit.**
+-dontnote com.google.mlkit.**

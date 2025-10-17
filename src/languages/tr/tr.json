@@ -1,0 +1,178 @@
+{
+  "translation":{
+    "general": {
+      "updateApp": "Güncelle",
+      "logOut": "Çıkış Yap",
+      "today": "Bugün",
+      "lastAccidentDate": "Son Kaza Tarihi",
+      "passingTime": "Kazasız Gün",
+      "close": "Kapat",
+      "logoutMessage": "Çıkış Yapmak İstediğinize Emin misiniz?",
+      "yes": "Evet",
+      "no": "Hayır"
+    },
+    "loginScreen": {
+      "email": "E-posta",
+      "password": "Şifre",
+      "login": "Giriş Yap",
+      "changePassword": "Şifremi Değiştir",
+      "version": "Versiyon",
+      "message1": "Değerli Çalışanımız",
+      "message2": "Lütfen e-mail adresinizi ve şifrenizi yazarak sisteme giriş yapınız.",
+      "message3": "Şifrenizi unutursanız, TST App -> IT Talep oluştur menüsü altından yeni şifre talep edebilirsiniz."
+    },
+    "safetyControlScreen": {
+      "name": "İsim",
+      "line": "Hat",
+      "area": "Alan",
+      "controlType": "Kontrol Tipi",
+      "accidentType": "Kaza Tipi",
+      "defectType": "Kusur Tipi",
+      "defectDetailsType": "Kusur Detay Tipi",
+      "typeOfActions": "Aksiyonun Tipi",
+      "followUp": "Devam ediyor",
+      "onSiteAction": "Hızlı Aksiyon(Tamamlandı)",
+      "defectDetails": "Kusur Detayı",
+      "potantialMeasure": "Potansiyel Önlem",
+      "create": "Oluştur",
+      "before": "Öncesi",
+      "after": "Sonrası",
+      "pleaseSelect": "Lütfen Seçiniz",
+      "noAccident": "Kazasız",
+      "search": "Arama",
+      "type": "Tip",
+      "cancel": "İptal",
+      "camera": "Kameran Çek",
+      "gallery": "Galeriden Seç",
+      "safetyPatrol": "ISG Takımı Denetim",
+      "safetyCheck": "Güvenlik Kontrolü",
+      "title": "Güvenlik Kontrolü Sonucunu Girin",
+      "pleaseFillAll": "Lütfen Tüm Alanları Doldurunuz.",
+      "error": "Hata",
+      "ok": "Tamam",
+      "info": "Bilgi",
+      "savedSuccesffuly": "Kayıt Başarılı",
+      "errorMessage": "Bir hata ile karşılaşıldı"
+    },
+    "safetyMainScreen": {
+      "message1": "Değerli Çalışanımız",
+      "message2": "Bugünkü sorularınızı aşağıdaki butona tıklayarak cevaplayabilirsiniz.",
+      "monthlyPoint": "Aylık Toplam Puanınız",
+      "ranking":"Sıralamanız",
+      "totalPoint": "Toplam Puanınız",
+      "answerQuestion": "Soruları Cevapla",
+      "completed": "Tamamlandı",
+      "safetyRules": "İSG Kuralları",
+      "safetyInspection": "S.Audit"
+    },
+    "safetyRules": {
+      "workPermit": "Çalışma İzni",
+      "safetyRules": "Güvenlik Kuralı",
+      "fireStudies": "Ateşli Çalışmalar",
+      "height": "Yüksekte Çalışmalar",
+      "indoorStudies": "Kapalı Alan Çalışmaları",
+      "heavyLifting": "Ağır Yük Kaldırma",
+      "onePoint": "Tek Nokta Eğitimi",
+      "safetyVideo": "ISG Videoları"
+    },
+    "itSr":
+    {
+      "request": "Lütfen sorununuzu yazınız",
+      "createITRequest": "IT Talep Oluştur"
+    },
+    "gonuldenScreen": {
+      "message1": "Değerli Çalışanımız",
+      "message2": "Listeden teşekkür etmek istediğiniz kişiyi seçerek teşekkürlerinizi iletebilirsiniz.",
+      "safety": "İş Güvenliği",
+      "ethics": "Etik",
+      "fundamental": "Sağlam Temel",
+      "winWin": "Kazan-Kazan",
+      "creativity": "Yaratıcılık",
+      "safetyMessage": "İnsanlara saygı gösterilmesinde en büyük önceliğin verildiği ve pozisyon sahiplerinin,eylemlere odaklanarak rutin güvenli davranışı teşvik etmede öncülük etmeleri gerektiği anlamına gelir.",
+      "ethicsMessage": "Toplum üyeleri arasında karşılıklı güvene dayalı etik davranışları geliştirmek ve ödül ve ceza ilkesine uymak demektir.",
+      "fundamentalMessage": "Gelecekte daha iyi olabilmek için mevcut durumu güçlendirmek,sürekli öğrenme ile güçlü bir altyapıya sahip olmak demektedir.",
+      "winWinMessage": "Başkalarıyla birlikte düşünmek ve paylaşmak, karşılıklı refah peşinde koşmak ve toplumsal değerler yaratarak sürekli büyümek anlamına gelir.",
+      "creativityMessage": "Açık bir zihinle açık işbirliği yaparak problemleri çözmede başı çekmeyi ifade eder."
+
+    },
+    "safetyDetailsScreen": {
+      "message1": "Değerli Çalışanımız",
+      "message2": "Bugünkü sorularınız aşağıdadır.",
+      "true": "Doğru",
+      "remaining": "Kalan",
+      "false": "Yanlış",
+      "firstQuestion": "1.Sorunun Cevabı",
+      "secondQuestion": "2.Sorunun Cevabı",
+      "thirdQuestion": "3.Sorunun Cevabı",
+      "choice": "Seçenek",
+      "totalPoint": "Toplam Puan",
+      "info": "Bilgilendirme!",
+      "ok": "Tamam"
+    },
+    "foodMenu": {
+      "title": "Yemek Menüsü",
+      "update": "Güncelleniyor...",
+      "updateMessage": "Bu Özellik yakında eklenecektir",
+      "turkishMenu": "Türk Yemekleri Menüsü",
+      "koreanMenu": "Kore Yemekleri Menüsü"
+    },
+    "hrApplications": "İK Uygulamaları",
+    "iTSR": "IT SR Talep",
+    "myMachine": "5S/MM Ligi",
+    "iTAuth": "IT Yetki Talebi",
+    "paperTracking": "Kağıt Takip",
+    "fireEquipment": "Yangın Ekipman Sistemi",
+    "bodyShowerChecklist": "Göz ve Boy Duşları Sistemi",
+    "hr": "İK",
+    "forgotPassword": "Şifremi Unuttum",
+    "goBack": "Geriye Dön",
+    "noDetails": "Detay Bulunamadı",
+    "forgotPasswordMessage": "Şifre sıfırlama linki mail adresinize gönderilmiştir.",
+    "unknownUser": "Kullanıcı Bulunamadı.",
+    "riskLevel": {
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek"
+    },
+    "employeeID": "Sicil No",
+    "employeeIDMessage": "Lütfen geçerli bir sicil numarası giriniz",
+    "requestForklift": "Talep Edilen Forklift",
+    "reservationLine": "Forkliftin İş Göreceği Hat",
+    "request": "Talep Oluştur",
+    "requestReason": "Talep Nedeni",
+    "fireEquipmentScreen": {
+      "title": "Yangın Ekipman Kontrolü",
+      "fireEquipment": "Yangın Ekipmanı",
+      "nozzle": "Nozul",
+        "hose": "Hortum",
+      "cabinet": "Kabin",
+      "valve": "Vana",
+      "body": "Gövde",
+      "submit": "Kaydet",
+      "controller": "Kontrolcü",
+      "location": "Konum",
+      "controlDate": "Kontrol Tarihi",
+      "notQrCode": "QR Kodu Bulunamadı",
+      "waterValve": "Su Vanası Açık mı",
+      "faultyValve": "Arızalı Vana?",
+      "reasonable": "Gideri Uygun mu?",
+      "deformation": "Deforme var mı?",
+      "eyeProtection": "Göz Duşu Koruma Kapağı var mı?"
+    },
+    "itAuth": {
+      "durationErrorMessage": "Maksimum Gün Sayısından Fazla Girilemez. Maksimum Gün",
+      "area": "Alan",
+      "category": "Kategori",
+      "reason": "Sebep",
+      "duration": "Süre",
+      "description": "Nedeninizi Açıklayınız",
+      "createRequest": "Talep Oluştur"
+    },
+    "description": "Açıklama",
+
+  }
+
+
+
+
+}

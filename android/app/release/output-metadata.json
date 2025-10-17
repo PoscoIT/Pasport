@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.tstapp",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 4194340,
+      "versionName": "FatihMehmetCOSKUN",
+      "outputFile": "app-release.apk"
+    }
+  ],
+  "elementType": "File"
+}
