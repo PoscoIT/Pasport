@@ -1,12 +1,11 @@
-import {initializeApp,getApps} from 'firebase/app';
-import { initializeFirestore  } from 'firebase/firestore';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
-import 'firebase/firestore';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+// firebase.js
+import { initializeApp, getApps, getApp } from "@react-native-firebase/app";
+import { getAuth } from "@react-native-firebase/auth";
+import { getDatabase } from "@react-native-firebase/database";
+import { getFirestore } from "@react-native-firebase/firestore";
+import { getMessaging } from "@react-native-firebase/messaging";
 
-
+// Firebase app'ı initialize et (sadece bir kez)
 const firebaseConfig = {
   apiKey: "AIzaSyB5xOYtAleXMTivI0cp7RABtPjuUvSDagA",
   authDomain: "tstappmobil-8edc6.firebaseapp.com",
@@ -15,19 +14,14 @@ const firebaseConfig = {
   storageBucket: "tstappmobil-8edc6.firebasestorage.app",
   messagingSenderId: "998655450144",
   appId: "1:998655450144:web:a6b13101d672a8e7d37045",
-  measurementId: "G-ERC0V98YDJ"
+  measurementId: "G-ERC0V98YDJ",
 };
-let app, auth;
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-if (!getApps().length){
-  app = initializeApp(firebaseConfig);
-  auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage),
-  });
-  initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
-}
+// Modülleri app ile birlikte al
+const auth = getAuth(app);
+const database = getDatabase(app);
+const firestore = getFirestore(app);
+const messaging = getMessaging(app);
 
-
-
-
-export  default  app
+export { app, auth, database, firestore, messaging };

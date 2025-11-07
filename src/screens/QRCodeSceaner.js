@@ -1,20 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {memo, useState} from 'react';
-import {StyleSheet, Text, View, Alert} from 'react-native';
-import Button from '../components/Button';
-import Toast from '../components/Toast';
-import Background_Green from '../components/Background_Green';
-import {InsertNewQrCodeRecord} from '../api/auth-api';
-import {Card, Title, Paragraph} from 'react-native-paper';
+import React, { memo, useState } from "react";
+import { StyleSheet, Text, View, Alert } from "react-native";
+import Button from "../components/Button";
+import Toast from "../components/Toast";
+import Background_Green from "../components/Background_Green";
+import { InsertNewQrCodeRecord } from "../api/auth-api";
 
-const QRCodeSceaner = ({navigation}) => {
-  const [toast, setToast] = useState({value: '', type: ''});
-  const [scan, setScan] = useState({value: false});
-  const [ScanResult, setScanResult] = useState({value: false});
-  const [result, setResult] = useState({value: null});
-  const [scanner, setScanner] = useState({value: ''});
+const QRCodeSceaner = ({ navigation }) => {
+  const [toast, setToast] = useState({ value: "", type: "" });
+  const [scan, setScan] = useState({ value: false });
+  const [ScanResult, setScanResult] = useState({ value: false });
+  const [result, setResult] = useState({ value: null });
+  const [scanner, setScanner] = useState({ value: "" });
   const [loading, setLoading] = useState(false);
-  const [setError] = useState('');
+  const [setError] = useState("");
 
   const onSuccess = (e) => {
     setResult(e);
@@ -40,10 +39,10 @@ const QRCodeSceaner = ({navigation}) => {
       setError(response.error);
     } else {
       Alert.alert(
-        'Kayıt Başarılı',
-        QrCodeNo[{text: 'Button Text', onPress: () => null}],
+        "Kayıt Başarılı",
+        QrCodeNo[{ text: "Button Text", onPress: () => null }]
       );
-      navigation.navigate('Dashboard');
+      navigation.navigate("Dashboard");
     }
     setLoading(false);
     return {};
@@ -52,8 +51,8 @@ const QRCodeSceaner = ({navigation}) => {
   return (
     <Background_Green style={styles.backGround}>
       {ScanResult && !scan && (
-        <View style={{flex: 1, width: '100%'}}>
-          <View style={{flex: 1}}>
+        <View style={{ flex: 1, width: "100%" }}>
+          <View style={{ flex: 1 }}>
             {(() => {
               return (
                 <View>
@@ -66,8 +65,9 @@ const QRCodeSceaner = ({navigation}) => {
                   <Button
                     mode="contained"
                     style={styles.button3}
-                    onPress={() => getSaveQrCode(result.data)}>
-                    {' '}
+                    onPress={() => getSaveQrCode(result.data)}
+                  >
+                    {" "}
                     Servisi Kaydet
                   </Button>
                 </View>
@@ -84,7 +84,7 @@ const QRCodeSceaner = ({navigation}) => {
       <Toast
         type={toast.type}
         message={toast.value}
-        onDismiss={() => setToast({value: '', type: ''})}
+        onDismiss={() => setToast({ value: "", type: "" })}
       />
     </Background_Green>
   );
@@ -92,34 +92,34 @@ const QRCodeSceaner = ({navigation}) => {
 
 const styles = StyleSheet.create({
   back: {
-    width: '100%',
+    width: "100%",
     fontSize: 15,
     padding: 10,
   },
   button3: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   label3: {
-    color: 'black',
+    color: "black",
     fontSize: 15,
-    alignSelf: 'center',
-    width: '100%',
-    justifyContent: 'center',
-    textAlign: 'center',
+    alignSelf: "center",
+    width: "100%",
+    justifyContent: "center",
+    textAlign: "center",
   },
   cameraStyle: {
     height: 200,
     marginTop: 40,
     width: 200,
-    alignSelf: 'center',
-    justifyContent: 'center',
+    alignSelf: "center",
+    justifyContent: "center",
   },
   cardStyle: {
     height: 75,
-    backgroundColor: 'transparent',
-    width: '100%',
+    backgroundColor: "transparent",
+    width: "100%",
   },
 });
 

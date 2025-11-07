@@ -1,29 +1,28 @@
 /* eslint-disable prettier/prettier */
-import React, {memo, useState} from 'react';
-import {StyleSheet, Dimensions} from 'react-native';
-import 'firebase/auth';
-import firebase from 'firebase/compat/app';
-import Background_Green from '../components/Background_Green';
-import {Card, Paragraph, Title, Button} from 'react-native-paper';
-import {getTitleStatus} from '../api/auth-api';
-import {getAuth} from "firebase/auth";
+import React, { memo, useState } from "react";
+import { StyleSheet, Dimensions } from "react-native";
+import Background_Green from "../components/Background_Green";
+import { Card, Text, Button } from "react-native-paper";
+import { getTitleStatus } from "../api/auth-api";
+import { onAuthStateChanged } from "@react-native-firebase/auth";
 
-var width = Dimensions.get('window').width; //full width
+var width = Dimensions.get("window").width; //full width
 
-const DashboardAward = ({navigation}) => {
-  const [titleStatus, setTitleStatus] = useState('');
-  const [cardStatus, setCardStatus] = useState('');
-  const [eliteStatus, setEliteStatus] = useState('');
-  const [prestigeStatus, setPrestigeStatus] = useState('');
-  const [premiumStatus, setPremiumStatus] = useState('');
-  const [starStatus, setStarStatus] = useState('');
-  const [EliteCountweekAgoRandom, setEliteCountweekAgoRandom] = useState('');
-  const [PrestigeCountweekAgoRandom, setPrestigeCountweekAgoRandom] = useState('');
-  const [PremiumCountweekAgoRandom, setPremiumCountweekAgoRandom] = useState('');
-  const [StarCountweekAgoRandom, setStarCountweekAgoRandom] = useState('');
-  const auth = getAuth()
+const DashboardAward = ({ navigation }) => {
+  const [titleStatus, setTitleStatus] = useState("");
+  const [cardStatus, setCardStatus] = useState("");
+  const [eliteStatus, setEliteStatus] = useState("");
+  const [prestigeStatus, setPrestigeStatus] = useState("");
+  const [premiumStatus, setPremiumStatus] = useState("");
+  const [starStatus, setStarStatus] = useState("");
+  const [EliteCountweekAgoRandom, setEliteCountweekAgoRandom] = useState("");
+  const [PrestigeCountweekAgoRandom, setPrestigeCountweekAgoRandom] =
+    useState("");
+  const [PremiumCountweekAgoRandom, setPremiumCountweekAgoRandom] =
+    useState("");
+  const [StarCountweekAgoRandom, setStarCountweekAgoRandom] = useState("");
 
-  auth.onAuthStateChanged(async (user) => {
+  onAuthStateChanged(async (user) => {
     if (user) {
       getTitleStatus((responsed) => {
         setCardStatus(responsed.cardStatus);
@@ -44,22 +43,24 @@ const DashboardAward = ({navigation}) => {
       {titleStatus == 1 && (
         <Card style={styles.cardStyle}>
           <Card.Content>
-            <Title>Dear Manager,</Title>
-            <Paragraph>You have,</Paragraph>
-            <Paragraph>{eliteStatus} pcs Elite-Card,</Paragraph>
-            <Paragraph>{prestigeStatus} pcs Prestige-Card,</Paragraph>
-            <Paragraph>{premiumStatus} pcs Premium Card,</Paragraph>
-            <Paragraph>{starStatus} pcs Star Card.</Paragraph>
+            <Text variant="titleLarge">Dear Manager,</Text>
+            <Text variant="bodyMedium">You have,</Text>
+            <Text variant="bodyMedium">{eliteStatus} pcs Elite-Card,</Text>
+            <Text variant="bodyMedium">
+              {prestigeStatus} pcs Prestige-Card,
+            </Text>
+            <Text variant="bodyMedium">{premiumStatus} pcs Premium Card,</Text>
+            <Text variant="bodyMedium">{starStatus} pcs Star Card.</Text>
           </Card.Content>
         </Card>
       )}
       {(titleStatus == 2 || titleStatus == undefined) && (
         <Card style={styles.cardStyleEmp}>
           <Card.Content>
-            <Title>Değerli Çalışanımız,</Title>
-            <Paragraph>
+            <Text variant="titleLarge">Değerli Çalışanımız,</Text>
+            <Text variant="bodyMedium">
               Aşağıda yer alan seçeneklerden ödülünüzü seçebilirsiniz.
-            </Paragraph>
+            </Text>
           </Card.Content>
         </Card>
       )}
@@ -70,8 +71,9 @@ const DashboardAward = ({navigation}) => {
           disabled={eliteStatus < 1 || eliteStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SendGift', {appHead: 'EliteCount'})
-          }>
+            navigation.navigate("SendGift", { appHead: "EliteCount" })
+          }
+        >
           Give an award (Elite Card) ({eliteStatus})
         </Button>
       )}
@@ -82,8 +84,12 @@ const DashboardAward = ({navigation}) => {
           disabled={eliteStatus < 1 || eliteStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SelectGift', {appHead: 'EliteCount', appCardKey: EliteCountweekAgoRandom})
-          }>
+            navigation.navigate("SelectGift", {
+              appHead: "EliteCount",
+              appCardKey: EliteCountweekAgoRandom,
+            })
+          }
+        >
           Select a Gift (Elite Card) ({eliteStatus})
         </Button>
       )}
@@ -94,8 +100,9 @@ const DashboardAward = ({navigation}) => {
           disabled={prestigeStatus < 1 || prestigeStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SendGift', {appHead: 'PrestigeCount'})
-          }>
+            navigation.navigate("SendGift", { appHead: "PrestigeCount" })
+          }
+        >
           Give an award (Prestige Card) ({prestigeStatus})
         </Button>
       )}
@@ -106,8 +113,12 @@ const DashboardAward = ({navigation}) => {
           disabled={prestigeStatus < 1 || prestigeStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SelectGift', {appHead: 'PrestigeCount', appCardKey: PrestigeCountweekAgoRandom})
-          }>
+            navigation.navigate("SelectGift", {
+              appHead: "PrestigeCount",
+              appCardKey: PrestigeCountweekAgoRandom,
+            })
+          }
+        >
           Select a Gift (Prestige Card) ({prestigeStatus})
         </Button>
       )}
@@ -118,8 +129,9 @@ const DashboardAward = ({navigation}) => {
           disabled={premiumStatus < 1 || premiumStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SendGift', {appHead: 'PremiumCount'})
-          }>
+            navigation.navigate("SendGift", { appHead: "PremiumCount" })
+          }
+        >
           Give an award (Premium Card) ({premiumStatus})
         </Button>
       )}
@@ -130,8 +142,12 @@ const DashboardAward = ({navigation}) => {
           disabled={premiumStatus < 1 || premiumStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SelectGift', {appHead: 'PremiumCount', appCardKey: PremiumCountweekAgoRandom})
-          }>
+            navigation.navigate("SelectGift", {
+              appHead: "PremiumCount",
+              appCardKey: PremiumCountweekAgoRandom,
+            })
+          }
+        >
           Select a Gift (Premium Card) ({premiumStatus})
         </Button>
       )}
@@ -142,8 +158,9 @@ const DashboardAward = ({navigation}) => {
           disabled={starStatus < 1 || starStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SendGift', {appHead: 'StarCount'})
-          }>
+            navigation.navigate("SendGift", { appHead: "StarCount" })
+          }
+        >
           Give an award (TST-Star Card) ({starStatus})
         </Button>
       )}
@@ -154,8 +171,12 @@ const DashboardAward = ({navigation}) => {
           disabled={starStatus < 1 || starStatus === undefined}
           style={styles.button}
           onPress={() =>
-            navigation.navigate('SelectGift', {appHead: 'StarCount', appCardKey: StarCountweekAgoRandom})
-          }>
+            navigation.navigate("SelectGift", {
+              appHead: "StarCount",
+              appCardKey: StarCountweekAgoRandom,
+            })
+          }
+        >
           Select a Gift (TST-Star Card) ({starStatus})
         </Button>
       )}
@@ -164,9 +185,8 @@ const DashboardAward = ({navigation}) => {
           icon="gift"
           mode="contained"
           style={styles.button}
-          onPress={() =>
-            navigation.navigate('ShowOldRecord')
-          }>
+          onPress={() => navigation.navigate("ShowOldRecord")}
+        >
           Show old records
         </Button>
       )}
@@ -177,13 +197,13 @@ const DashboardAward = ({navigation}) => {
 const styles = StyleSheet.create({
   cardStyle: {
     height: 180,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginTop: 10,
     width: width - 10,
   },
   cardStyleEmp: {
     height: 110,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginTop: 10,
     width: width - 10,
   },
@@ -191,8 +211,8 @@ const styles = StyleSheet.create({
     margin: 10,
     width: width - 30,
     height: 50,
-    alignSelf: 'center',
-    justifyContent: 'center',
+    alignSelf: "center",
+    justifyContent: "center",
   },
 });
 

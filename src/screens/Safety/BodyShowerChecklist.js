@@ -299,7 +299,7 @@ const BodyShowerChecklist = () => {
           marginVertical: 10,
         }}
       >
-        <Card.Title title="Ekipman Numarası:" subtitle={item.Location} />
+        <Text title="Ekipman Numarası:" subtitle={item.Location} />
         <Card.Content>
           <Text style={styles.title}>
             {t("fireEquipmentScreen.waterValve")}{" "}

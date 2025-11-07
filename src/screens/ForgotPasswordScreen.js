@@ -1,24 +1,29 @@
 import {
   Alert,
   Dimensions,
-  SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button, Card, Paragraph, Title } from "react-native-paper";
+import { Button, Card, Text } from "react-native-paper";
+
 import { t } from "i18next";
 import TextInput from "../components/TextInput";
 import { useState } from "react";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail } from "@react-native-firebase/auth";
+import { auth } from "../database/firebaseDB";
 
 const { width, height } = Dimensions.get("window");
 const ForgotPasswordScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
-  const auth = getAuth();
+
+  // Değiştirildi: getAuth() satırı kaldırıldı, RNF'de buna gerek yok.
+  // const auth = getAuth();
+
   const [email, setEmail] = useState({ value: "", error: "" });
+
   const triggerResetEmail = async () => {
+    // Değiştirildi: sendPasswordResetEmail(auth, ...) yerine auth().sendPasswordResetEmail(...)
     await sendPasswordResetEmail(auth, email.value)
       .then(() => {
         Alert.alert(t("forgotPasswordMessage"));
@@ -30,13 +35,13 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeAreaStyle}>
+    <View style={styles.safeAreaStyle}>
       {!loading && (
         <View>
           <Card style={[styles.cardStyle]}>
             <Card.Content>
-              <Title>{t("loginScreen.message1")},</Title>
-              <Paragraph>{t("loginScreen.message2")}</Paragraph>
+              <Text variant="titleLarge">{t("loginScreen.message1")}</Text>
+              <Text variant="bodyMedium">{t("loginScreen.message2")}</Text>
             </Card.Content>
           </Card>
           <View>
@@ -102,7 +107,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 const styles = StyleSheet.create({

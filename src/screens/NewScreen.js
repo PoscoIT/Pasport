@@ -1,40 +1,51 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Linking, Dimensions } from "react-native";
+
 import {
-  StyleSheet,
-  View,
-  Linking,
-  Dimensions,
-  SafeAreaView,
-} from "react-native";
-import {
-  Avatar,
-  Icon,
   MenuItem,
   OverflowMenu,
-  Text,
   TopNavigation,
   TopNavigationAction,
 } from "@ui-kitten/components";
-import "firebase/auth";
-import firebase from "firebase/compat/app";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
 import { getVersionNo, sendUserInfoName } from "../api/auth-api";
-import { getAuth } from "firebase/auth";
-import { useAuth } from "../hooks/useAuth";
+
 import { t } from "i18next";
-const MenuIcon = (props) => <Icon {...props} name="more-vertical" />;
+import { signOut } from "@react-native-firebase/auth";
+const MenuIcon = (props) => (
+  <MaterialCommunityIcons
+    name="dots-vertical" // "more-vertical" yerine MaterialCommunityIcons karşılığı
+    size={props.size || 24}
+    color={props.color || "black"}
+  />
+);
 
-const InfoIcon = (props) => <Icon {...props} name="info" />;
+// Info icon
+const InfoIcon = (props) => (
+  <MaterialCommunityIcons
+    name="information" // "info" yerine karşılık
+    size={props.size || 24}
+    color={props.color || "black"}
+  />
+);
 
-const LogoutIcon = (props) => <Icon {...props} name="log-out" />;
+// Logout icon
+const LogoutIcon = (props) => (
+  <MaterialCommunityIcons
+    name="logout" // "log-out" yerine karşılık
+    size={props.size || 24}
+    color={props.color || "black"}
+  />
+);
 
 let width = Dimensions.get("window").width; //full width
 let height = Dimensions.get("window").height; //full width
 
 const logoutUser = (companyCode) => {
-  const auth = getAuth();
   if (companyCode === "TST") {
-    auth.signOut();
+    signOut();
   }
 };
 
@@ -97,7 +108,7 @@ export const TopNavigationImageTitleShowcase = (navigation) => {
     }, []);
 
     return (
-      <SafeAreaView style={styles.titleContainer}>
+      <View style={styles.titleContainer}>
         {/* <Text
           style={{
             fontWeight: '600',
@@ -106,7 +117,7 @@ export const TopNavigationImageTitleShowcase = (navigation) => {
           }}>
           {title} Safety App
         </Text>*/}
-      </SafeAreaView>
+      </View>
     );
   };
 

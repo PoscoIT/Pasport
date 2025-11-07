@@ -1,8 +1,7 @@
-import {createStackNavigator} from '@react-navigation/stack';
-import DashboardAward from '../screens/DashboardAward';
-import SendGift from '../screens/SendGift';
-import SelectGift from '../screens/SelectGift';
-import ShowOldRecord from '../screens/ShowOldRecord';
+import { createStackNavigator } from "@react-navigation/stack";
+import DashboardAward from "../screens/DashboardAward";
+import SendGift from "../screens/SendGift";
+import SelectGift from "../screens/SelectGift";
 
 const AwardStack = () => {
   const Stack = createStackNavigator();
@@ -11,7 +10,8 @@ const AwardStack = () => {
       initialRouteName="DashboardAward"
       screenOptions={{
         headerShown: false,
-      }}>
+      }}
+    >
       <Stack.Screen name="DashboardAward" component={DashboardAward} />
       <Stack.Screen name="SendGift" component={SendGift} />
 

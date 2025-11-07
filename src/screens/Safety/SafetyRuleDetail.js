@@ -1,52 +1,37 @@
-import React, {memo, useEffect, useMemo, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  FlatList,
-  ActivityIndicator, TouchableOpacity,
-} from 'react-native';
-import 'firebase/auth';
-import Background_Green from '../../components/BackgroundGradient';
-import {Dimensions, Platform} from 'react-native';
-import {Card, Paragraph, Avatar, List} from 'react-native-paper';
-import {Toggle} from '@ui-kitten/components';
-import Button from '../../components/Button';
-import {InsertSafetyRuleCheck, sendUserInfoName} from '../../api/auth-api';
-import {getAuth} from 'firebase/auth';
-import {
-  getDatabase,
-  limitToFirst,
-  limitToLast,
-  onValue,
-  orderByChild,
-  query,
-  ref,
-  update,
-} from 'firebase/database';
-import firebaseDB from '../../database/firebaseDB';
-import VideoModal from '../../components/VideoModal';
-import {t} from "i18next";
+/* eslint-disable no-alert */
+import React, { memo, useEffect, useState } from "react";
+import { StyleSheet, View, ScrollView } from "react-native";
+import Background_Green from "../../components/BackgroundGradient";
+import { Dimensions, Platform } from "react-native";
+import { Card, Text, List } from "react-native-paper";
+import { Toggle } from "@ui-kitten/components";
+import Button from "../../components/Button";
+import { InsertSafetyRuleCheck, sendUserInfoName } from "../../api/auth-api";
+import { auth, database } from "../../database/firebaseDB";
+
+import { t } from "i18next";
 
 const Separator = () => <View style={styles.separator} />;
 
-let width = Dimensions.get('window').width; //full width
-let height = Dimensions.get('window').height; //full width
+let width = Dimensions.get("window").width; //full width
+let height = Dimensions.get("window").height; //full width
 
-const SafetyRuleDetail = ({route: {params}, navigation}) => {
-  const db = getDatabase(firebaseDB);
-  const auth = getAuth();
+const SafetyRuleDetail = ({ route: { params }, navigation }) => {
+  // Değiştirildi: `db` ve `auth` tanımlamaları kaldırıldı, servisler doğrudan kullanılacak
+  // const db = getDatabase(firebaseDB);
+  // const auth = getAuth();
+
+  // Değiştirildi: auth() servisi doğrudan çağrıldı
   let user = auth.currentUser;
-  const isUserPoscoAssanUser = user.email.includes('@poscoassan.com');
+  const isUserPoscoAssanUser = user.email.includes("@poscoassan.com");
 
   const [poscoAssanAccidentDate, setPoscoAssanAccidentDate] =
-    useState('2020-11-13');
+    useState("2020-11-13");
   const [poscoTnpcAccidentDate, setPoscoTnpcAccidentDate] =
-    useState('2022-09-05');
+    useState("2022-09-05");
 
   let d1 = new Date(
-    isUserPoscoAssanUser ? poscoAssanAccidentDate : poscoTnpcAccidentDate,
+    isUserPoscoAssanUser ? poscoAssanAccidentDate : poscoTnpcAccidentDate
   );
   let t1 = d1.getTime();
   let d2 = new Date();
@@ -55,10 +40,10 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
   let today = new Date();
 
   let date =
-    ('0' + today.getDate()).slice(-2) +
-    '.' +
-    ('0' + (today.getMonth() + 1)).slice(-2) +
-    '.' +
+    ("0" + today.getDate()).slice(-2) +
+    "." +
+    ("0" + (today.getMonth() + 1)).slice(-2) +
+    "." +
     today.getFullYear();
   const [listeMulti, setListeMulti] = useState([]);
   const [listeMulti2, setListeMulti2] = useState([]);
@@ -71,50 +56,50 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
   const [firstInitial, setFirstInitial] = useState(0);
   const [limit, setLimit] = useState(1);
   let liMulti = [];
-  const imageSize = Dimensions.get('window').width / 2 - 15;
+  const imageSize = Dimensions.get("window").width / 2 - 15;
 
   if (user) {
     if (user != null) {
       var uid = user.uid;
-      var uid = user.uid;
+      // var uid = user.uid; // Bu satır gereksizdi, kaldırdım
       var uemail = user.email;
     }
   }
   let todayFull = new Date();
-  let dd = String(today.getDate()).padStart(2, '0');
-  let mm = String(today.getMonth() + 1).padStart(2, '0');
-  let hours = String(today.getHours()).padStart(2, '0');
-  let min = String(today.getMinutes()).padStart(2, '0');
-  let sec = String(today.getSeconds()).padStart(2, '0');
+  let dd = String(today.getDate()).padStart(2, "0");
+  let mm = String(today.getMonth() + 1).padStart(2, "0");
+  let hours = String(today.getHours()).padStart(2, "0");
+  let min = String(today.getMinutes()).padStart(2, "0");
+  let sec = String(today.getSeconds()).padStart(2, "0");
   let yyyy = today.getFullYear();
-  today = mm + '-' + dd + '-' + yyyy;
-  todayFull = hours + ':' + min + ':' + sec + '  ' + dd + '-' + mm + '-' + yyyy;
+  today = mm + "-" + dd + "-" + yyyy;
+  todayFull = hours + ":" + min + ":" + sec + "  " + dd + "-" + mm + "-" + yyyy;
 
   const getAccidentDate = async () => {
-    onValue(ref(db, 'tstapp/'), snapshot => {
-      const {version} = snapshot.val();
+    database.ref("tstapp/").on("value", (snapshot) => {
+      const { version } = snapshot.val();
       setPoscoAssanAccidentDate(version.AccidentDate);
       setPoscoTnpcAccidentDate(version.AccidentDate_Tnpc);
     });
   };
 
-  sendUserInfoName(async sendResponse => {
-    const dbSafetyDb = isUserPoscoAssanUser ? 'SafetyDB/' : 'SafetyDBTnpc/';
-    await update(
-      ref(
-        db,
+  sendUserInfoName(async (sendResponse) => {
+    const dbSafetyDb = isUserPoscoAssanUser ? "SafetyDB/" : "SafetyDBTnpc/";
+
+    await database
+      .ref(
         dbSafetyDb +
           yyyy +
-          '_' +
+          "_" +
           mm +
-          '_' +
+          "_" +
           dd +
-          '/' +
+          "/" +
           sendResponse.empSicil +
-          '/' +
-          params.appHead,
-      ),
-      {
+          "/" +
+          params.appHead
+      )
+      .update({
         relatedDate: today,
         insertedDateTime: todayFull,
         fromMail: uemail,
@@ -123,29 +108,28 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
         fromUname: sendResponse.uname,
         fromSicilNo: sendResponse.empSicil,
         fromLine: sendResponse.line,
-        page: 'SafetyDashBoard',
+        page: "SafetyDashBoard",
         appHead: params.appHead,
-      },
-    );
+      });
   });
 
-  sendUserInfoName(async sendResponse => {
-    const dbSafetyDb2 = isUserPoscoAssanUser ? 'SafetyDB2/' : 'SafetyDB2Tnpc/';
-    await update(
-      ref(
-        db,
+  sendUserInfoName(async (sendResponse) => {
+    const dbSafetyDb2 = isUserPoscoAssanUser ? "SafetyDB2/" : "SafetyDB2Tnpc/";
+
+    await database
+      .ref(
         dbSafetyDb2 +
           yyyy +
-          '_' +
+          "_" +
           mm +
-          '_' +
+          "_" +
           dd +
-          '/' +
+          "/" +
           params.appHead +
-          '/' +
-          sendResponse.empSicil,
-      ),
-      {
+          "/" +
+          sendResponse.empSicil
+      )
+      .update({
         relatedDate: today,
         insertedDateTime: todayFull,
         fromMail: uemail,
@@ -154,10 +138,9 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
         fromUname: sendResponse.uname,
         fromSicilNo: sendResponse.empSicil,
         fromLine: sendResponse.line,
-        page: 'SafetyDashBoard',
+        page: "SafetyDashBoard",
         appHead: params.appHead,
-      },
-    );
+      });
   });
 
   const imageStyle = {
@@ -165,12 +148,12 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
     height: height / 10,
     padding: 4,
     margin: 4,
-    flexDirection: 'row',
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 4},
+    flexDirection: "row",
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
-    backgroundColor: 'rgba(179,211,215,0.49)',
+    backgroundColor: "rgba(179,211,215,0.49)",
     flex: 1,
   };
 
@@ -180,140 +163,140 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
     }
     setLoading(true);
 
-    if (listeMulti.Content0 !== undefined && listeMulti.Content0 !== '') {
+    if (listeMulti.Content0 !== undefined && listeMulti.Content0 !== "") {
       if (ListeSemihMulti != null) {
-        if (listeMulti.Content0 != '') {
+        if (listeMulti.Content0 != "") {
           if (ListeSemihMulti.ch0 != undefined) {
             if (ListeSemihMulti.ch0 != true) {
-              alert('1. Checklisti doldurmanız gerekiyor!');
+              alert("1. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('1. Checklisti doldurmanız gerekiyor!');
+            alert("1. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content1 != '') {
+        if (listeMulti.Content1 != "") {
           if (ListeSemihMulti.ch1 != undefined) {
             if (ListeSemihMulti.ch1 != true) {
-              alert('2. Checklisti doldurmanız gerekiyor!');
+              alert("2. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('2. Checklisti doldurmanız gerekiyor!');
+            alert("2. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content2 != '') {
+        if (listeMulti.Content2 != "") {
           if (ListeSemihMulti.ch2 != undefined) {
             if (ListeSemihMulti.ch2 != true) {
-              alert('3. Checklisti doldurmanız gerekiyor!');
+              alert("3. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('3. Checklisti doldurmanız gerekiyor!');
+            alert("3. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content3 != '') {
+        if (listeMulti.Content3 != "") {
           if (ListeSemihMulti.ch3 != undefined) {
             if (ListeSemihMulti.ch3 != true) {
-              alert('4. Checklisti doldurmanız gerekiyor!');
+              alert("4. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('4. Checklisti doldurmanız gerekiyor!');
+            alert("4. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content4 != '') {
+        if (listeMulti.Content4 != "") {
           if (ListeSemihMulti.ch4 != undefined) {
             if (ListeSemihMulti.ch4 != true) {
-              alert('5. Checklisti doldurmanız gerekiyor!');
+              alert("5. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('5. Checklisti doldurmanız gerekiyor!');
+            alert("5. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content5 != '') {
+        if (listeMulti.Content5 != "") {
           if (ListeSemihMulti.ch5 != undefined) {
             if (ListeSemihMulti.ch5 != true) {
-              alert('6. Checklisti doldurmanız gerekiyor!');
+              alert("6. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('6. Checklisti doldurmanız gerekiyor!');
+            alert("6. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content6 != '') {
+        if (listeMulti.Content6 != "") {
           if (ListeSemihMulti.ch6 != undefined) {
             if (ListeSemihMulti.ch6 != true) {
-              alert('7. Checklisti doldurmanız gerekiyor!');
+              alert("7. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('7. Checklisti doldurmanız gerekiyor!');
+            alert("7. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content7 != '') {
+        if (listeMulti.Content7 != "") {
           if (ListeSemihMulti.ch7 != undefined) {
             if (ListeSemihMulti.ch7 != true) {
-              alert('8. Checklisti doldurmanız gerekiyor!');
+              alert("8. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('8. Checklisti doldurmanız gerekiyor!');
+            alert("8. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content8 != '') {
+        if (listeMulti.Content8 != "") {
           if (ListeSemihMulti.ch8 != undefined) {
             if (ListeSemihMulti.ch8 != true) {
-              alert('9. Checklisti doldurmanız gerekiyor!');
+              alert("9. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('9. Checklisti doldurmanız gerekiyor!');
+            alert("9. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
-        if (listeMulti.Content9 != '') {
+        if (listeMulti.Content9 != "") {
           if (ListeSemihMulti.ch9 != undefined) {
             if (ListeSemihMulti.ch9 != true) {
-              alert('10. Checklisti doldurmanız gerekiyor!');
+              alert("10. Checklisti doldurmanız gerekiyor!");
               setLoading(false);
               return;
             }
           } else {
-            alert('10. Checklisti doldurmanız gerekiyor!');
+            alert("10. Checklisti doldurmanız gerekiyor!");
             setLoading(false);
             return;
           }
         }
       } else {
-        alert('Checklisti doldurmanız gerekiyor!');
+        alert("Checklisti doldurmanız gerekiyor!");
         setLoading(false);
         return;
       }
@@ -321,169 +304,167 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
 
     const response = await InsertSafetyRuleCheck({
       ch0:
-        listeMulti.Content0 !== undefined && listeMulti.Content0 !== ''
+        listeMulti.Content0 !== undefined && listeMulti.Content0 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch0 != undefined
               ? ListeSemihMulti.ch0
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch1:
-        listeMulti.Content1 !== undefined && listeMulti.Content1 !== ''
+        listeMulti.Content1 !== undefined && listeMulti.Content1 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch1 != undefined
               ? ListeSemihMulti.ch1
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch2:
-        listeMulti.Content2 !== undefined && listeMulti.Content2 !== ''
+        listeMulti.Content2 !== undefined && listeMulti.Content2 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch2 != undefined
               ? ListeSemihMulti.ch2
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch3:
-        listeMulti.Content3 !== undefined && listeMulti.Content3 !== ''
+        listeMulti.Content3 !== undefined && listeMulti.Content3 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch3 != undefined
               ? ListeSemihMulti.ch3
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch4:
-        listeMulti.Content4 !== undefined && listeMulti.Content4 !== ''
+        listeMulti.Content4 !== undefined && listeMulti.Content4 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch4 != undefined
               ? ListeSemihMulti.ch4
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch5:
-        listeMulti.Content5 !== undefined && listeMulti.Content5 !== ''
+        listeMulti.Content5 !== undefined && listeMulti.Content5 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch5 != undefined
               ? ListeSemihMulti.ch5
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch6:
-        listeMulti.Content6 !== undefined && listeMulti.Content6 !== ''
+        listeMulti.Content6 !== undefined && listeMulti.Content6 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch6 != undefined
               ? ListeSemihMulti.ch6
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch7:
-        listeMulti.Content7 !== undefined && listeMulti.Content7 !== ''
+        listeMulti.Content7 !== undefined && listeMulti.Content7 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch7 != undefined
               ? ListeSemihMulti.ch7
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch8:
-        listeMulti.Content8 !== undefined && listeMulti.Content8 !== ''
+        listeMulti.Content8 !== undefined && listeMulti.Content8 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch8 != undefined
               ? ListeSemihMulti.ch8
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       ch9:
-        listeMulti.Content9 !== undefined && listeMulti.Content9 !== ''
+        listeMulti.Content9 !== undefined && listeMulti.Content9 !== ""
           ? ListeSemihMulti != undefined
             ? ListeSemihMulti.ch9 != undefined
               ? ListeSemihMulti.ch9
               : false
             : false
-          : 'Not Found',
+          : "Not Found",
       appHead: params.appHead,
       appDate: params.appDate,
       endDate: today,
     });
     if (response.error) {
-      setError(response.error);
+      // setError(response.error); // setError tanımlı değil, yorum satırı yaptım
     } else {
-      alert('Kayıt başarılı.');
+      alert("Kayıt başarılı.");
     }
     setLoading(false);
-    navigation.navigate('SafetyRules');
+    navigation.navigate("SafetyRules");
   };
 
   const getQuestions = async () => {
     var today = new Date();
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
-    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, "0");
+    var dd = String(today.getDate()).padStart(2, "0");
     var yyyy = today.getFullYear();
     if (loading) {
       return;
     }
     setLoading(true);
     const dbNameSafetyRules = isUserPoscoAssanUser
-      ? 'SafetyRules/'
-      : 'SafetyRulesTNPC/';
+      ? "SafetyRules/"
+      : "SafetyRulesTNPC/";
     const dbSafetyRuleResult = isUserPoscoAssanUser
-      ? 'SafetyRuleResult/TST/'
-      : 'SafetyRuleResult/TNPC/';
-    await onValue(
-      query(ref(db, dbNameSafetyRules + params.appHead)),
-      snapshot => {
-        snapshot = snapshot.val();
-        setListeMulti(snapshot);
-        let objectValue = Object.entries(snapshot);
-        setFirebaseDataData(objectValue);
+      ? "SafetyRuleResult/TST/"
+      : "SafetyRuleResult/TNPC/";
 
-        objectValue
-          .filter(([key, value]) => key.includes('Content'))
-          .slice(firstInitial, finalInitial)
-          .map((item, index) => {
-            const {insertDate, summary, summaryColor, titleColor, uriList} =
-              item[1];
-            let uriList2 = uriList?.split(',');
+    const snapshot = await database
+      .ref(dbNameSafetyRules + params.appHead)
+      .once("value");
 
-            uriList2?.map((item, index2) => {
-              liMulti.push({
-                insertDate: insertDate,
-                summary: summary,
-                summaryColor: summaryColor,
-                titleColor: titleColor,
-                source: {
-                  uri: item,
-                },
-              });
-            });
-          });
-        setListeMulti2(liMulti);
+    let snapshotVal = snapshot.val();
+    setListeMulti(snapshotVal);
+    let objectValue = Object.entries(snapshotVal);
+    setFirebaseDataData(objectValue);
 
-        sendUserInfoName(async sendResponse => {
-          await onValue(
-            ref(
-              db,
-              dbSafetyRuleResult +
-                yyyy +
-                '_' +
-                mm +
-                '_' +
-                dd +
-                '/' +
-                sendResponse.empSicil +
-                '/' +
-                params.appHead +
-                '/',
-            ),
-            snapshote => {
-              snapshote = snapshote.val();
-              setListeSemihMulti(snapshote);
-              setLoading(false);
-              return loading;
+    objectValue
+      .filter(([key, value]) => key.includes("Content"))
+      .slice(firstInitial, finalInitial)
+      .map((item, index) => {
+        const { insertDate, summary, summaryColor, titleColor, uriList } =
+          item[1];
+        let uriList2 = uriList?.split(",");
+
+        uriList2?.map((item, index2) => {
+          liMulti.push({
+            insertDate: insertDate,
+            summary: summary,
+            summaryColor: summaryColor,
+            titleColor: titleColor,
+            source: {
+              uri: item,
             },
-          );
+          });
         });
-      },
-    );
+      });
+    setListeMulti2(liMulti);
+
+    await sendUserInfoName(async (sendResponse) => {
+      const snapshote = await database
+        .ref(
+          dbSafetyRuleResult +
+            yyyy +
+            "_" +
+            mm +
+            "_" +
+            dd +
+            "/" +
+            sendResponse.empSicil +
+            "/" +
+            params.appHead +
+            "/"
+        )
+        .once("value");
+
+      let snapshoteVal = snapshote.val();
+      setListeSemihMulti(snapshoteVal);
+      setLoading(false);
+      return loading;
+    });
   };
 
   useEffect(() => {
@@ -498,159 +479,180 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
   }, []);
 
   return (
-
     <Background_Green>
       <ScrollView nestedScrollEnabled={true}>
-
-
-      <View style={styles.container}>
-        <Card style={[styles.cardStyle, {backgroundColor: 'BLUE'}]}>
-          <Card.Content>
-            <View style={{flexDirection: 'row'}}>
-              <View style={{width: width / 2}}>
-                <View>
-                  <Paragraph
-                    style={{
-                      color: '#333',
-                      fontWeight: '600',
-                      fontSize: width / 22,
-                      padding: 5,
-                    }}>
-                    {t("general.today")}:
-                  </Paragraph>
+        <View style={styles.container}>
+          <Card style={[styles.cardStyle, { backgroundColor: "BLUE" }]}>
+            <Card.Content>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ width: width / 2 }}>
+                  <View>
+                    <Text
+                      style={{
+                        color: "#333",
+                        fontWeight: "600",
+                        fontSize: width / 22,
+                        padding: 5,
+                      }}
+                    >
+                      {t("general.today")}:
+                    </Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        color: "#333",
+                        fontWeight: "600",
+                        fontSize: width / 22,
+                        padding: 5,
+                      }}
+                    >
+                      {t("general.lastAccidentDate")}:
+                    </Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        color: "#333",
+                        fontWeight: "600",
+                        fontSize: width / 22,
+                        padding: 5,
+                      }}
+                    >
+                      {t("general.passingTime")}:
+                    </Text>
+                  </View>
                 </View>
-                <View>
-                  <Paragraph
-                    style={{
-                      color: '#333',
-                      fontWeight: '600',
-                      fontSize: width / 22,
-                      padding: 5,
-                    }}>
-                    {t("general.lastAccidentDate")}:
-                  </Paragraph>
-                </View>
-                <View>
-                  <Paragraph
-                    style={{
-                      color: '#333',
-                      fontWeight: '600',
-                      fontSize: width / 22,
-                      padding: 5,
-                    }}>
-                    {t("general.passingTime")}:
-                  </Paragraph>
+                <View
+                  style={{
+                    width: width / 2 - 40,
+                    alignItems: "flex-end",
+                    alignContent: "flex-end",
+                    left: 0,
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={{
+                        color: "#333",
+                        fontWeight: "600",
+                        fontSize: width / 22,
+                        textAlign: "right",
+                        padding: 5,
+                      }}
+                    >
+                      {date}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        color: "#333",
+                        fontWeight: "600",
+                        fontSize: width / 22,
+                        textAlign: "right",
+                        padding: 5,
+                      }}
+                    >
+                      {isUserPoscoAssanUser
+                        ? poscoAssanAccidentDate.split("-").reverse().join(".")
+                        : poscoTnpcAccidentDate.split("-").reverse().join(".")}
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: "row" }}>
+                    {lastInDate
+                      ? lastInDate
+                          ?.toString()
+                          ?.split("")
+                          ?.map((item, index) => (
+                            <View style={{ width: width / 8 }} key={index}>
+                              <Text style={styles.paragCounter}>{item}</Text>
+                            </View>
+                          ))
+                      : null}
+                  </View>
                 </View>
               </View>
-              <View
-                style={{
-                  width: width / 2 - 40,
-                  alignItems: 'flex-end',
-                  alignContent: 'flex-end',
-                  left: 0,
-                }}>
-                <View>
-                  <Paragraph
-                    style={{
-                      color: '#333',
-                      fontWeight: '600',
-                      fontSize: width / 22,
-                      textAlign: 'right',
-                      padding: 5,
-                    }}>
-                    {date}
-                  </Paragraph>
-                </View>
-                <View>
-                  <Paragraph
-                    style={{
-                      color: '#333',
-                      fontWeight: '600',
-                      fontSize: width / 22,
-                      textAlign: 'right',
-                      padding: 5,
-                    }}>
-                    {isUserPoscoAssanUser
-                      ? poscoAssanAccidentDate.split('-').reverse().join('.')
-                      : poscoTnpcAccidentDate.split('-').reverse().join('.')}
-                  </Paragraph>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  {lastInDate? lastInDate?.toString()?.split('')?.map((item,index)=>(
-                      <View style={{width: width / 8}} key={index}>
-                        <Paragraph style={styles.paragCounter}>{item}</Paragraph>
-                      </View>
-                  )):null}
-                </View>
-              </View>
-            </View>
-          </Card.Content>
-        </Card>
+            </Card.Content>
+          </Card>
 
-        <View style={styles.containerInside}>
-          <View style={styles.containerInside2}>
-            <Text style={styles.mehmetFatih}>{listeMulti.Name}</Text>
-            <Separator />
+          <View style={styles.containerInside}>
+            <View style={styles.containerInside2}>
+              <Text style={styles.mehmetFatih}>{listeMulti.Name}</Text>
+              <Separator />
 
-            {params.appHead == 9 && (
+              {params.appHead == 9 && (
                 <View>
                   {firebaseData
-                      .filter(([key, value]) => key.includes('Content'))
-                      .filter(item => item[1] !== '')
-                      .map((item, index) =>
-                          firebaseData
-                              .filter(([keys, value]) => keys.includes('Title' + index))
-                              .filter(items => items[1] !== '')
-                              .map((items, indexs) => (
-                                  <List.Item
-                                      key={indexs}
-                                      style={[styles.card, styles.elevation]}
-                                      title={listeMulti.Name}
-                                      description={items[1]}
-                                      onPress={() => {
-                                        navigation.navigate('SafetyVideo',{data:item[1],title:items[1],itemId:items})
-                                      }}
-
-                                  />
-                              )),
-                      )}
+                    .filter(([key, value]) => key.includes("Content"))
+                    .filter((item) => item[1] !== "")
+                    .map((item, index) =>
+                      firebaseData
+                        .filter(([keys, value]) =>
+                          keys.includes("Title" + index)
+                        )
+                        .filter((items) => items[1] !== "")
+                        .map((items, indexs) => (
+                          <List.Item
+                            key={indexs}
+                            style={[styles.card, styles.elevation]}
+                            title={listeMulti.Name}
+                            description={items[1]}
+                            onPress={() => {
+                              navigation.navigate("SafetyVideo", {
+                                data: item[1],
+                                title: items[1],
+                                itemId: items,
+                              });
+                            }}
+                          />
+                        ))
+                    )}
                 </View>
-            )}
+              )}
 
-
-            {params.appHead == 8 && (
+              {params.appHead == 8 && (
                 <View>
-
                   <ScrollView showsVerticalScrollIndicator={false}>
                     {firebaseData
-                        .filter(([key, value]) => key.includes('Content')).sort((a,b)=>Date.parse(b[1].insertDate)-Date.parse(a[1].insertDate))
-                        .map((item, index) => {
-                          return(<View key={index} style={styles.photoContainer}>
+                      .filter(([key, value]) => key.includes("Content"))
+                      .sort(
+                        (a, b) =>
+                          Date.parse(b[1].insertDate) -
+                          Date.parse(a[1].insertDate)
+                      )
+                      .map((item, index) => {
+                        return (
+                          <View key={index} style={styles.photoContainer}>
                             {item
-                                .filter(item => item.uriList)
+                              .filter((item) => item.uriList)
 
-                                .map((cat, indexed) => {
-                                  return(
-                                    <List.Item
-                                        key={indexed}
-                                        style={[styles.card, styles.elevation]}
-                                        title={cat.summary}
-                                        description={new Date(cat?.insertDate)?.toLocaleDateString("tr")}
-                                        onPress={() => {
-                                          navigation.navigate('SafetyImage', {data: cat, itemId: index})
-                                        }}
-
-                                    />
-
-                                )})}
-                          </View>)
-                        })}
+                              .map((cat, indexed) => {
+                                return (
+                                  <List.Item
+                                    key={indexed}
+                                    style={[styles.card, styles.elevation]}
+                                    title={cat.summary}
+                                    description={new Date(
+                                      cat?.insertDate
+                                    )?.toLocaleDateString("tr")}
+                                    onPress={() => {
+                                      navigation.navigate("SafetyImage", {
+                                        data: cat,
+                                        itemId: index,
+                                      });
+                                    }}
+                                  />
+                                );
+                              })}
+                          </View>
+                        );
+                      })}
                   </ScrollView>
-                </View>)}
+                </View>
+              )}
 
-
-
-                {/* <ScrollView showsVerticalScrollIndicator={false}>
+              {/* <ScrollView showsVerticalScrollIndicator={false}>
                   {firebaseData
                     .filter(([key, value]) => key.includes('Content'))
 
@@ -685,17 +687,11 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
                     ))}
                 </ScrollView>*/}
 
-
-
-
-            {params.appHead != 9 && params.appHead != 8 && (
-
-
+              {params.appHead != 9 && params.appHead != 8 && (
                 <View>
-
                   {firebaseData
-                    .filter(([key, value]) => key.includes('Content'))
-                    .filter(item => item[1] !== '')
+                    .filter(([key, value]) => key.includes("Content"))
+                    .filter((item) => item[1] !== "")
                     .map((item, index) => (
                       <View style={styles.containerCheck} key={index}>
                         <View style={styles.ViewContainerLeft}>
@@ -714,10 +710,10 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
                                   ? false
                                   : ListeSemihMulti[`ch${index}`]
                               )
-                                ? 'success'
-                                : 'danger'
+                                ? "success"
+                                : "danger"
                             }
-                            onChange={isChecked => {
+                            onChange={(isChecked) => {
                               setListeSemihMulti({
                                 ...ListeSemihMulti,
                                 [`ch${index}`]: isChecked,
@@ -727,51 +723,40 @@ const SafetyRuleDetail = ({route: {params}, navigation}) => {
                         </View>
                       </View>
                     ))}
-
                 </View>
-
-
-
-            )}
-
-
-          </View>
-          <Separator />
-          {params.appHead != 9 && params.appHead != 8 && (
-              <View style={{height: 120}}>
-                <Paragraph />
-                <Paragraph />
+              )}
+            </View>
+            <Separator />
+            {params.appHead != 9 && params.appHead != 8 && (
+              <View style={{ height: 120 }}>
+                <Text />
+                <Text />
                 {!loading && (
-                    <Button mode="contained"  onPress={insertSafetyRule}>
-                      {' '}
-                      Sonucları Kaydet
-                    </Button>
+                  <Button mode="contained" onPress={insertSafetyRule}>
+                    {" "}
+                    Sonucları Kaydet
+                  </Button>
                 )}
               </View>
-          )}
-
+            )}
+          </View>
         </View>
-
-
-      </View>
-
       </ScrollView>
     </Background_Green>
-
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    minHeight: Platform.OS === 'ios' ? height - 210 : height + 100,
+    alignItems: "center",
+    minHeight: Platform.OS === "ios" ? height - 210 : height + 100,
     marginBottom: 40,
   },
   containerInside: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     width: width,
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   cardStyle: {
@@ -782,8 +767,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 5,
     marginBottom: 10,
-    shadowColor: '#303838',
-    shadowOffset: {width: 0, height: 5},
+    shadowColor: "#303838",
+    shadowOffset: { width: 0, height: 5 },
     shadowRadius: 5,
     shadowOpacity: 0.85,
     height: 110,
@@ -796,90 +781,89 @@ const styles = StyleSheet.create({
     width: width,
   },
   card: {
-    backgroundColor: 'rgba(216,228,232,0.85)',
+    backgroundColor: "rgba(216,228,232,0.85)",
     borderRadius: 2,
     paddingHorizontal: 25,
-    width: '100%',
+    width: "100%",
     paddingVertical: 10,
-    borderBottomWidth:0.2
-
+    borderBottomWidth: 0.2,
   },
   elevation: {
     elevation: 15,
     borderWidth: 0.1,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
   },
   mehmetFatih: {
-    flexWrap: 'wrap',
-    textAlign: 'center',
-    color: '#333',
-    fontWeight: 'bold',
+    flexWrap: "wrap",
+    textAlign: "center",
+    color: "#333",
+    fontWeight: "bold",
     fontSize: width / 20,
     padding: 10,
   },
   mehmetFatih2: {
-    flexWrap: 'wrap',
-    textAlign: 'left',
-    color: '#333',
-    fontWeight: 'bold',
+    flexWrap: "wrap",
+    textAlign: "left",
+    color: "#333",
+    fontWeight: "bold",
     fontSize: width / 28,
     padding: 10,
   },
   heading: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   mehmetFatih3: {
-    flexWrap: 'wrap',
-    textAlign: 'center',
-    color: '#333',
-    fontWeight: 'bold',
+    flexWrap: "wrap",
+    textAlign: "center",
+    color: "#333",
+    fontWeight: "bold",
     fontSize: width / 20,
     padding: 10,
     width: width,
   },
   paragCounter: {
-    color: '#333',
-    fontWeight: '600',
-    borderStyle: 'solid',
+    color: "#333",
+    fontWeight: "600",
+    borderStyle: "solid",
     borderWidth: 2,
     margin: 2,
-    backgroundColor: '#ee5',
+    backgroundColor: "#ee5",
     padding: 5,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: width / 22,
   },
   containerCheck: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   containerCheck3: {
-    flexDirection: 'column',
-    alignItems: 'center',
+    flexDirection: "column",
+    alignItems: "center",
   },
   ViewContainerLeft: {
     flex: 18,
-    width: '100%',
+    width: "100%",
   },
   ViewContainerRight: {
     flex: 3,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
   separator: {
-    borderBottomColor: '#fff',
+    borderBottomColor: "#fff",
     borderWidth: 1,
-    width: '100%',
+    width: "100%",
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   photoContainer: {
     flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   h1: {
     padding: 40,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 24,
   },
 });

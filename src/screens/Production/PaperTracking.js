@@ -15,7 +15,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Card } from "react-native-paper";
-import { Button, Icon } from "@ui-kitten/components";
+import { Button } from "@ui-kitten/components";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { sendUserInfoName } from "../../api/auth-api";
 import NetInfo from "@react-native-community/netinfo";
@@ -235,7 +235,7 @@ const PaperTracking = () => {
         }}
       >
         <Text style={styles.modalText}>Kağıt Bilgileri</Text>
-        <Card.Title title="Barkod Numarası:" subtitle={item.Barcode} />
+        <Text title="Barkod Numarası:" subtitle={item.Barcode} />
         <Card.Content>
           <Text style={styles.title}>Barkod Numarası: {item.Barcode}</Text>
           <Text style={styles.title}>
@@ -456,9 +456,9 @@ const PaperTracking = () => {
             <Button
               appearance={"ghost"}
               onPress={scanAgain2}
-              accessoryLeft={(props) => (
-                <Icon {...props} name={"arrow-back-outline"} />
-              )}
+              // accessoryLeft={(props) => (
+              //   <Icon {...props} name={"arrow-back-outline"} />
+              // )}
             >
               <Text>Geri</Text>
             </Button>

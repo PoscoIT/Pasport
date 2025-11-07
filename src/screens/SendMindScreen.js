@@ -1,79 +1,55 @@
-import React, {memo, useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  Text,
-  Dimensions,
-  View,
-  ActivityIndicator,
-} from 'react-native';
-import firebase, {getDatabase, onValue, orderByChild, query, ref} from 'firebase/database';
-import Toast from '../components/Toast';
-import {sendUserInfoName} from '../api/auth-api';
-import {SectionGrid} from 'react-native-super-grid';
-import Background_Green from '../components/Background_Green';
-import {Card, Title, Paragraph} from 'react-native-paper';
-import firebaseDB from '../database/firebaseDB';
+import React, { memo, useState, useEffect } from "react";
+import { StyleSheet, Dimensions, View, ActivityIndicator } from "react-native";
+import Toast from "../components/Toast";
+import { sendUserInfoName } from "../api/auth-api";
+import { SectionGrid } from "react-native-super-grid";
+import Background_Green from "../components/Background_Green";
+import { Card, Text } from "react-native-paper";
+import { database } from "../database/firebaseDB";
 
-let width = Dimensions.get('window').width; //full width
+let width = Dimensions.get("window").width; // full width
 
-const SendMindScreen = ({navigation}) => {
+const SendMindScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState({value: '', type: ''});
+  const [toast, setToast] = useState({ value: "", type: "" });
   const [liste, setListe] = useState([]);
   const Separator = () => <View style={styles.separator} />;
 
   const getTelNos = async () => {
-    const db = getDatabase(firebaseDB);
-    await sendUserInfoName(sendResponse => {
-      onValue(ref(db, 'Gonulden/CreditUsedLog/'), snapshot => {
-        let li = [];
-        snapshot.forEach(child => {
-          child.forEach(childes => {
-            if (sendResponse.uname === childes.val().fromUname) {
+    await sendUserInfoName((sendResponse) => {
+      const refDB = database.ref("Gonulden/CreditUsedLog/");
+      refDB.on("value", (snapshot) => {
+        const li = [];
+        snapshot.forEach((child) => {
+          child.forEach((childes) => {
+            const val = childes.val();
+            if (sendResponse.uname === val.fromUname) {
               li.push({
-                label: childes.val().toAdSoyad,
-                value: childes.val().toCommente,
-                lineValue: childes.val().toDeger,
-                lineva: childes.val().insertedDateTime,
-                relatedDate: childes.val().relatedDate,
+                label: val.toAdSoyad,
+                value: val.toCommente,
+                lineValue: val.toDeger,
+                lineva: val.insertedDateTime,
+                relatedDate: val.relatedDate,
               });
             }
           });
         });
-        li.sort((a,b)=>Date.parse(a.relatedDate?.replaceAll("-","."))-Date.parse(b.relatedDate?.replaceAll("-","."))).reverse()
-       /* if (li.length > 0) {
-          li.sort(function (a, b) {
-            if (a.relatedDate > b.relatedDate) {
-              return -1;
-            } else if (a.relatedDate < b.relatedDate) {
-              return 1;
-            } else {
-              if (a.lineva > b.lineva) {
-                return -1;
-              }
-              if (a.lineva < b.lineva) {
-                return 1;
-              }
-              return 0;
-            }
-          });
 
-        }*/
+        li.sort(
+          (a, b) =>
+            Date.parse(a.relatedDate?.replaceAll("-", ".")) -
+            Date.parse(b.relatedDate?.replaceAll("-", "."))
+        ).reverse();
+
         setListe(li);
+        setLoading(false);
       });
     });
-
-    setLoading(false);
-    return loading;
   };
 
   useEffect(() => {
     let isMounted = true;
-    getTelNos().then(() => {
-      if (isMounted) {
-        setLoading(false);
-      }
-    });
+    getTelNos();
     return () => {
       isMounted = false;
     };
@@ -81,13 +57,13 @@ const SendMindScreen = ({navigation}) => {
 
   return (
     <Background_Green>
-      {loading && <ActivityIndicator color={'#444'} />}
+      {loading && <ActivityIndicator color={"#444"} />}
       <Card style={styles.cardStyle}>
         <Card.Content>
-          <Title>Değerli Çalışanımız,</Title>
-          <Paragraph>
+          <Text variant="titleLarge">Değerli Çalışanımız,</Text>
+          <Text variant="bodyMedium">
             Gönderdiğiniz teşekkürleri aşağıda görebilirsiniz.
-          </Paragraph>
+          </Text>
           <Separator />
         </Card.Content>
       </Card>
@@ -101,8 +77,8 @@ const SendMindScreen = ({navigation}) => {
             },
           ]}
           style={styles.gridView}
-          renderItem={({item}) => (
-            <View style={[styles.itemContainer, {backgroundColor: '#39b'}]}>
+          renderItem={({ item }) => (
+            <View style={[styles.itemContainer, { backgroundColor: "#39b" }]}>
               <Text style={styles.itemName2}>{item.label}</Text>
               <Text style={styles.itemName}>{item.lineva}</Text>
               <Text style={styles.itemName}>{item.lineValue}</Text>
@@ -114,7 +90,7 @@ const SendMindScreen = ({navigation}) => {
       <Toast
         type={toast.type}
         message={toast.value}
-        onDismiss={() => setToast({value: '', type: ''})}
+        onDismiss={() => setToast({ value: "", type: "" })}
       />
     </Background_Green>
   );
@@ -127,32 +103,35 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   itemContainer: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
     borderRadius: 5,
     padding: 5,
     height: 120,
   },
   itemName: {
     fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   itemName2: {
     fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
-    textAlign: 'center',
+    color: "#fff",
+    fontWeight: "600",
+    textAlign: "center",
   },
   itemCode: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 11,
-    color: '#fff',
+    color: "#fff",
   },
   cardStyle: {
-    width: '100%',
-    backgroundColor: 'white',
+    width: "100%",
+    backgroundColor: "white",
     marginTop: 8,
     height: 90,
+  },
+  separator: {
+    marginVertical: 4,
   },
 });
 

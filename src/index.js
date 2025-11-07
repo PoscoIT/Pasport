@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "./hooks/useAuth";
+import { useEffect, useState } from "react";
+import { useAuth, user } from "./hooks/useAuth";
 import {
   StyleSheet,
   View,
@@ -8,16 +8,19 @@ import {
   Text,
   Alert,
   Dimensions,
+  Platform,
+  StatusBar,
 } from "react-native";
+import { TransitionPresets } from "@react-navigation/stack";
 import LoginStack from "./navigation/LoginStack";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Layout, Avatar, Icon } from "@ui-kitten/components";
-import { TopNavigationImageTitleShowcase2 } from "./screens/NewScreen2";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import { Layout, Avatar } from "@ui-kitten/components";
+
 import MentorStack from "./navigation/MentorStack";
 import GonuldenStack from "./navigation/GonuldenStack";
 import LineStack from "./navigation/LineStack";
-import { getAuth } from "firebase/auth";
+// import auth from "@react-native-firebase/auth";
+import { auth } from "./database/firebaseDB";
 import { getVersionNo } from "./api/auth-api";
 import MyMac from "./navigation/MyMac";
 import {
@@ -29,19 +32,19 @@ import {
 import { t } from "i18next";
 import PaperTracking from "./screens/Production/PaperTracking";
 import FireEquipmentChecklist from "./screens/Safety/FireEquipmentChecklist";
-import CareSystemStack from "./navigation/CareSystemStack";
 import ITIncidentStack from "./navigation/ITIncidentStack";
 import ITAuthStack from "./navigation/ITAuthStack";
 import BodyShowerChecklist from "./screens/Safety/BodyShowerChecklist";
+import { signOut } from "@react-native-firebase/auth";
+import { createStackNavigator } from "@react-navigation/stack";
+import { LoginScreen } from "./screens";
 
 const Index = ({ navigation }) => {
-  const { user, loading, isOpen } = useAuth();
-  getAuth();
+  const { user, loading } = useAuth();
 
   const logoutUser = (companyCode) => {
-    const auth = getAuth();
     if (companyCode === "TST") {
-      auth.signOut();
+      signOut(auth);
     }
   };
   const color = "red";
@@ -49,7 +52,7 @@ const Index = ({ navigation }) => {
 
   const handlePress = () => setExpanded(!expanded);
   const size = 24;
-  const Tab = createBottomTabNavigator();
+  const Stack = createStackNavigator();
   const Drawer = createDrawerNavigator();
   const [isLoading, setIsLoading] = useState(true);
   const [versionStatus, setVersionStatus] = useState(false);
@@ -58,31 +61,17 @@ const Index = ({ navigation }) => {
   const CustomDrawerContent = (props) => {
     return (
       <DrawerContentScrollView {...props}>
-        <View>
+        <View
+          style={{
+            position: "fixed",
+            left: 0,
+            right: 0,
+            top: 0,
+          }}
+        >
           <Avatar style={styles.logo} source={require("./assets/logo.png")} />
         </View>
         <DrawerItemList {...props} />
-        {/*<AccordionItem {...props} />*/}
-        {/*   logoutUser('TST')*/}
-        {/*  <List.Section>
-              <List.Accordion titleStyle={{fontSize:14,color:expanded ? '#1f95d5' : '#3c3c3c'}}
-                  title="Forklift Reservation"
-                  expanded={expanded}
-                  style={{ backgroundColor: expanded ? '#FFFFFF' : '#FFFFFF'}}
-                  onPress={handlePress}
-              >
-                  <List.Item
-                      titleStyle={{fontSize:14}}
-                      title="Rezarvasyon Yap"
-                      onPress={() => props.navigation.navigate("Forklift Reservation")}
-                  />
-                  <List.Item
-                      titleStyle={{fontSize:14}}
-                      title="Rezarvasyonları Görüntüle"
-                      onPress={() => props.navigation.navigate("Forklift Reservation Viewer")}
-                  />
-              </List.Accordion>
-          </List.Section>*/}
 
         <DrawerItem
           label={t("general.logOut")}
@@ -116,6 +105,7 @@ const Index = ({ navigation }) => {
       }).catch((err) => console.log(err));
     } else {
       setVersionStatus(false);
+
       setIsLoading(false);
     }
   };
@@ -141,15 +131,23 @@ const Index = ({ navigation }) => {
     );
   } else {
     return user ? (
-      <View style={{ flex: 1, backgroundColor: "#FDFAF6", marginTop: 35 }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#FDFAF6",
+          paddingTop: Platform.OS === "android" ? 0 : 44,
+        }}
+      >
         <Layout style={{ flex: 1 }}>
-          {/* <TopNavigationImageTitleShowcase /> */}
-
           <Drawer.Navigator
-            initialRouteName="Login"
+            screenOptions={({ route, navigation }) => ({
+              gestureEnabled: true,
+              ...TransitionPresets.ModalPresentationIOS,
+            })}
+            initialRouteName="SafetyMainScreen"
             drawerContent={(props) => <CustomDrawerContent {...props} />}
           >
-            <Drawer.Screen name="Safety 1st" component={MentorStack} />
+            <Drawer.Screen name="SafetyMainScreen" component={MentorStack} />
             {/* <Drawer.Screen  name="Checklist" component={CareSystemStack} />    */}
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
@@ -238,29 +236,24 @@ const Index = ({ navigation }) => {
         </Layout>
       </View>
     ) : (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#FDFAF6" }}>
-        <Layout style={{ flex: 1 }}>
-          <TopNavigationImageTitleShowcase2 />
-
-          <Tab.Navigator
-            initialRouteName="LoginStack"
-            screenOptions={{
-              activeTintColor: "#C7E2FF",
-              backgroundColor: "#C7E2FF",
-            }}
-          >
-            <Tab.Screen
-              name="Login"
-              component={LoginStack}
-              options={{
-                headerShown: false,
-                tabBarStyle: { display: "none" },
-              }}
-            />
-          </Tab.Navigator>
-        </Layout>
-      </SafeAreaView>
+      <Stack.Navigator
+        initialRouteName="LoginStack"
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: "#C7E2FF",
+          tabBarStyle: { backgroundColor: "#C7E2FF" },
+        }}
+      >
+        <Stack.Screen name="LoginStack" component={LoginStack} />
+      </Stack.Navigator>
     );
+    // <View style={{ flex: 1, backgroundColor: "#FDFAF6" }}>
+    //   <TopNavigationImageTitleShowcase2 />
+    {
+      /* <Text>Fatih</Text> */
+    }
+
+    // </View>
   }
 };
 

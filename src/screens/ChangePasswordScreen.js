@@ -1,111 +1,99 @@
-import {Alert, Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {Button, Card, Paragraph, Title} from "react-native-paper";
-import {t} from "i18next";
+import React, { useState } from "react";
+import {
+  Alert,
+  Dimensions,
+  StyleSheet,
+  View,
+  Platform,
+  StatusBar,
+} from "react-native";
+import { Button } from "react-native-paper";
+import { t } from "i18next";
 import TextInput from "../components/TextInput";
-import React, {useState} from "react";
-import {getAuth,sendPasswordResetEmail} from "firebase/auth";
+import { sendPasswordResetEmail } from "@react-native-firebase/auth";
+import { auth } from "../database/firebaseDB";
 
-const {width, height} = Dimensions.get('window');
-const ChangePasswordScreen = ({navigation})=>{
-    const [loading, setLoading] = useState(false);
-    const auth = getAuth();
-    const [password, setPassword] = useState({value: '', error: ''});
-    const triggerResetEmail = async () => {
-        await sendPasswordResetEmail(auth, email.value).then(()=>{
-            Alert.alert(t("forgotPasswordMessage"))
-            navigation.goBack(-1)
-        }).catch(()=>{
-            Alert.alert(t("unknownUser"))
-        })
+const { width, height } = Dimensions.get("window");
 
+const ChangePasswordScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState({ value: "", error: "" });
 
+  const triggerResetEmail = async () => {
+    if (!email.value) {
+      Alert.alert(t("pleaseEnterEmail"));
+      return;
     }
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email.value);
+      Alert.alert(t("forgotPasswordMessage"));
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert(t("unknownUser"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return(
-        <SafeAreaView style={styles.safeAreaStyle}>
-            {!loading && (
-                <View>
+  return (
+    <View style={styles.safeAreaStyle}>
+      {!loading && (
+        <View>
+          <View
+            style={{
+              flexDirection: "column",
+              flexGrow: 1,
+              marginHorizontal: 10,
+              borderRadius: 30,
+            }}
+          >
+            <TextInput
+              label={t("loginScreen.email")}
+              returnKeyType="done"
+              value={email.value}
+              onChangeText={(text) => setEmail({ value: text, error: "" })}
+              error={!!email.error}
+              errorText={email.error}
+              autoCapitalize="none"
+            />
+          </View>
 
-                    <View>
-                        <View style={{flexDirection: "column", flexGrow: 1, marginHorizontal: 10, borderRadius: 30}}>
-                            <TextInput
-                                label={t("loginScreen.password")}
-                                returnKeyType="done"
-                                value={password.value}
-                                onChangeText={text => setPassword({value: text, error: ''})}
-                                error={!!password.error}
-                                errorText={password.error}
-                                secureTextEntry
-                                autoCapitalize="none"
-                                eyeIcon={true}
-                            />
-                        </View>
-                        <View style={{flexDirection: "column", flexGrow: 1, marginHorizontal: 10, borderRadius: 30}}>
-                            <TextInput
-                                label={t("loginScreen.password")}
-                                returnKeyType="done"
-                                value={password.value}
-                                onChangeText={text => setPassword({value: text, error: ''})}
-                                error={!!password.error}
-                                errorText={password.error}
-                                secureTextEntry
-                                autoCapitalize="none"
-                                eyeIcon={true}
-                            />
-                        </View>
-                        <View style={{flexDirection: "column", flexGrow: 1, marginHorizontal: 60}}>
-                            <Button
-                                onPress={triggerResetEmail}
-                                mode="contained"
-                                style={styles.button}
-                            >
-                                {t("forgotPassword")}
-                            </Button>
-                        </View>
+          <View
+            style={{
+              flexDirection: "column",
+              flexGrow: 1,
+              marginHorizontal: 60,
+            }}
+          >
+            <Button
+              onPress={triggerResetEmail}
+              mode="contained"
+              style={styles.button}
+            >
+              {t("forgotPassword")}
+            </Button>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
 
-                    </View>
-
-                </View>
-            )}
-        </SafeAreaView>
-    )
-}
 const styles = StyleSheet.create({
-    backGround: {
-        width: width,
+  safeAreaStyle: {
+    flex: 1,
+    justifyContent: "flex-start",
+    height: height,
+    backgroundColor: "#D6E4EF",
 
-    },
-    container: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'white',
-    },
-    inputContainer: {
-        fontSize: 12,
-    },
-    leftParag: {
-        fontSize: 12,
-        marginLeft: 5,
-        justifyContent: 'center',
-    },
-    input2: {
-        marginBottom: 10,
-        backgroundColor: 'transparent',
-    },
-    cardStyle: {
-        backgroundColor: '#f6f6f6',
-    },
-    safeAreaStyle: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        height: height,
-        backgroundColor: "#D6E4EF"
-    },
-    button: {
-        backgroundColor: "#196795",
-        borderRadius: 10,
-        marginTop: 20
-    }
+    paddingTop: Platform.OS === "android" ? 0 : 44,
+  },
+  button: {
+    backgroundColor: "#196795",
+    borderRadius: 10,
+    marginTop: 20,
+  },
 });
-export default ChangePasswordScreen
+
+export default ChangePasswordScreen;

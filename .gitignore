@@ -15,6 +15,7 @@ build/
 !default.perspectivev3
 xcuserdata
 *.xccheckout
+
 *.moved-aside
 DerivedData
 *.hmap
@@ -24,6 +25,7 @@ DerivedData
 # Android/IntelliJ
 #
 build/
+.kotlin/
 .idea
 .gradle
 local.properties

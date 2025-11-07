@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
-
-# Define the library name here.
 project(tstapp_appmodules)
 
-# This file includes all the necessary to let you build your application with the New Architecture.
+# Include New Architecture build
 include(${REACT_ANDROID_DIR}/cmake-utils/ReactNative-application.cmake)
+
+# Include Codegen support
+include(${REACT_ANDROID_DIR}/cmake-utils/ReactNative-codegen.cmake)

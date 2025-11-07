@@ -1,36 +1,50 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {memo} from 'react';
-import {StyleSheet, KeyboardAvoidingView, ScrollView} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
+import React, { memo } from "react";
+import {
+  StyleSheet,
+  KeyboardAvoidingView,
+  View,
+  Platform,
+  StatusBar,
+  Dimensions,
+} from "react-native";
 
-const BackgroundGradient = ({children}) => (
-  <SafeAreaView style={styles.background}>
+import LinearGradient from "react-native-linear-gradient";
+let height = Dimensions.get("window").height;
 
-      <KeyboardAvoidingView style={styles.container} behavior="padding">
-        <LinearGradient
-          start={{x: 0.0, y: 0.0}}
-          end={{x: 1.0, y: 1.0}}
-          locations={[0, 0.5, 1]}
-          useAngle={true}
-          angle={180}
-          colors={['#FDFAF6', 'rgba(122,183,209,0.44)', '#FDFAF6']}
-          style={styles.linearGradient}>
-          {children}
-        </LinearGradient>
-      </KeyboardAvoidingView>
-  </SafeAreaView>
+const BackgroundGradient = ({ children }) => (
+  <View style={styles.background}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <LinearGradient
+        start={{ x: 0.0, y: 0.0 }}
+        end={{ x: 1.0, y: 1.0 }}
+        locations={[0, 0.5, 1]}
+        useAngle={true}
+        angle={180}
+        colors={["#FDFAF6", "rgba(122,183,209,0.44)", "#FDFAF6"]}
+        style={styles.linearGradient}
+      >
+        {children}
+      </LinearGradient>
+    </KeyboardAvoidingView>
+  </View>
 );
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: '#FDFAF6',
+    backgroundColor: "#FDFAF6",
     flex: 1,
+    justifyContent: "flex-start",
+    height: height,
+    backgroundColor: "#D6E4EF",
+
+    // iPhone çentik alanı + Android status bar yüksekliğini hesaba kat
+    paddingTop: Platform.OS === "android" ? 0 : 0,
   },
   container: {
-    width: '100%',
-    alignSelf: 'center',
-    alignItems: 'center',
+    width: "100%",
+    alignSelf: "center",
+    alignItems: "center",
   },
 });
 

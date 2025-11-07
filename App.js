@@ -1,46 +1,43 @@
-import React from 'react';
-import App from './src';
-import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
-import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import 'react-native-gesture-handler';
-import * as eva from '@eva-design/eva';
-import {MD3LightTheme, useTheme} from 'react-native-paper';
-import {decode, encode} from 'base-64';
-import './src/database/firebaseDB'
+import "react-native-gesture-handler";
+import "./src/database/firebaseDB";
+import "./src/languages/i18n";
+import React from "react";
+import { enableScreens } from "react-native-screens";
+import { ApplicationProvider } from "@ui-kitten/components";
+import * as eva from "@eva-design/eva";
+
+import { Provider as PaperProvider, MD3LightTheme } from "react-native-paper";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+
 import SplashNavigator from "./src/navigation/SplashNavigator";
-import { Provider as PaperProvider } from 'react-native-paper';
-import './src/languages/i18n';
-import {SafeAreaProvider} from "react-native-safe-area-context";
+import { decode, encode } from "base-64";
 
+// base64 polyfill (bazı Firebase işlemleri için)
 
-
-
+enableScreens(false);
 if (!global.btoa) {
   global.btoa = encode;
 }
-
 if (!global.atob) {
   global.atob = decode;
 }
 
 const Main = () => {
-    const theme = useTheme();
   return (
-    <SafeAreaProvider>
-
-      <IconRegistry icons={EvaIconsPack} />
-
-      <ApplicationProvider {...eva} theme={eva.light}>
-
-          <PaperProvider  theme={MD3LightTheme}>
-    <SplashNavigator/>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ApplicationProvider {...eva} theme={eva.light}>
+          <PaperProvider theme={MD3LightTheme}>
+            {/* Navigation container en dışta olmalı */}
+            <NavigationContainer>
+              <SplashNavigator />
+            </NavigationContainer>
           </PaperProvider>
-
-
-      </ApplicationProvider>
-
-
-    </SafeAreaProvider>
+        </ApplicationProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 

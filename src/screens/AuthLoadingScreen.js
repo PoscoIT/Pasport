@@ -1,11 +1,10 @@
 /* eslint-disable eqeqeq */
-import React, {memo} from 'react';
-import {ActivityIndicator, StyleSheet} from 'react-native';
-import 'firebase/auth';
-import Background from '../components/Background';
-import {theme} from '../core/theme';
+import { memo } from "react";
+import { ActivityIndicator, StyleSheet } from "react-native";
+import Background from "../components/Background";
+import { theme } from "../core/theme";
 
-const AuthLoadingScreen = ({navigation}) => {
+const AuthLoadingScreen = ({ navigation }) => {
   return (
     <Background>
       <ActivityIndicator
@@ -19,7 +18,7 @@ const AuthLoadingScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   actIndicator: {
-    textAlign: 'center',
+    textAlign: "center",
     flex: 1,
   },
 });

@@ -48,9 +48,9 @@ target 'Pasport' do
 
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-  pod 'Firebase', :modular_headers => true
-  pod 'FirebaseMessaging', :modular_headers => true
-  pod 'FirebaseCore', :modular_headers => true
+  # pod 'Firebase', :modular_headers => true
+  # pod 'FirebaseMessaging', :modular_headers => true
+  # pod 'FirebaseCore', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'lottie-react-native', :path => '../node_modules/lottie-react-native'
@@ -58,10 +58,7 @@ target 'Pasport' do
 
 
 
-  target 'TSTAppTests' do
-    inherit! :complete
-    # Pods for testing
-  end
+ 
 
   post_install do |installer|
        installer.pods_project.targets.each do |target|

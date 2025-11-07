@@ -21,7 +21,9 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { sendUserInfoName } from "../../api/auth-api";
 import { REACT_APP_SECRET_KEY } from "@env";
 import { t } from "i18next";
-import { get, getDatabase, query, ref } from "firebase/database";
+
+import { database } from "../../database/firebaseDB";
+
 import {
   useFocusEffect,
   useIsFocused,
@@ -58,7 +60,7 @@ const FireEquipmentChecklist = () => {
   const [checkedNozzle, setCheckedNozzle] = useState(false);
   const [permission, setPermission] = useState(false);
   const [description, setDescription] = useState("");
-  const db = getDatabase();
+
   const navigation = useNavigation();
   const [pageAuthorization, setPageAuthorization] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -106,12 +108,17 @@ const FireEquipmentChecklist = () => {
   };
 
   const getDialogInfo = async () => {
-    const s = query(ref(db, "tstapp/authorization/fireEquipmentControl"));
-    await get(s).then((snapshot) => {
-      setUsers(snapshot.val().users);
-      setPageAuthorization(users.includes(employeeID));
+    const s = database.ref("tstapp/authorization/fireEquipmentControl");
+
+    // Değiştirildi: get(s) yerine s.once('value')
+    await s.once("value").then((snapshot) => {
+      // Olası state gecikme hatasını düzeltmek için local değişken kullanıldı
+      const usersList = snapshot.val().users;
+      setUsers(usersList);
+      setPageAuthorization(usersList.includes(employeeID));
     });
   };
+
   const codeScannner = useCodeScanner({
     codeTypes: [
       "qr",
@@ -325,13 +332,13 @@ const FireEquipmentChecklist = () => {
           shadowColor: "#333",
           shadowOpacity: 0.3,
           shadowOffset: { width: 1, height: 1 },
-          backgroundColor: "#f3f3f3",
+          backgroundColor: "#f3f3ff",
           width: "100%",
           paddingVertical: 15,
           marginVertical: 10,
         }}
       >
-        <Card.Title title="Ekipman Numarası:" subtitle={item.EquipmentNo} />
+        <Text title="Ekipman Numarası:" subtitle={item.EquipmentNo} />
         <Card.Content>
           <Text style={styles.title}>
             {t("fireEquipmentScreen.cabinet")} Statü:{" "}

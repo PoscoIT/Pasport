@@ -1,21 +1,21 @@
 /* eslint-disable no-alert */
 /* eslint-disable eqeqeq */
 /* eslint-disable react-native/no-inline-styles */
-import React, {memo, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {InsertNewRecordToFirebase} from '../../api/auth-api';
-import Background_Green from '../../components/Background_Green';
-import TextInput from '../../components/TextInput';
-import Button from '../../components/Button';
-import Toast from '../../components/Toast';
-import {Card, Title, Paragraph} from 'react-native-paper';
-import {Toggle} from '@ui-kitten/components';
+import { memo, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { InsertNewRecordToFirebase } from "../../api/auth-api";
+import Background_Green from "../../components/Background_Green";
+import TextInput from "../../components/TextInput";
+import Button from "../../components/Button";
+import Toast from "../../components/Toast";
+import { Card, Text } from "react-native-paper";
+import { Toggle } from "@ui-kitten/components";
 
-const CheckListScreen = ({navigation}) => {
-  const [toast, setToast] = useState({value: '', type: ''});
-  const [name, setName] = useState({value: '', error: ''});
-  const [name2, setName2] = useState({value: '', error: ''});
-  const [setError] = useState('');
+const CheckListScreen = ({ navigation }) => {
+  const [toast, setToast] = useState({ value: "", type: "" });
+  const [name, setName] = useState({ value: "", error: "" });
+  const [name2, setName2] = useState({ value: "", error: "" });
+  const [setError] = useState("");
   const [loading, setLoading] = useState(false);
   const Separator = () => <View style={styles.separator} />;
   const [country1, setCountry1] = useState(false);
@@ -51,70 +51,75 @@ const CheckListScreen = ({navigation}) => {
     if (response.error) {
       setError(response.error);
     } else {
-      alert('Kayıt başarılı.');
-      navigation.navigate('Dashboard');
+      alert("Kayıt başarılı.");
+      navigation.navigate("Dashboard");
     }
     setLoading(false);
   };
   return (
     <Background_Green style={styles.backGround}>
       <Card style={styles.cardStyle}>
-        <Card.Content >
-          <Title>Değerli Çalışanımız,</Title>
-          <Paragraph>Bugünkü sağlık durumunuzu belirtiniz</Paragraph>
+        <Card.Content>
+          <Text variant="titleLarge">Değerli Çalışanımız,</Text>
+          <Text variant="bodyMedium">Bugünkü sağlık durumunuzu belirtiniz</Text>
         </Card.Content>
       </Card>
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>{'Öksürük var mı?'} </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Öksürük var mı?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country2}
-            status={country2 && 'danger'}
+            status={country2 && "danger"}
             onChange={(isChecked) => {
               setCountry2(isChecked);
-            }}>
-            {!country2 && 'Yok'}
-            {country2 && 'Var'}
+            }}
+          >
+            {!country2 && "Yok"}
+            {country2 && "Var"}
           </Toggle>
         </View>
       </View>
       <Separator />
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>
-            {'Boğaz ağrısı var mı?'}{' '}
-          </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Boğaz ağrısı var mı?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country3}
-            status={country3 && 'danger'}
+            status={country3 && "danger"}
             onChange={(isChecked) => {
               setCountry3(isChecked);
-            }}>
-            {!country3 && 'Yok'}
-            {country3 && 'Var'}
+            }}
+          >
+            {!country3 && "Yok"}
+            {country3 && "Var"}
           </Toggle>
         </View>
       </View>
       <Separator />
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>
-            {'Nefes almada güçlük var mı?'}{' '}
-          </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Nefes almada güçlük var mı?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country4}
-            status={country4 && 'danger'}
+            status={country4 && "danger"}
             onChange={(isChecked) => {
               setCountry4(isChecked);
-            }}>
-            {!country4 && 'Yok'}
-            {country4 && 'Var'}
+            }}
+          >
+            {!country4 && "Yok"}
+            {country4 && "Var"}
           </Toggle>
         </View>
       </View>
@@ -126,60 +131,64 @@ const CheckListScreen = ({navigation}) => {
             {
               height: 65,
             },
-          ]}>
-          <Paragraph style={styles.leftParag}>
+          ]}
+        >
+          <Text variant="bodyMedium" style={styles.leftParag}>
             {
-              'Son bir haftada hastalığa yakalanmış ya da yakalanan kişi ile temas var mı?'
-            }{' '}
-          </Paragraph>
+              "Son bir haftada hastalığa yakalanmış ya da yakalanan kişi ile temas var mı?"
+            }{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country5}
-            status={country5 && 'danger'}
+            status={country5 && "danger"}
             onChange={(isChecked) => {
               setCountry5(isChecked);
-            }}>
-            {!country5 && 'Yok'}
-            {country5 && 'Var'}
+            }}
+          >
+            {!country5 && "Yok"}
+            {country5 && "Var"}
           </Toggle>
         </View>
       </View>
       <Separator />
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>
-            {'Ailede semptom gösteren var mı? '}{' '}
-          </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Ailede semptom gösteren var mı? "}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country6}
-            status={country6 && 'danger'}
+            status={country6 && "danger"}
             onChange={(isChecked) => {
               setCountry6(isChecked);
-            }}>
-            {!country6 && 'Yok'}
-            {country6 && 'Var'}
+            }}
+          >
+            {!country6 && "Yok"}
+            {country6 && "Var"}
           </Toggle>
         </View>
       </View>
       <Separator />
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>
-            {'Burun veya geniz akıntısı var mı?'}{' '}
-          </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Burun veya geniz akıntısı var mı?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country11}
-            status={country11 && 'danger'}
+            status={country11 && "danger"}
             onChange={(isChecked) => {
               setCountry11(isChecked);
-            }}>
-            {!country11 && 'Yok'}
-            {country11 && 'Var'}
+            }}
+          >
+            {!country11 && "Yok"}
+            {country11 && "Var"}
           </Toggle>
         </View>
       </View>
@@ -191,34 +200,36 @@ const CheckListScreen = ({navigation}) => {
             {
               height: 65,
             },
-          ]}>
-          <Paragraph style={styles.leftParag}>
-            {'Yurtdışından gelen biri ile son 14 gün içinde görüştünüz mü?'}{' '}
-          </Paragraph>
+          ]}
+        >
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Yurtdışından gelen biri ile son 14 gün içinde görüştünüz mü?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country7}
-            status={country7 && 'danger'}
+            status={country7 && "danger"}
             onChange={(isChecked) => {
               setCountry7(isChecked);
-            }}>
-            {!country7 && 'Yok'}
-            {country7 && 'Var'}
+            }}
+          >
+            {!country7 && "Yok"}
+            {country7 && "Var"}
           </Toggle>
         </View>
       </View>
       <Separator />
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>
-            {'Vücut Sıcaklığı ve ateş var mı?'}{' '}
-          </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Vücut Sıcaklığı ve ateş var mı?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country1}
-            status={country1 && 'danger'}
+            status={country1 && "danger"}
             onChange={(isChecked) => {
               setCountry1(isChecked);
               if (isChecked) {
@@ -226,23 +237,26 @@ const CheckListScreen = ({navigation}) => {
               } else {
                 setIsEditable(false);
               }
-            }}>
-            {!country1 && 'Yok'}
-            {country1 && 'Var'}
+            }}
+          >
+            {!country1 && "Yok"}
+            {country1 && "Var"}
           </Toggle>
         </View>
       </View>
       <View style={styles.container}>
         <View style={styles.ViewContainerLeftBottom}>
-          <Paragraph style={styles.leftParag}>{'Varsa kaç derece?'} </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Varsa kaç derece?"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRightBottom}>
           <TextInput
             editable={isEditable}
             label={
               isEditable
-                ? 'Ateş Kaç Derece'
-                : 'Ateşiniz varsa değer girebilirsiniz!'
+                ? "Ateş Kaç Derece"
+                : "Ateşiniz varsa değer girebilirsiniz!"
             }
             returnKeyType="next"
             style={styles.inputContainer}
@@ -250,7 +264,7 @@ const CheckListScreen = ({navigation}) => {
             multiline={true}
             numberOfLines={1}
             value={name2.value}
-            onChangeText={(text) => setName2({value: text, error: ''})}
+            onChangeText={(text) => setName2({ value: text, error: "" })}
             error={!!name2.error}
             errorText={name2.error}
           />
@@ -259,14 +273,14 @@ const CheckListScreen = ({navigation}) => {
       <Separator />
       <View style={styles.container}>
         <View style={styles.ViewContainerLeft}>
-          <Paragraph style={styles.leftParag}>
-            {'Diğer (Var işaretleme durumunda nedenini yazınız.)'}{' '}
-          </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Diğer (Var işaretleme durumunda nedenini yazınız.)"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRight}>
           <Toggle
             checked={country8}
-            status={country8 && 'danger'}
+            status={country8 && "danger"}
             onChange={(isChecked) => {
               setCountry8(isChecked);
               if (isChecked) {
@@ -274,45 +288,49 @@ const CheckListScreen = ({navigation}) => {
               } else {
                 setIsEditable2(false);
               }
-            }}>
-            {!country8 && 'Yok'}
-            {country8 && 'Var'}
+            }}
+          >
+            {!country8 && "Yok"}
+            {country8 && "Var"}
           </Toggle>
         </View>
       </View>
       <View style={styles.container}>
         <View style={styles.ViewContainerLeftBottom}>
-          <Paragraph style={styles.leftParag}>{'Diğer'} </Paragraph>
+          <Text variant="bodyMedium" style={styles.leftParag}>
+            {"Diğer"}{" "}
+          </Text>
         </View>
         <View style={styles.ViewContainerRightBottom}>
           <TextInput
             editable={isEditable2}
             label={
               isEditable2
-                ? 'Açıklamanız'
-                : 'Diğeri seçmeniz durumunda yazabilirsiniz.'
+                ? "Açıklamanız"
+                : "Diğeri seçmeniz durumunda yazabilirsiniz."
             }
             returnKeyType="next"
             style={styles.inputContainer}
             multiline={true}
             numberOfLines={5}
             value={name.value}
-            onChangeText={(text) => setName({value: text, error: ''})}
+            onChangeText={(text) => setName({ value: text, error: "" })}
             error={!!name.error}
             errorText={name.error}
           />
         </View>
       </View>
       <Separator />
-      <View style={{height: 200}}>
-        <Paragraph />
-        <Paragraph />
+      <View style={{ height: 200 }}>
+        <Text />
+        <Text />
         {!loading && (
           <Button
             mode="contained"
             style={styles.button}
-            onPress={_InsertNewRecordToFirebase}>
-            {' '}
+            onPress={_InsertNewRecordToFirebase}
+          >
+            {" "}
             Sonucları Gönder
           </Button>
         )}
@@ -321,7 +339,7 @@ const CheckListScreen = ({navigation}) => {
       <Toast
         type={toast.type}
         message={toast.value}
-        onDismiss={() => setToast({value: '', type: ''})}
+        onDismiss={() => setToast({ value: "", type: "" })}
       />
     </Background_Green>
   );
@@ -330,50 +348,50 @@ const CheckListScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   inputContainer: {
     fontSize: 12,
-    width: '95%',
+    width: "95%",
   },
   separator: {
-    borderBottomColor: '#fff',
+    borderBottomColor: "#fff",
     borderWidth: 1,
-    width: '100%',
+    width: "100%",
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   container: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardStyle: {
     height: 80,
-    backgroundColor: 'transparent',
-    width: '100%',
+    backgroundColor: "transparent",
+    width: "100%",
   },
   ViewContainerLeft: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     flex: 8,
-    width: '100%',
+    width: "100%",
     height: 50,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   ViewContainerRight: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     flex: 4,
-    width: '100%',
+    width: "100%",
   },
   leftParag: {
     fontSize: 14,
     marginLeft: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   ViewContainerLeftBottom: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     flex: 5,
     height: 50,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   ViewContainerRightBottom: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     flex: 8,
   },
 });

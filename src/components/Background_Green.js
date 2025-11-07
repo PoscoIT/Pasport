@@ -1,33 +1,36 @@
-import React, {memo} from 'react';
+import { memo } from "react";
 import {
   ImageBackground,
   StyleSheet,
   KeyboardAvoidingView,
-  ScrollView,
+  StatusBar,
   Dimensions,
-} from 'react-native';
-let height = Dimensions.get('window').height; //full width
+  View,
+} from "react-native";
+let height = Dimensions.get("window").height; //full width
 
-const Background = ({children}) => (
-    <ScrollView style={{flex:1,height:height}}>
+const Background = ({ children }) => (
+  <View style={{ flex: 1, height: height }}>
     <ImageBackground resizeMode="repeat" style={styles.background}>
-
-        <KeyboardAvoidingView style={styles.container} behavior="padding">
-          {children}
-        </KeyboardAvoidingView>
-
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
+        {children}
+      </KeyboardAvoidingView>
     </ImageBackground>
-    </ScrollView>
+  </View>
 );
 
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: '#e3f2fd',
+    justifyContent: "flex-start",
+    height: height,
+
+    paddingTop: Platform.OS === "android" ? 0 : 0,
+    backgroundColor: "#e3f2fd",
   },
   container: {
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
 });
 

@@ -1,29 +1,40 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {memo} from 'react';
-import {StyleSheet, KeyboardAvoidingView, ScrollView} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
+import React, { memo } from "react";
+import {
+  StyleSheet,
+  KeyboardAvoidingView,
+  ScrollView,
+  View,
+  Platform,
+  Dimensions,
+  StatusBar,
+} from "react-native";
 
-const Background = ({children}) => (
-  <SafeAreaView style={styles.background}>
-    <ScrollView style={{flex: 1}}>
+const height = Dimensions.get("window").height;
+
+const Background = ({ children }) => (
+  <View style={styles.background}>
+    <ScrollView style={{ flex: 1 }}>
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         {children}
       </KeyboardAvoidingView>
     </ScrollView>
-  </SafeAreaView>
+  </View>
 );
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     flex: 1,
+    justifyContent: "flex-start",
+    height: height,
 
+    paddingTop: Platform.OS === "android" ? 0 : 44,
   },
   container: {
-    width: '100%',
-    alignSelf: 'center',
-    alignItems: 'center',
+    width: "100%",
+    alignSelf: "center",
+    alignItems: "center",
   },
 });
 

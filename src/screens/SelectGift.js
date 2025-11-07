@@ -1,78 +1,78 @@
-import React, {memo, useEffect, useState} from 'react';
-import {StyleSheet, Text, FlatList, Alert} from 'react-native';
-import 'firebase/auth';
-import Background_Green from '../components/Background_Green';
-import CardView from '../components/cardView';
-import firebase from 'firebase/compat/app';
-import {InsertSelectedAward} from '../api/auth-api';
-const SelectGift = ({route: {params}, navigation}) => {
+import React, { memo, useEffect, useState } from "react";
+import { StyleSheet, Text, FlatList, Alert } from "react-native";
+import Background_Green from "../components/Background_Green";
+import CardView from "../components/cardView";
+import { database } from "../database/firebaseDB";
+import { InsertSelectedAward } from "../api/auth-api";
+
+const SelectGift = ({ route: { params }, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [liste, setListe] = useState([]);
+
   const getTelNos = async () => {
-    firebase
-      .database()
-      .ref('TST_Award/Odul/' + params.appHead)
-      .on('value', snapshot => {
-        let li = [];
-        snapshot.forEach(child => {
-          if (child.val().active == 1)
-            li.push({
-              title: child.val().title,
-              brand: child.val().brand,
-              source: child.val().source,
-              id: child.val().id,
-            });
-        });
-        setListe(li);
+    const ref = database.ref("TST_Award/Odul/" + params.appHead);
+    ref.on("value", (snapshot) => {
+      const li = [];
+      snapshot.forEach((child) => {
+        const val = child.val();
+        if (val.active === 1) {
+          li.push({
+            title: val.title,
+            brand: val.brand,
+            source: val.source,
+            id: val.id,
+          });
+        }
       });
-    setLoading(false);
-    return loading;
+      setListe(li);
+      setLoading(false);
+    });
   };
 
   const insertRec = async (id, title, brand) => {
-    if (loading) {
-      return;
-    }
+    if (loading) return;
+
     setLoading(true);
-    const response = await InsertSelectedAward({
-      awardType: params.appHead,
-      selectedId: id,
-      brandtitle: title,
-      brand: brand,
-      cardKey: params.appCardKey.toString().split(',')[0],
-    }).then(() => {
-      return {response};
-    });
-    setLoading(false);
-    Alert.alert(
-      'Ödül Seçimi',
-      'Ödül seçimi başarılı. Talebiniz İnsan Kaynaklarına iletilmiştir.',
-    );
-    navigation.navigate('DashboardAward');
+    try {
+      await InsertSelectedAward({
+        awardType: params.appHead,
+        selectedId: id,
+        brandtitle: title,
+        brand: brand,
+        cardKey: params.appCardKey.toString().split(",")[0],
+      });
+
+      Alert.alert(
+        "Ödül Seçimi",
+        "Ödül seçimi başarılı. Talebiniz İnsan Kaynaklarına iletilmiştir."
+      );
+      navigation.navigate("DashboardAward");
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Hata", "Ödül seçimi sırasında bir hata oluştu.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     let isMounted = true;
-    getTelNos().then(() => {
-      if (isMounted) {
-        setLoading(false);
-      }
-    });
+    getTelNos();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const Item = ({title, brand, source, id}) => (
+  const Item = ({ title, brand, source, id }) => (
     <CardView
       title={title}
       brand={brand}
-      source={{uri: source}}
+      source={{ uri: source }}
       onPress={() => insertRec(id, title, brand)}
     />
   );
 
-  const renderItem = ({item}) => (
+  const renderItem = ({ item }) => (
     <Item
       title={item.title}
       brand={item.brand}
@@ -81,26 +81,15 @@ const SelectGift = ({route: {params}, navigation}) => {
     />
   );
 
-  const getHeader = () => {
-    return <Text>{''}</Text>;
-  };
-
-  const getFooter = () => {
-    if (this.loading) {
-      return null;
-    }
-    return <Text>{''}</Text>;
-  };
-
   return (
     <Background_Green>
       <FlatList
         style={styles.FlatList}
         data={liste}
         renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        ListHeaderComponent={getHeader}
-        ListFooterComponent={getFooter}
+        keyExtractor={(item) => item.id.toString()}
+        ListHeaderComponent={() => <Text>{""}</Text>}
+        ListFooterComponent={() => <Text>{""}</Text>}
       />
     </Background_Green>
   );
