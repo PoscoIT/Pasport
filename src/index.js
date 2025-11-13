@@ -86,7 +86,7 @@ const Index = ({ navigation }) => {
             ])
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   40"} />
+        <DrawerItem label={t("loginScreen.version") + "   41"} />
       </DrawerContentScrollView>
     );
   };
@@ -94,7 +94,7 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 40) {
+        if (responsee.version > 41) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(

@@ -213,7 +213,7 @@ const SafetyDetailScreen = ({ navigation }) => {
     } else {
       settype2Answer(3);
     }
-    console.log("buyradadasd");
+
     const response = await InsertNewRecordSafetyFirstApplication({
       totalPoint: totalPoint,
       question1Id: liste[rand].id,
@@ -297,7 +297,7 @@ const SafetyDetailScreen = ({ navigation }) => {
           <Separator />
           {loading && <ActivityIndicator color={"#444"} />}
           {!loading && (
-            <View style={[styles.container3, { marginLeft: 20 }]}>
+            <View style={[styles.container3, { marginLeft: 20, marginTop: 5 }]}>
               <Text variant="bodyMedium" style={styles.leftParag}>
                 {liste[rand].question}
               </Text>
@@ -366,7 +366,12 @@ const SafetyDetailScreen = ({ navigation }) => {
           {!loading && (
             <View style={styles.viewCont}>
               <Text></Text>
-              <Button mode="contained" onPress={insertRec2} disabled={disabled}>
+              <Button
+                buttonColor="#4e7291ff"
+                mode="contained"
+                onPress={insertRec2}
+                disabled={disabled}
+              >
                 Cevapları Gönder - SEND
               </Button>
               <Text></Text>
@@ -405,8 +410,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   cardStyle: {
-    backgroundColor: "transparent",
+    backgroundColor: "#d6e9f7ff",
     width: "100%",
+    borderRadius: 10,
   },
   leftParag: {
     fontSize: 14,

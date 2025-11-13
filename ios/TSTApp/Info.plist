@@ -34,11 +34,9 @@
 		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Play using while you are hiking</string>
+	<string>PASPort  needs access to your media.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>PASPort  needs access to your Camera.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your message to user when the photo library is accessed for the first time</string>
 	<key>RCTNewArchEnabled</key>

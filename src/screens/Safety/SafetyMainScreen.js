@@ -211,18 +211,16 @@ const SafetyMainScreen = ({ route: { params }, navigation }) => {
                 {t("safetyMainScreen.safetyRules")}
               </Button>
 
-              {isEmailPoscoAssan && (
-                <Button
-                  textColor="#fff"
-                  style={styles.buttonRight}
-                  mode="outlined"
-                  onPress={() => navigation.navigate("SafetyControl")}
-                >
-                  {languageData
-                    ? languageData[43]?.Name
-                    : t("safetyMainScreen.safetyInspection")}
-                </Button>
-              )}
+              <Button
+                textColor="#fff"
+                style={styles.buttonRight}
+                mode="outlined"
+                onPress={() => navigation.navigate("SafetyControl")}
+              >
+                {languageData.length > 0
+                  ? languageData[43]?.Name
+                  : t("safetyMainScreen.safetyInspection")}
+              </Button>
             </View>
 
             <ImageBackground

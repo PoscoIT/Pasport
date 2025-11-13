@@ -14,6 +14,7 @@ import Background_Green from "../components/Background_Green";
 import PickerModal from "react-native-picker-modal-view";
 import Button from "../components/Button";
 import { t } from "i18next";
+import { ScrollView } from "react-native-gesture-handler";
 
 let height = Dimensions.get("window").height; //full width
 let width = Dimensions.get("window").width; //full width
@@ -215,139 +216,145 @@ const GiveMindScreen = ({ navigation }) => {
 
   return (
     <Background_Green>
-      <Card style={styles.cardStyle}>
-        <Card.Content>
-          <Text variant="titleLarge">{t("loginScreen.message1")},</Text>
-          <Text variant="bodyMedium">{t("loginScreen.message2")}</Text>
-          <Text variant="bodyMedium">
-            Kalan Teşekkür Miktarı (Remaining Thanks) : {creditPoint}
-          </Text>
-        </Card.Content>
-      </Card>
-      <View>
-        <View style={styles.container}>
-          <PickerModal
-            onSelected={(item) => {
-              setAdSoyad({ value: item.Name });
-              setsicilNo({ value: item.value });
-              setlineInfo({ value: item.lineValue });
-              setMailInfo({ value: item.MailAdd });
-              setSelectedItem(item);
-            }}
-            Autocomplete={false}
-            items={liste}
-            sortingLanguage={"tr"}
-            showToTopButton={true}
-            selected={selectedItem}
-            showAlphabeticalIndex={true}
-            autoGenerateAlphabeticalIndex={true}
-            selectPlaceholderText={"Ad Soyad (Name Surname)"}
-            searchPlaceholderText={"Search..."}
-            requireSelection={false}
-            autoSort={true}
+      <ScrollView>
+        <Card style={styles.cardStyle}>
+          <Card.Content>
+            <Text variant="titleLarge">{t("loginScreen.message1")},</Text>
+            <Text variant="bodyMedium">{t("loginScreen.message2")}</Text>
+            <Text variant="bodyMedium">
+              Kalan Teşekkür Miktarı (Remaining Thanks) : {creditPoint}
+            </Text>
+          </Card.Content>
+        </Card>
+        <View>
+          <View style={styles.container}>
+            <PickerModal
+              onSelected={(item) => {
+                setAdSoyad({ value: item.Name });
+                setsicilNo({ value: item.value });
+                setlineInfo({ value: item.lineValue });
+                setMailInfo({ value: item.MailAdd });
+                setSelectedItem(item);
+              }}
+              Autocomplete={false}
+              items={liste}
+              sortingLanguage={"tr"}
+              showToTopButton={true}
+              selected={selectedItem}
+              showAlphabeticalIndex={true}
+              autoGenerateAlphabeticalIndex={true}
+              selectPlaceholderText={"Ad Soyad (Name Surname)"}
+              searchPlaceholderText={"Search..."}
+              requireSelection={false}
+              autoSort={true}
+            />
+          </View>
+          <View style={styles.container}>
+            <PickerModal
+              onSelected={(item) => {
+                setDeger({ value: item.value });
+                setSelectedItem2(item);
+              }}
+              Autocomplete={false}
+              items={dataCore}
+              sortingLanguage={"tr"}
+              showToTopButton={true}
+              selected={selectedItem2}
+              selectPlaceholderText={"İlgili Değer (Related Core Value)"}
+              searchPlaceholderText={"Search..."}
+              requireSelection={false}
+              autoSort={true}
+            />
+          </View>
+          <View style={styles.containerAciklama}>
+            <TextInput
+              mode="fixed"
+              placeholder="Açıklama (Explanation)"
+              style={styles.input2}
+              value={commente.value}
+              onChangeText={(text) => setCommente({ value: text })}
+              multiline={true}
+              Autocomplete={false}
+              maxLength={160}
+              right={<TextInput.Affix text={commente.value.length + "/160"} />}
+              underlineColorAndroid="transparent"
+            />
+          </View>
+          <View style={styles.container}>
+            {!loading && (
+              <Button
+                mode="contained"
+                style={styles.button}
+                onPress={insertRec}
+              >
+                {" "}
+                Teşekkür Gönder (Send)
+              </Button>
+            )}
+          </View>
+          <View style={styles.listItemViewer}>
+            <View style={styles.ViewContainerRightBottom}>
+              <Card>
+                <Card.Content>
+                  <Text variant="titleLarge">{t("gonuldenScreen.safety")}</Text>
+                  <Text variant="bodyMedium">
+                    {t("gonuldenScreen.safetyMessage")}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </View>
+            <View style={styles.ViewContainerRightBottom}>
+              <Card>
+                <Card.Content>
+                  <Text variant="titleLarge">{t("gonuldenScreen.ethics")}</Text>
+                  <Text variant="bodyMedium">
+                    {t("gonuldenScreen.ethicsMessage")}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </View>
+            <View style={styles.ViewContainerRightBottom}>
+              <Card>
+                <Card.Content>
+                  <Text variant="titleLarge">
+                    {t("gonuldenScreen.fundamental")}
+                  </Text>
+                  <Text variant="bodyMedium">
+                    {t("gonuldenScreen.fundamentalMessage")}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </View>
+            <View style={styles.ViewContainerRightBottom}>
+              <Card>
+                <Card.Content>
+                  <Text variant="titleLarge">{t("gonuldenScreen.winWin")}</Text>
+                  <Text variant="bodyMedium">
+                    {t("gonuldenScreen.winWinMessage")}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </View>
+            <View style={styles.ViewContainerRightBottom}>
+              <Card>
+                <Card.Content>
+                  <Text variant="titleLarge">
+                    {t("gonuldenScreen.creativity")}
+                  </Text>
+                  <Text variant="bodyMedium">
+                    {t("gonuldenScreen.creativityMessage")}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </View>
+          </View>
+          <Toast
+            type={toast.type}
+            message={toast.value}
+            onDismiss={() => setToast({ value: "", type: "" })}
           />
         </View>
-        <View style={styles.container}>
-          <PickerModal
-            onSelected={(item) => {
-              setDeger({ value: item.value });
-              setSelectedItem2(item);
-            }}
-            Autocomplete={false}
-            items={dataCore}
-            sortingLanguage={"tr"}
-            showToTopButton={true}
-            selected={selectedItem2}
-            selectPlaceholderText={"İlgili Değer (Related Core Value)"}
-            searchPlaceholderText={"Search..."}
-            requireSelection={false}
-            autoSort={true}
-          />
-        </View>
-        <View style={styles.containerAciklama}>
-          <TextInput
-            mode="fixed"
-            placeholder="Açıklama (Explanation)"
-            style={styles.input2}
-            value={commente.value}
-            onChangeText={(text) => setCommente({ value: text })}
-            multiline={true}
-            Autocomplete={false}
-            maxLength={160}
-            right={<TextInput.Affix text={commente.value.length + "/160"} />}
-            underlineColorAndroid="transparent"
-          />
-        </View>
-        <View style={styles.container}>
-          {!loading && (
-            <Button mode="contained" style={styles.button} onPress={insertRec}>
-              {" "}
-              Teşekkür Gönder (Send)
-            </Button>
-          )}
-        </View>
-        <View style={styles.listItemViewer}>
-          <View style={styles.ViewContainerRightBottom}>
-            <Card>
-              <Card.Content>
-                <Text variant="titleLarge">{t("gonuldenScreen.safety")}</Text>
-                <Text variant="bodyMedium">
-                  {t("gonuldenScreen.safetyMessage")}
-                </Text>
-              </Card.Content>
-            </Card>
-          </View>
-          <View style={styles.ViewContainerRightBottom}>
-            <Card>
-              <Card.Content>
-                <Text variant="titleLarge">{t("gonuldenScreen.ethics")}</Text>
-                <Text variant="bodyMedium">
-                  {t("gonuldenScreen.ethicsMessage")}
-                </Text>
-              </Card.Content>
-            </Card>
-          </View>
-          <View style={styles.ViewContainerRightBottom}>
-            <Card>
-              <Card.Content>
-                <Text variant="titleLarge">
-                  {t("gonuldenScreen.fundamental")}
-                </Text>
-                <Text variant="bodyMedium">
-                  {t("gonuldenScreen.fundamentalMessage")}
-                </Text>
-              </Card.Content>
-            </Card>
-          </View>
-          <View style={styles.ViewContainerRightBottom}>
-            <Card>
-              <Card.Content>
-                <Text variant="titleLarge">{t("gonuldenScreen.winWin")}</Text>
-                <Text variant="bodyMedium">
-                  {t("gonuldenScreen.winWinMessage")}
-                </Text>
-              </Card.Content>
-            </Card>
-          </View>
-          <View style={styles.ViewContainerRightBottom}>
-            <Card>
-              <Card.Content>
-                <Text variant="titleLarge">
-                  {t("gonuldenScreen.creativity")}
-                </Text>
-                <Text variant="bodyMedium">
-                  {t("gonuldenScreen.creativityMessage")}
-                </Text>
-              </Card.Content>
-            </Card>
-          </View>
-        </View>
-        <Toast
-          type={toast.type}
-          message={toast.value}
-          onDismiss={() => setToast({ value: "", type: "" })}
-        />
-      </View>
+      </ScrollView>
     </Background_Green>
   );
 };

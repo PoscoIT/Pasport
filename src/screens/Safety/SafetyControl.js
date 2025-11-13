@@ -22,6 +22,7 @@ import {
   Provider,
   Dialog,
   DefaultTheme,
+  IconButton,
 } from "react-native-paper";
 import { theme } from "../../core/theme";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -607,11 +608,13 @@ const SafetyControl = ({ navigation }) => {
               </TouchableWithoutFeedback>
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View>
-                  <View>
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      {languageData[13]?.Name}
-                    </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ color: "red" }}> *</Text>
+                    <Text> {languageData[13]?.Name}</Text>
                   </View>
                   {lineUniqueList ? (
                     <PickerModal
@@ -639,10 +642,8 @@ const SafetyControl = ({ navigation }) => {
               {areaUniqueList?.length > 0 ? (
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <View>
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      {languageData[14]?.Name}
-                    </Text>
+                    <Text style={{ color: "red" }}> *</Text>
+                    <Text> {languageData[14]?.Name}</Text>
                     {areaUniqueList ? (
                       <PickerModal
                         style={{ width: "100%", backgroundColor: "black" }}
@@ -667,11 +668,13 @@ const SafetyControl = ({ navigation }) => {
 
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View>
-                  <View>
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      {languageData[15]?.Name}
-                    </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ color: "red" }}> *</Text>
+                    <Text> {languageData[15]?.Name}</Text>
                   </View>
                   {inspectionList ? (
                     <PickerModal
@@ -698,15 +701,17 @@ const SafetyControl = ({ navigation }) => {
               </TouchableWithoutFeedback>
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View>
-                  <View>
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      {languageData[16]?.Name}
-                    </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ color: "red" }}> *</Text>
+                    <Text> {languageData[16]?.Name}</Text>
                   </View>
                   {accidentList ? (
                     <PickerModal
-                      style={{ width: "100%", backgroundColor: "red" }}
+                      style={{ width: "100%", backgroundColor: "black" }}
                       Autocomplete={false}
                       items={accidentList}
                       sortingLanguage={"tr"}
@@ -716,7 +721,7 @@ const SafetyControl = ({ navigation }) => {
                       selectPlaceholderText={
                         <Text>
                           <Text style={{ color: "red" }}> *</Text>
-                          {languageData[27]?.Name}
+                          <Text> {languageData[27]?.Name}</Text>
                         </Text>
                       }
                       searchPlaceholderText={languageData[29]?.Name}
@@ -729,11 +734,13 @@ const SafetyControl = ({ navigation }) => {
               </TouchableWithoutFeedback>
               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View>
-                  <View>
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      {languageData[17]?.Name}
-                    </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text style={{ color: "red" }}> *</Text>
+                    <Text> {languageData[17]?.Name}</Text>
                   </View>
 
                   <PickerModal
@@ -747,7 +754,7 @@ const SafetyControl = ({ navigation }) => {
                     selectPlaceholderText={
                       <Text>
                         <Text style={{ color: "red" }}> *</Text>
-                        {languageData[27]?.Name}
+                        <Text> {languageData[27]?.Name}</Text>
                       </Text>
                     }
                     searchPlaceholderText={languageData[29]?.Name}
@@ -758,7 +765,7 @@ const SafetyControl = ({ navigation }) => {
                 </View>
               </TouchableWithoutFeedback>
 
-              <View>
+              <View style={{ height: 60 }}>
                 <Text>{languageData[19]?.Name}</Text>
                 <RadioGroup
                   style={{
@@ -776,7 +783,11 @@ const SafetyControl = ({ navigation }) => {
                 </RadioGroup>
               </View>
               <KeyboardAvoidingView
-                style={{ flex: 1, justifyContent: "center" }}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  marginTop: Platform.OS === "ios" ? 20 : 0,
+                }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
               >
                 <TextInput
@@ -803,7 +814,7 @@ const SafetyControl = ({ navigation }) => {
                     {action === 1 ? (
                       <Text style={{ color: "red" }}> *</Text>
                     ) : null}
-                    {languageData[23]?.Name}
+                    <Text> {languageData[23]?.Name}</Text>
                   </Text>
                 }
                 autoCapitalize="none"
@@ -920,7 +931,11 @@ const SafetyControl = ({ navigation }) => {
                 </Portal>
               </View>
               <View
-                style={{ flex: 1, alignItems: "center", marginVertical: 10 }}
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  marginVertical: 10,
+                }}
               >
                 {loading ? (
                   <ActivityIndicator
@@ -932,7 +947,6 @@ const SafetyControl = ({ navigation }) => {
                     style={styles.button}
                     disabled={loading}
                     onPress={addForm}
-                    color={theme.colors.primary}
                     mode="contained"
                   >
                     {languageData[24]?.Name}
@@ -953,10 +967,10 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "flex-start",
     marginBottom: 40,
-    justifyContent: "flex-start",
-    height: height,
 
-    paddingTop: Platform.OS === "android" ? 0 : 44,
+    justifyContent: "flex-start",
+
+    paddingTop: Platform.OS === "android" ? 0 : 0,
   },
   select: {
     margin: 5,

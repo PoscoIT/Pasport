@@ -170,6 +170,7 @@ const BodyShowerChecklist = () => {
         console.log(err);
       })
       .finally(() => {
+        setScan(true);
         setModalVisible(false);
       });
   };
@@ -410,7 +411,7 @@ const BodyShowerChecklist = () => {
           style={StyleSheet.absoluteFill}
           codeScanner={codeScannner}
           device={device}
-          isActive={scan}
+          isActive={true}
         />
 
         <Modal
@@ -440,7 +441,7 @@ const BodyShowerChecklist = () => {
                       onPress={() => {
                         setModalVisible(!modalVisible);
                         setData([]);
-                        setScan(false);
+                        setScan(true);
                         setCount(count + 1);
                       }}
                     >
@@ -452,7 +453,7 @@ const BodyShowerChecklist = () => {
                     Göz ve Boy Duşları, Göz Solüsyonları Kontrolleri
                   </Text>
                   <Text>{qrValue}</Text>
-                  {data ? (
+                  {data.length > 0 ? (
                     data[0]?.isRecent === true ? (
                       <FlatList
                         keyExtractor={(item) => item.ID}
@@ -468,7 +469,15 @@ const BodyShowerChecklist = () => {
                       checklistPopup()
                     )
                   ) : (
-                    checklistPopup()
+                    <FlatList
+                      keyExtractor={(item) => item.ID}
+                      renderItem={renderItem}
+                      ListEmptyComponent={
+                        <View>
+                          <Text>{t("fireEquipmentScreen.notQrCode")}</Text>
+                        </View>
+                      }
+                    />
                   )}
                 </View>
               </View>

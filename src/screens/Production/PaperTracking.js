@@ -30,13 +30,8 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 
 const PaperTracking = () => {
   const navigation = useNavigation();
-  const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(0);
   const [netInfo, setNetInfo] = useState("");
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
-  const [scanner, setScanner] = useState("");
   const [ScanResult, setScanResult] = useState(false);
   const [scan, setScan] = useState(false);
   const [data, setData] = useState([]);
@@ -45,19 +40,14 @@ const PaperTracking = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
-  const [scanned, setScanned] = useState(false);
   const [employeeID, setEmployeeId] = useState("");
   const { width, height } = Dimensions.get("screen");
   const [selectedReturnMessage, setSelectedReturnMessage] = useState("");
   const [returnMessageData, setReturnMessageData] = useState([]);
   const [countMethod, setCountMethod] = useState(false);
-  const select = useRef();
   const url = "https://tstapp.poscoassan.com.tr:8443";
   const [returnMessage, setReturnMessage] = useState("");
   const device = useCameraDevice("back");
-  const [hasPermission, setHasPermission] = useState(false);
-  const isFocused = useIsFocused();
-  const [checked, setChecked] = useState(false);
 
   const getPermission = async (a) => {
     const cameraPermission = await Camera.requestCameraPermission();
@@ -162,6 +152,7 @@ const PaperTracking = () => {
           setCount(count + 1);
           setData([]);
           setQrValue("");
+          setScan(true);
           setReturnMessage("");
           setSelectedReturnMessage("");
 
@@ -206,6 +197,7 @@ const PaperTracking = () => {
               setCount(count + 1);
               setData([]);
               setQrValue("");
+              setScan(true);
               setReturnMessage("");
               setSelectedReturnMessage("");
             } else {
@@ -495,6 +487,7 @@ const PaperTracking = () => {
                   onPress={() => {
                     setModalVisible(!modalVisible);
                     setData([]);
+                    setQrValue("");
                     setScan(false);
                     setCount(count + 1);
                   }}
@@ -543,6 +536,7 @@ const PaperTracking = () => {
                     setQrValue("");
                     setQrValueManual("");
                     setModalVisible1(!modalVisible1);
+                    setCount(count + 1);
                   }}
                 >
                   <FontAwesome name={"close"} color="#000000" size={32} />
@@ -605,6 +599,7 @@ const PaperTracking = () => {
                     setQrValue("");
                     setQrValueManual("");
                     setModalVisible2(!modalVisible2);
+                    setCount(count + 1);
                   }}
                 >
                   <FontAwesome name={"close"} color="#000000" size={32} />

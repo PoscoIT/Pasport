@@ -5,6 +5,8 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { Button } from "react-native-paper";
 
@@ -158,7 +160,7 @@ const LoginScreen = ({ navigation }) => {
                 marginVertical: 50,
               }}
             >
-              <Text>{t("loginScreen.version")} 40</Text>
+              <Text>{t("loginScreen.version")} 41</Text>
             </View>
           </View>
         </View>
@@ -197,6 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     height: height,
     backgroundColor: "#D6E4EF",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 30 : 60,
   },
   button: {
     backgroundColor: "#196795",

@@ -4,12 +4,12 @@ import { Fragment } from "react";
 import { t } from "i18next";
 
 const DATA = [
-  {
-    id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: t("foodMenu.title"),
-    to: "FoodMenu",
-    icon: "food",
-  },
+  // {
+  //   id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
+  //   title: t("foodMenu.title"),
+  //   to: "FoodMenu",
+  //   icon: "food",
+  // },
   {
     id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
     title: "Gönülden",
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 8,
+    marginBottom: 8,
   },
   title: {
     fontSize: 16,

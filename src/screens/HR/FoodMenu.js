@@ -96,7 +96,6 @@ const FoodMenu = () => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      console.log(jsonData);
       // Burada jsonData değişkeni JSON formatına dönüştürülmüş veriyi içerir
     } catch (error) {
       console.error("An error occurred:", error);

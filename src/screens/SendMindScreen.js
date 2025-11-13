@@ -1,11 +1,17 @@
-import React, { memo, useState, useEffect } from "react";
-import { StyleSheet, Dimensions, View, ActivityIndicator } from "react-native";
+import { memo, useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Dimensions,
+  View,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
 import Toast from "../components/Toast";
 import { sendUserInfoName } from "../api/auth-api";
-import { SectionGrid } from "react-native-super-grid";
 import Background_Green from "../components/Background_Green";
 import { Card, Text } from "react-native-paper";
 import { database } from "../database/firebaseDB";
+import { ScrollView } from "react-native-gesture-handler";
 
 let width = Dimensions.get("window").width; // full width
 
@@ -58,54 +64,72 @@ const SendMindScreen = ({ navigation }) => {
   return (
     <Background_Green>
       {loading && <ActivityIndicator color={"#444"} />}
-      <Card style={styles.cardStyle}>
-        <Card.Content>
-          <Text variant="titleLarge">Değerli Çalışanımız,</Text>
-          <Text variant="bodyMedium">
-            Gönderdiğiniz teşekkürleri aşağıda görebilirsiniz.
-          </Text>
-          <Separator />
-        </Card.Content>
-      </Card>
-      {!loading && (
-        <SectionGrid
-          itemDimension={width - 10}
-          fixed
-          sections={[
-            {
-              data: liste,
-            },
-          ]}
-          style={styles.gridView}
-          renderItem={({ item }) => (
-            <View style={[styles.itemContainer, { backgroundColor: "#39b" }]}>
-              <Text style={styles.itemName2}>{item.label}</Text>
-              <Text style={styles.itemName}>{item.lineva}</Text>
-              <Text style={styles.itemName}>{item.lineValue}</Text>
-              <Text style={styles.itemCode}>{item.value}</Text>
-            </View>
-          )}
+      <ScrollView>
+        <Card style={styles.cardStyle}>
+          <Card.Content>
+            <Text variant="titleLarge">Değerli Çalışanımız,</Text>
+            <Text variant="bodyMedium">
+              Gönderdiğiniz teşekkürleri aşağıda görebilirsiniz.
+            </Text>
+            <Separator />
+          </Card.Content>
+        </Card>
+        {!loading && (
+          <FlatList
+            style={styles.gridView}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
+            data={liste}
+            keyExtractor={(item) => item.lineva}
+            renderItem={({ item }) => (
+              <View style={[styles.itemContainer, { backgroundColor: "#39b" }]}>
+                <Text style={styles.itemName2}>{item.label}</Text>
+                <Text style={styles.itemName}>{item.lineva}</Text>
+                <Text style={styles.itemName}>{item.lineValue}</Text>
+                <Text style={styles.itemCode}>{item.value}</Text>
+              </View>
+            )}
+          />
+          // <SectionGrid
+          //   itemDimension={width - 10}
+          //   fixed
+          //   sections={[
+          //     {
+          //       data: liste,
+          //     },
+          //   ]}
+          //   style={styles.gridView}
+          //   renderItem={({ item }) => (
+          //     <View style={[styles.itemContainer, { backgroundColor: "#39b" }]}>
+          //       <Text style={styles.itemName2}>{item.label}</Text>
+          //       <Text style={styles.itemName}>{item.lineva}</Text>
+          //       <Text style={styles.itemName}>{item.lineValue}</Text>
+          //       <Text style={styles.itemCode}>{item.value}</Text>
+          //     </View>
+          //   )}
+          // />
+        )}
+        <Toast
+          type={toast.type}
+          message={toast.value}
+          onDismiss={() => setToast({ value: "", type: "" })}
         />
-      )}
-      <Toast
-        type={toast.type}
-        message={toast.value}
-        onDismiss={() => setToast({ value: "", type: "" })}
-      />
+      </ScrollView>
     </Background_Green>
   );
 };
 
 const styles = StyleSheet.create({
   gridView: {
-    flex: 1,
-    width: width - 10,
     marginBottom: 50,
+    paddingBottom: 50,
+    marginTop: 20,
   },
   itemContainer: {
     justifyContent: "flex-start",
     borderRadius: 5,
     padding: 5,
+    marginBottom: 10,
     height: 120,
   },
   itemName: {

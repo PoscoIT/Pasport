@@ -85,7 +85,7 @@ android {
 
     packagingOptions {
         jniLibs {
-            useLegacyPackaging true
+            useLegacyPackaging false
         }
     }
 
@@ -93,8 +93,8 @@ android {
         applicationId "com.pasport"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4194385
-        versionName "5.6.8"
+        versionCode 4194386
+        versionName "5.6.9"
         missingDimensionStrategy 'react-native-camera', 'general'
 
 

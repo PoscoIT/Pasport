@@ -292,10 +292,9 @@ export const sendUserInfoName = async (callback) => {
         );
 
         const snapshot = await get(dbQuery);
-        console.log("basdasd23123213");
+
         if (snapshot.exists()) {
           snapshot.forEach(function (childSnapshot) {
-            console.log(childSnapshot.val());
             const val = childSnapshot.val();
             uname = val.AdSoyad;
             empSicil = val.SicilNo;
@@ -622,7 +621,6 @@ export const getVersionNo = async (callback) => {
         });
       }
     } catch (error) {
-      ß;
       console.log("getVersionNo hatası:", error);
     }
 
@@ -1262,7 +1260,7 @@ export const InsertNewRecordSafetyFirstApplication = async ({
       uid = user.uid;
       uemail = user.email;
     }
-    console.log(user);
+
     // Changed: Replaced Timestamp.now() and convertTimestamp with new Date()
     var today = new Date();
     var todayFull = new Date();
@@ -1298,7 +1296,6 @@ export const InsertNewRecordSafetyFirstApplication = async ({
       });
 
       await sendUserInfo(async (responsed) => {
-        console.log(responsed, "asdsadasd");
         // Changed: Chained query and ref
         const q = database
           .ref(`SafetyPivot/${yyyy}_${mm}/`)
@@ -1534,7 +1531,7 @@ export const InsertNewRecordSafetyFirstApplication2 = async (callback) => {
       uid = user.uid;
       uemail = user.email;
     }
-    console.log("burda", user);
+
     // Changed: Replaced Timestamp.now() and convertTimestamp with new Date()
     var today = new Date();
     var todayFull = new Date();

@@ -32,6 +32,7 @@ import {
 
 import {
   Camera,
+  getCameraDevice,
   useCameraDevice,
   useCodeScanner,
 } from "react-native-vision-camera";
@@ -93,6 +94,7 @@ const FireEquipmentChecklist = () => {
       .get(`${url}/ISGSystems/GetFireEquipment`, {
         headers: {
           "auth-token": REACT_APP_SECRET_KEY,
+          "Content-type": "application/json",
         },
         params: {
           EquipmentNo: qrValue,
@@ -190,11 +192,10 @@ const FireEquipmentChecklist = () => {
           Alert.alert("Hata", "Lütfen bağlantınızı kontrol ediniz.");
         }
       })
-      .catch((err) => {
-        console.log(err);
-      })
+      .catch((err) => {})
       .finally(() => {
         setModalVisible(false);
+        setScan(true);
       });
   };
 
@@ -480,7 +481,7 @@ const FireEquipmentChecklist = () => {
                   onPress={() => {
                     setModalVisible(!modalVisible);
                     setData([]);
-                    setScan(false);
+                    setScan(true);
                     setCount(count + 1);
                   }}
                 >
@@ -489,7 +490,7 @@ const FireEquipmentChecklist = () => {
               </View>
               <Text style={styles.modalText}> Yangın Ekipman Bilgileri</Text>
               <Text>{qrValue}</Text>
-              {pageAuthorization ? (
+              {pageAuthorization && data.length > 0 ? (
                 data && data[0]?.isRecent === true ? (
                   <FlatList
                     keyExtractor={(item) => item.ID}
@@ -507,7 +508,6 @@ const FireEquipmentChecklist = () => {
               ) : (
                 <FlatList
                   keyExtractor={(item) => item.ID}
-                  data={data}
                   renderItem={renderItem}
                   ListEmptyComponent={
                     <View>

@@ -1,6 +1,7 @@
 import {
   Alert,
   Dimensions,
+  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -102,7 +103,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 marginVertical: 50,
               }}
             >
-              <Text>{t("loginScreen.version")} 40</Text>
+              <Text>{t("loginScreen.version")} 41</Text>
             </View>
           </View>
         </View>
@@ -138,6 +139,7 @@ const styles = StyleSheet.create({
   safeAreaStyle: {
     flex: 1,
     justifyContent: "flex-start",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 30 : 60,
     height: height,
     backgroundColor: "#D6E4EF",
   },
