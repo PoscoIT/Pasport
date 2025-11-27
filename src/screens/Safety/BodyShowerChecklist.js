@@ -29,6 +29,7 @@ import {
   useCodeScanner,
 } from "react-native-vision-camera";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { ScrollView } from "react-native-gesture-handler";
 
 const BodyShowerChecklist = () => {
   const [count, setCount] = useState(0);
@@ -57,10 +58,11 @@ const BodyShowerChecklist = () => {
   const device = useCameraDevice("back");
   const [hasPermission, setHasPermission] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [isActive, setIsActive] = useState(true);
 
   let scanAgain = (a = false) => {
     setCountMethod(a);
-    setScan(true);
+
     setScanResult(false);
   };
 
@@ -69,7 +71,6 @@ const BodyShowerChecklist = () => {
 
     setQrValue(e.data);
 
-    setScan(false);
     setScanResult(true);
   };
   const getUser = async () => {
@@ -78,14 +79,14 @@ const BodyShowerChecklist = () => {
     });
   };
 
-  const getChecklistHistory = async () => {
+  const getChecklistHistory = async (qrValue2) => {
     await axios
       .get(`${url}/ISGSystems/GetBodyShower`, {
         headers: {
           "auth-token": REACT_APP_SECRET_KEY,
         },
         params: {
-          EquipmentNo: qrValue,
+          EquipmentNo: qrValue2,
           // EquipmentNo:qrValue
         },
       })
@@ -114,8 +115,9 @@ const BodyShowerChecklist = () => {
       setModalVisible(true);
       setQrValue(codes[0]?.value);
 
-      setScan(false);
       setScanResult(true);
+
+      getChecklistHistory(codes[0]?.value);
     },
     requestCameraPermission: true,
   });
@@ -152,7 +154,6 @@ const BodyShowerChecklist = () => {
       })
       .then((res) => {
         if (res.data) {
-          setCount(count + 1);
           setData([]);
           setCheckedDeformation(false);
           setCheckedFaultyValve(false);
@@ -170,7 +171,7 @@ const BodyShowerChecklist = () => {
         console.log(err);
       })
       .finally(() => {
-        setScan(true);
+        setIsActive(true);
         setModalVisible(false);
       });
   };
@@ -276,7 +277,7 @@ const BodyShowerChecklist = () => {
         </View>
 
         <View style={{ marginTop: 15 }}>
-          <Button onPress={() => addChecklist()}>
+          <Button style={{ borderRadius: 10 }} onPress={() => addChecklist()}>
             {t("fireEquipmentScreen.submit")}
           </Button>
         </View>
@@ -374,7 +375,7 @@ const BodyShowerChecklist = () => {
       if (cameraPermission === "granted") {
         setPermission(true);
         // Küçük delay ile başlat (bazı cihazlarda gerekli)
-        setTimeout(() => setScan(true), 400);
+        setTimeout(() => setIsActive(true), 400);
       } else {
         Linking.openSettings();
       }
@@ -383,11 +384,12 @@ const BodyShowerChecklist = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setScan(true); // ekrana geldiğinde aktif et
+      setIsActive(true);
 
       return () => {
-        navigation.navigate("SafetyMainScreen");
-        setScan(false); // ekrandan çıkarken pasif et
+        navigation.navigate(t("safetyApplication"));
+
+        setIsActive(true);
       };
     }, [])
   );
@@ -396,9 +398,9 @@ const BodyShowerChecklist = () => {
     getUser();
   }, []);
 
-  useEffect(() => {
-    getChecklistHistory();
-  }, [qrValue, count]);
+  // useEffect(() => {
+  //   getChecklistHistory();
+  // }, [qrValue, count]);
 
   if (!device || !permission) {
     return null;
@@ -411,7 +413,7 @@ const BodyShowerChecklist = () => {
           style={StyleSheet.absoluteFill}
           codeScanner={codeScannner}
           device={device}
-          isActive={true}
+          isActive={isActive}
         />
 
         <Modal
@@ -420,7 +422,8 @@ const BodyShowerChecklist = () => {
           visible={modalVisible}
           onRequestClose={() => {
             setModalVisible(!modalVisible);
-            setCount(count + 1);
+
+            setIsActive(true);
           }}
         >
           <KeyboardAvoidingView
@@ -441,8 +444,7 @@ const BodyShowerChecklist = () => {
                       onPress={() => {
                         setModalVisible(!modalVisible);
                         setData([]);
-                        setScan(true);
-                        setCount(count + 1);
+                        setIsActive(true);
                       }}
                     >
                       <FontAwesome name={"close"} color="#000000" size={32} />

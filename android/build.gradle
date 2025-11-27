@@ -22,15 +22,40 @@ buildscript {
     }
 }
 
+// Apply Java 21 LTS to ALL subprojects using pluginManager
+allprojects {
+    plugins.withId('com.android.library') {
+        android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_21
+                targetCompatibility JavaVersion.VERSION_21
+            }
+        }
+    }
+    
+    plugins.withId('com.android.application') {
+        android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_21
+                targetCompatibility JavaVersion.VERSION_21
+            }
+        }
+    }
+}
 
-
-// ✅ Groovy ile uyumlu hale getirildi
+// ✅ Apply Java 21 LTS to all subprojects
 subprojects { subproject ->
     afterEvaluate { proj ->
         if (proj.plugins.hasPlugin("com.android.library") || proj.plugins.hasPlugin("com.android.application")) {
             proj.android {
                 compileSdkVersion rootProject.ext.compileSdkVersion
                 buildToolsVersion rootProject.ext.buildToolsVersion
+
+                // Java compatibility: keep target at 17 for Android modules to avoid classfile mismatches
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
 
                 defaultConfig {
                     minSdkVersion rootProject.ext.minSdkVersion
@@ -40,6 +65,13 @@ subprojects { subproject ->
                 buildFeatures {
                     buildConfig = true
                 }
+            }
+        }
+        
+        // Apply Kotlin JVM target 17 to Kotlin tasks to match Java compilation target
+        proj.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = "17"
             }
         }
     }

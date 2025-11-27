@@ -304,6 +304,7 @@ set(OLD_GLOB
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGImageShadowNode.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGImageState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGLayoutableShadowNode.cpp"
+  "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGLayoutableState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGShadowNodes.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")

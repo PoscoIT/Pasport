@@ -1,5 +1,5 @@
 {
-  "translation":{
+  "translation": {
     "general": {
       "updateApp": "Update App",
       "logOut": "Logout",
@@ -55,11 +55,12 @@
       "savedSuccessfully": "Saved Successfully",
       "errorMessage": "An error was encountered"
     },
+    "safetyApplication": "Safety Application",
     "safetyMainScreen": {
       "message1": "Dear Employee",
       "message2": "You can answer your questions today by clicking the button below.",
       "monthlyPoint": "Monthly score",
-      "ranking":"Your Ranking",
+      "ranking": "Your Ranking",
       "totalPoint": "Total Point",
       "answerQuestion": "Answer the Questions",
       "completed": "Completed",
@@ -76,8 +77,7 @@
       "onePoint": "One Point Lesson",
       "safetyVideo": "Safety Videos"
     },
-    "itSr":
-    {
+    "itSr": {
       "request": "Please write your problem",
       "createITRequest": "Create IT request"
     },
@@ -137,7 +137,7 @@
     },
     "employeeIDMessage": "Please enter a valid employee ID",
     "requestForklift": "Requested Forklift",
-      "reservationLine": "Forklift Line of Duty",
+    "reservationLine": "Forklift Line of Duty",
     "request": "Create Request",
     "requestReason": "Cause of Request",
     "fireEquipmentScreen": {
@@ -170,7 +170,4 @@
     },
     "description": "Description"
   }
-
-
-
 }

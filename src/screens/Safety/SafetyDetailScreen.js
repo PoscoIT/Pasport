@@ -254,10 +254,7 @@ const SafetyDetailScreen = ({ navigation }) => {
           {
             text: t("safetyDetailsScreen.ok"),
             onPress: () => {
-              navigation.navigate("SafetyMainScreen", {
-                appHead: "ok",
-                checkedControl: true,
-              });
+              navigation.replace(t("safetyApplication"));
               setDisabled(false);
             },
           },
@@ -321,7 +318,7 @@ const SafetyDetailScreen = ({ navigation }) => {
           <Separator />
           {loading && <ActivityIndicator color={"#444"} />}
           {!loading && (
-            <View style={[styles.container3, { marginLeft: 20 }]}>
+            <View style={[styles.container3, { marginHorizontal: 20 }]}>
               <Text variant="bodyMedium" style={styles.leftParag}>
                 {liste[rand2].question}
               </Text>
@@ -386,7 +383,7 @@ const SafetyDetailScreen = ({ navigation }) => {
               >
                 {({ remainingTime }) => (
                   <Text style={{ fontSize: 11 }}>
-                    {t("safetyDetailsScreen.remaining")}:{remainingTime}s
+                    {t("safetyDetailsScreen.remaining")}:{remainingTime}
                   </Text>
                 )}
               </CountdownCircleTimer>

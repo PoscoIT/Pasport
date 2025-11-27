@@ -3309,7 +3309,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-video (6.17.0):
+  - react-native-video (6.18.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3327,7 +3327,7 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-video/Video (= 6.17.0)
+    - react-native-video/Video (= 6.18.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -3338,7 +3338,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-video/Fabric (6.17.0):
+  - react-native-video/Fabric (6.18.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3366,7 +3366,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-video/Video (6.17.0):
+  - react-native-video/Video (6.18.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3949,7 +3949,7 @@ PODS:
     - FirebaseCoreExtension
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.29.0):
+  - RNGestureHandler (2.29.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -4034,7 +4034,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (3.19.3):
+  - RNReanimated (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -4061,11 +4061,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.19.3)
-    - RNReanimated/worklets (= 3.19.3)
+    - RNReanimated/reanimated (= 3.19.4)
+    - RNReanimated/worklets (= 3.19.4)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (3.19.3):
+  - RNReanimated/reanimated (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -4092,10 +4092,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.19.3)
+    - RNReanimated/reanimated/apple (= 3.19.4)
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (3.19.3):
+  - RNReanimated/reanimated/apple (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -4124,7 +4124,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets (3.19.3):
+  - RNReanimated/worklets (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -4151,10 +4151,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/worklets/apple (= 3.19.3)
+    - RNReanimated/worklets/apple (= 3.19.4)
     - SocketRocket
     - Yoga
-  - RNReanimated/worklets/apple (3.19.3):
+  - RNReanimated/worklets/apple (3.19.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -4242,7 +4242,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNSVG (15.14.0):
+  - RNSVG (15.15.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -4268,10 +4268,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNSVG/common (= 15.14.0)
+    - RNSVG/common (= 15.15.0)
     - SocketRocket
     - Yoga
-  - RNSVG/common (15.14.0):
+  - RNSVG/common (15.15.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -4302,11 +4302,11 @@ PODS:
   - RNVectorIcons (9.2.0):
     - React-Core
   - SocketRocket (0.7.1)
-  - VisionCamera (4.7.2):
-    - VisionCamera/Core (= 4.7.2)
-    - VisionCamera/React (= 4.7.2)
-  - VisionCamera/Core (4.7.2)
-  - VisionCamera/React (4.7.2):
+  - VisionCamera (4.7.3):
+    - VisionCamera/Core (= 4.7.3)
+    - VisionCamera/React (= 4.7.3)
+  - VisionCamera/Core (4.7.3)
+  - VisionCamera/React (4.7.3):
     - React-Core
   - Yoga (0.0.0)
 
@@ -4690,7 +4690,7 @@ SPEC CHECKSUMS:
   react-native-image-picker: 86bf00a37006892936db36eb85f219f3084694fe
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
   react-native-safe-area-context: 9c4af81e2f37bcb251946f3dba42c2eeedfad59a
-  react-native-video: 201e71d168053580319a4741e1ef44380cdcb06f
+  react-native-video: f9758cda5b9dd6fd378389002f28f3f19017a406
   React-NativeModulesApple: 8ce162c145e6b9767bb37a090c77d3d28f7d32b5
   React-oscompat: eb0626e8ba1a2c61673c991bf9dc21834898475d
   React-perflogger: d0d0d1b884120fa0a13bd38ac5e9c3c8e8bfe82a
@@ -4728,15 +4728,15 @@ SPEC CHECKSUMS:
   RNFBDatabase: 560ab05abec8486c170ce6bcb4318b735444e68a
   RNFBFirestore: 9ee3a44eb8caeb3ad2a9b75c4a5dc9ba28153613
   RNFBMessaging: 8fb5d5711add86109150229404a6ff6b2a3ba0eb
-  RNGestureHandler: ee0b4a1abf212238615f58df1221a7f9a2342b80
+  RNGestureHandler: ddb7aba31ad4b42ee14d88f02d1211eedcd8ba57
   RNLocalize: 0aa716b7d0f1316ca5f8f16ed42b79b9e3093279
   RNPermissions: 4c963fcc063e6a11111cae0567b69479edcd5412
-  RNReanimated: 31c02f92fba91ea6e5fbb7dc00f235e232c4ac42
+  RNReanimated: 4e74028d93c3720db2d317de16774710477b569c
   RNScreens: de996b48c82245c0b68c677da3334c2061e2a951
-  RNSVG: 596e9946ddc0e023c6e6931038c9e49b553f742d
+  RNSVG: 56e6ea43069ffeed41f666faf1c2c6f4fda057fb
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  VisionCamera: 2230ecfd78a1f6cddd8be0fe4e6589f21a6385e1
+  VisionCamera: 3ea10c46a5c612f5f89fb46a54bef4a0de8b58a7
   Yoga: cc4a6600d61e4e9276e860d4d68eebb834a050ba
 
 PODFILE CHECKSUM: 1e2752539f19b8aeab08568b59bb775eace041d6

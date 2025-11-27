@@ -37,7 +37,8 @@ import ITAuthStack from "./navigation/ITAuthStack";
 import BodyShowerChecklist from "./screens/Safety/BodyShowerChecklist";
 import { signOut } from "@react-native-firebase/auth";
 import { createStackNavigator } from "@react-navigation/stack";
-import { LoginScreen } from "./screens";
+import { CheckListScreen, LoginScreen } from "./screens";
+import Checklist from "./screens/Production/Checklist";
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -86,7 +87,7 @@ const Index = ({ navigation }) => {
             ])
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   41"} />
+        <DrawerItem label={t("loginScreen.version") + "   43"} />
       </DrawerContentScrollView>
     );
   };
@@ -94,7 +95,7 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 41) {
+        if (responsee.version > 43) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
@@ -141,13 +142,18 @@ const Index = ({ navigation }) => {
         <Layout style={{ flex: 1 }}>
           <Drawer.Navigator
             screenOptions={({ route, navigation }) => ({
+              headerTitle: "",
               gestureEnabled: true,
               ...TransitionPresets.ModalPresentationIOS,
             })}
-            initialRouteName="SafetyMainScreen"
+            initialRouteName={t("safetyApplication")}
             drawerContent={(props) => <CustomDrawerContent {...props} />}
           >
-            <Drawer.Screen name="SafetyMainScreen" component={MentorStack} />
+            <Drawer.Screen
+              name={t("safetyApplication")}
+              component={MentorStack}
+            />
+            {/* <Drawer.Screen name="Checklist" component={Checklist} /> */}
             {/* <Drawer.Screen  name="Checklist" component={CareSystemStack} />    */}
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />

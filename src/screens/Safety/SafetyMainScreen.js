@@ -194,7 +194,7 @@ const SafetyMainScreen = ({ route: { params }, navigation }) => {
                 onPress={() =>
                   checked || checkedFatih
                     ? null
-                    : navigation.navigate("SafetyDetailScreen")
+                    : navigation.replace("SafetyDetailScreen")
                 }
               >
                 {checked || checkedFatih

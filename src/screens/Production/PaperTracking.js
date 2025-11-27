@@ -12,7 +12,7 @@ import {
   Linking,
 } from "react-native";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Card } from "react-native-paper";
 import { Button } from "@ui-kitten/components";
@@ -101,6 +101,8 @@ const PaperTracking = () => {
 
       setScan(false);
       setScanResult(true);
+
+      fetchPaperData(codes[0]?.value);
     },
     requestCameraPermission: true,
   });
@@ -329,31 +331,31 @@ const PaperTracking = () => {
     );
   };
 
-  const filteredData = useMemo(
-    () => async () => {
-      if (qrValue.length > 0 || countMethod) {
-        await axios
-          .get(`${url}/Production/GetAllPaper`, {
-            params: {
-              barcode: qrValue,
-            },
-            headers: {
-              "auth-token": REACT_APP_SECRET_KEY,
-            },
-          })
-          .then((res) => {
-            setData(res.data);
-          })
-          .catch((err) => {
-            setModalVisible(false);
-          });
-      } else {
-        setData([]);
-      }
-    },
-    [qrValue, count]
-  );
+  const fetchPaperData = async (barcodeParam) => {
+    // Eğer barkod yoksa işlem yapma (CountMethod değilse)
+    if (!barcodeParam && !countMethod) return;
 
+    try {
+      const res = await axios.get(`${url}/Production/GetAllPaper`, {
+        params: {
+          barcode: barcodeParam,
+        },
+        headers: {
+          "auth-token": REACT_APP_SECRET_KEY,
+        },
+      });
+
+      // Veri geldiyse state'i güncelle
+      setData(res.data);
+
+      // Modal'ı veri geldikten veya istek tamamlandıktan sonra açmak daha güvenlidir
+      // Ancak sizin akışınızda modal zaten açık olabilir, sorun değil.
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Hata", "Veri çekilemedi.");
+      setModalVisible(false);
+    }
+  };
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
@@ -381,10 +383,6 @@ const PaperTracking = () => {
   useEffect(() => {
     getUser();
   }, []);
-
-  useEffect(() => {
-    filteredData();
-  }, [filteredData]);
 
   useEffect(() => {
     getMessageCategory();
@@ -554,6 +552,7 @@ const PaperTracking = () => {
                     style={styles.button3}
                     onPress={() => {
                       setQrValue(qrValueManual);
+                      fetchPaperData(qrValueManual);
                     }}
                   >
                     <Text style={styles.buttonTextStyle}>Sorgula</Text>
@@ -617,6 +616,7 @@ const PaperTracking = () => {
                     style={styles.button3}
                     onPress={() => {
                       setQrValue(qrValueManual);
+                      fetchPaperData(qrValueManual);
                     }}
                   >
                     <Text style={styles.buttonTextStyle}>Sorgula</Text>

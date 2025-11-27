@@ -81,7 +81,7 @@ export const TopNavigationImageTitleShowcase = (navigation) => {
       >
         <MenuItem
           accessoryLeft={InfoIcon}
-          title={`${t("loginScreen.version")} 41`}
+          title={`${t("loginScreen.version")} 44`}
         />
         <MenuItem accessoryLeft={InfoIcon} title={t("general.updateApp")} />
         <MenuItem accessoryLeft={LogoutIcon} title={t("general.logOut")} />

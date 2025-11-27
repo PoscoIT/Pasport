@@ -141,6 +141,7 @@ const FireEquipmentChecklist = () => {
 
       setScan(false);
       setScanResult(true);
+      getChecklistHistory();
     },
     requestCameraPermission: true,
   });
@@ -405,7 +406,7 @@ const FireEquipmentChecklist = () => {
       setScan(true); // ekrana geldiğinde aktif et
 
       return () => {
-        navigation.navigate("SafetyMainScreen");
+        navigation.navigate(t("safetyApplication"));
         setScan(false); // ekrandan çıkarken pasif et
       };
     }, [])
@@ -419,9 +420,9 @@ const FireEquipmentChecklist = () => {
     getUser();
   }, []);
 
-  useEffect(() => {
-    getChecklistHistory();
-  }, [qrValue, count]);
+  // useEffect(() => {
+  //   getChecklistHistory();
+  // }, [qrValue, count]);
 
   useEffect(() => {
     (async () => {

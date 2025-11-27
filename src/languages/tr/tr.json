@@ -1,5 +1,5 @@
 {
-  "translation":{
+  "translation": {
     "general": {
       "updateApp": "Güncelle",
       "logOut": "Çıkış Yap",
@@ -58,7 +58,7 @@
       "message1": "Değerli Çalışanımız",
       "message2": "Bugünkü sorularınızı aşağıdaki butona tıklayarak cevaplayabilirsiniz.",
       "monthlyPoint": "Aylık Toplam Puanınız",
-      "ranking":"Sıralamanız",
+      "ranking": "Sıralamanız",
       "totalPoint": "Toplam Puanınız",
       "answerQuestion": "Soruları Cevapla",
       "completed": "Tamamlandı",
@@ -75,8 +75,8 @@
       "onePoint": "Tek Nokta Eğitimi",
       "safetyVideo": "ISG Videoları"
     },
-    "itSr":
-    {
+    "safetyApplication": "ISG Uygulamaları",
+    "itSr": {
       "request": "Lütfen sorununuzu yazınız",
       "createITRequest": "IT Talep Oluştur"
     },
@@ -93,7 +93,6 @@
       "fundamentalMessage": "Gelecekte daha iyi olabilmek için mevcut durumu güçlendirmek,sürekli öğrenme ile güçlü bir altyapıya sahip olmak demektedir.",
       "winWinMessage": "Başkalarıyla birlikte düşünmek ve paylaşmak, karşılıklı refah peşinde koşmak ve toplumsal değerler yaratarak sürekli büyümek anlamına gelir.",
       "creativityMessage": "Açık bir zihinle açık işbirliği yaparak problemleri çözmede başı çekmeyi ifade eder."
-
     },
     "safetyDetailsScreen": {
       "message1": "Değerli Çalışanımız",
@@ -144,7 +143,7 @@
       "title": "Yangın Ekipman Kontrolü",
       "fireEquipment": "Yangın Ekipmanı",
       "nozzle": "Nozul",
-        "hose": "Hortum",
+      "hose": "Hortum",
       "cabinet": "Kabin",
       "valve": "Vana",
       "body": "Gövde",
@@ -168,11 +167,6 @@
       "description": "Nedeninizi Açıklayınız",
       "createRequest": "Talep Oluştur"
     },
-    "description": "Açıklama",
-
+    "description": "Açıklama"
   }
-
-
-
-
 }
