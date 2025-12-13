@@ -328,7 +328,7 @@ const SafetyControl = ({ navigation }) => {
               setFilePath("");
               setChecked(false);
               setLoading(false);
-              navigation.navigate(t("safetyApplication"));
+              navigation.navigate("SafetyMainScreen");
             } else {
               Alert.alert(
                 languageData[38]?.Name,

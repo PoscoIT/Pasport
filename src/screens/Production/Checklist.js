@@ -80,13 +80,8 @@ const Checklist = () => {
           alert("Veri Bulunamadı.");
           setQuestionList([]);
         }
-      })
-      .catch((err) => alert("Bir hata Oluştu"));
+      });
   };
-
-  useEffect(() => {
-    //getQuestionList();
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -102,7 +97,6 @@ const Checklist = () => {
       }
     })();
   }, []);
-  console.log("csacaca", isActive);
 
   if (!device || !permission) {
     return (
@@ -215,7 +209,7 @@ const Checklist = () => {
                     onChangeText={(text) => handleAnswerChange(item.ID, text)}
                     right={<TextInput.Affix text={item.Uom} />}
                     label={item.Question}
-                    keyboardType={item.Type === 4 ? "numeric" : "default"}
+                    keyboardType={item.Type === 3 ? "numeric" : "default"}
                   />
                 )}
               </View>

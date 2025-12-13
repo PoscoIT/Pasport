@@ -387,7 +387,7 @@ const BodyShowerChecklist = () => {
       setIsActive(true);
 
       return () => {
-        navigation.navigate(t("safetyApplication"));
+        navigation.navigate("SafetyMainScreen");
 
         setIsActive(true);
       };

@@ -181,6 +181,7 @@ const SafetyDetailScreen = ({ navigation }) => {
     }
     setIsPlaying(false);
     setLoading(true);
+    setDisabled(true);
 
     if (quest1Answer !== undefined) {
       if (
@@ -245,8 +246,6 @@ const SafetyDetailScreen = ({ navigation }) => {
       message +=
         `\n${t("safetyDetailsScreen.totalPoint")}:` + totalPoint + " / 3";
 
-      setDisabled(true);
-
       Alert.alert(
         t("safetyDetailsScreen.info"),
         message,
@@ -254,14 +253,14 @@ const SafetyDetailScreen = ({ navigation }) => {
           {
             text: t("safetyDetailsScreen.ok"),
             onPress: () => {
-              navigation.replace(t("safetyApplication"));
-              setDisabled(false);
+              navigation.replace("SafetyMainScreen");
             },
           },
         ],
         { cancelable: false }
       );
     }
+
     setLoading(false);
   };
 

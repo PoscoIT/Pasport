@@ -406,7 +406,7 @@ const FireEquipmentChecklist = () => {
       setScan(true); // ekrana geldiğinde aktif et
 
       return () => {
-        navigation.navigate(t("safetyApplication"));
+        navigation.navigate("SafetyMainScreen");
         setScan(false); // ekrandan çıkarken pasif et
       };
     }, [])

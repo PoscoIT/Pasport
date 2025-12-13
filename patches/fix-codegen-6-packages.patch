@@ -1,0 +1,83 @@
+diff --git a/node_modules/@react-native-async-storage/async-storage/android/build.gradle b/node_modules/@react-native-async-storage/async-storage/android/build.gradle
+index 1111111..2222222 100644
+--- a/node_modules/@react-native-async-storage/async-storage/android/build.gradle
++++ b/node_modules/@react-native-async-storage/async-storage/android/build.gradle
+@@ -1,5 +1,7 @@
++// PATCH: Disable codegen for RN 0.81.5
++def nodeExecutable = "/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"
++
+ task generateCodegenSchemaFromJavaScript(type: Exec) {
+     workingDir "$projectDir/../../"
+-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
++    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
+ }
+
+diff --git a/node_modules/lottie-react-native/android/build.gradle b/node_modules/lottie-react-native/android/build.gradle
+index 1111111..2222222 100644
+--- a/node_modules/lottie-react-native/android/build.gradle
++++ b/node_modules/lottie-react-native/android/build.gradle
+@@ -1,5 +1,7 @@
++// PATCH: Disable codegen for RN 0.81.5
++def nodeExecutable = "/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"
++
+ task generateCodegenSchemaFromJavaScript(type: Exec) {
+     workingDir "$projectDir/../../"
+-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
++    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
+ }
+
+diff --git a/node_modules/react-native-gesture-handler/android/build.gradle b/node_modules/react-native-gesture-handler/android/build.gradle
+index 1111111..2222222 100644
+--- a/node_modules/react-native-gesture-handler/android/build.gradle
++++ b/node_modules/react-native-gesture-handler/android/build.gradle
+@@ -1,5 +1,7 @@
++// PATCH: Disable codegen for RN 0.81.5
++def nodeExecutable = "/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"
++
+ task generateCodegenSchemaFromJavaScript(type: Exec) {
+     workingDir "$projectDir/../../"
+-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
++    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
+ }
+
+diff --git a/node_modules/react-native-localize/android/build.gradle b/node_modules/react-native-localize/android/build.gradle
+index 1111111..2222222 100644
+--- a/node_modules/react-native-localize/android/build.gradle
++++ b/node_modules/react-native-localize/android/build.gradle
+@@ -1,5 +1,7 @@
++// PATCH: Disable codegen for RN 0.81.5
++def nodeExecutable = "/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"
++
+ task generateCodegenSchemaFromJavaScript(type: Exec) {
+     workingDir "$projectDir/../../"
+-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
++    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
+ }
+
+diff --git a/node_modules/react-native-image-picker/android/build.gradle b/node_modules/react-native-image-picker/android/build.gradle
+index 1111111..2222222 100644
+--- a/node_modules/react-native-image-picker/android/build.gradle
++++ b/node_modules/react-native-image-picker/android/build.gradle
+@@ -1,5 +1,7 @@
++// PATCH: Disable codegen for RN 0.81.5
++def nodeExecutable = "/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"
++
+ task generateCodegenSchemaFromJavaScript(type: Exec) {
+     workingDir "$projectDir/../../"
+-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
++    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
+ }
+
+diff --git a/node_modules/react-native-permissions/android/build.gradle b/node_modules/react-native-permissions/android/build.gradle
+index 1111111..2222222 100644
+--- a/node_modules/react-native-permissions/android/build.gradle
++++ b/node_modules/react-native-permissions/android/build.gradle
+@@ -1,5 +1,7 @@
++// PATCH: Disable codegen for RN 0.81.5
++def nodeExecutable = "/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"
++
+ task generateCodegenSchemaFromJavaScript(type: Exec) {
+     workingDir "$projectDir/../../"
+-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
++    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
+ }

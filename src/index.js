@@ -39,6 +39,7 @@ import { signOut } from "@react-native-firebase/auth";
 import { createStackNavigator } from "@react-navigation/stack";
 import { CheckListScreen, LoginScreen } from "./screens";
 import Checklist from "./screens/Production/Checklist";
+import CraneChecklist from "./screens/Production/CraneChecklist";
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -87,7 +88,7 @@ const Index = ({ navigation }) => {
             ])
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   43"} />
+        <DrawerItem label={t("loginScreen.version") + "   44"} />
       </DrawerContentScrollView>
     );
   };
@@ -95,7 +96,7 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 43) {
+        if (responsee.version > 44) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
@@ -146,19 +147,17 @@ const Index = ({ navigation }) => {
               gestureEnabled: true,
               ...TransitionPresets.ModalPresentationIOS,
             })}
-            initialRouteName={t("safetyApplication")}
+            initialRouteName="SafetyMainScreen"
             drawerContent={(props) => <CustomDrawerContent {...props} />}
           >
-            <Drawer.Screen
-              name={t("safetyApplication")}
-              component={MentorStack}
-            />
+            <Drawer.Screen name="SafetyMainScreen" component={MentorStack} />
+
             {/* <Drawer.Screen name="Checklist" component={Checklist} /> */}
             {/* <Drawer.Screen  name="Checklist" component={CareSystemStack} />    */}
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
             <Drawer.Screen name={t("myMachine")} component={MyMac} />
-
+            <Drawer.Screen name="Vinç Checklist" component={CraneChecklist} />
             <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
 
             {/*<Drawer.Screen options={{*/}
