@@ -35,7 +35,7 @@ const CraneChecklist = () => {
   const [scanResult, setScanResult] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [qrValue, setQrValue] = useState("");
-  const [machineID, setMachineID] = useState("");
+  const [machineID, setMachineID] = useState(null);
   const [isActive, setIsActive] = useState(true);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -112,13 +112,26 @@ const CraneChecklist = () => {
       (item) => String(formValues[item.ID]?.Answer || "").trim() !== ""
     );
     if (allFieldsFilled) {
+      const formData = new FormData();
+
+      const body = {
+        formValues: JSON.stringify(formValues),
+      };
+
+      const formBody = Object.keys(body)
+        .map(
+          (key) => encodeURIComponent(key) + "=" + encodeURIComponent(body[key])
+        )
+        .join("&");
+
       await axios
         .post(
-          "http://10.0.2.2:5509/WorkOrder/AddChecklistQuestion",
-          { formValues },
+          "https://tstapp.poscoassan.com.tr:8443/Production/AddChecklistQuestion",
+          formBody,
           {
             headers: {
               "auth-token": REACT_APP_SECRET_KEY,
+              "Content-Type": "application/x-www-form-urlencoded",
             },
           }
         )
@@ -136,6 +149,10 @@ const CraneChecklist = () => {
           } else {
             alert("Hata ile Karşılaşıldı.");
           }
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("Hata ile Karşılaşıldı.");
         });
     } else {
       Alert.alert("Lütfen tüm alanları doldurunuz.");
@@ -145,10 +162,9 @@ const CraneChecklist = () => {
   const codeScannner = useCodeScanner({
     codeTypes: ["qr", "ean-13"], // Gereksizleri kısalttım performans için
     onCodeScanned: (codes) => {
-      setMachineID("");
+      setMachineID(null);
       setModalVisible(true);
       setQrValue(codes[0]?.value);
-
       setIsActive(false);
       setScan(false);
       setScanResult(true);
@@ -160,7 +176,7 @@ const CraneChecklist = () => {
       setQrValue(
         codes[0]?.value.replace("https://poscoassan.com.tr/machineBarcode/", "")
       );
-      setMachineID(qrValue.split("-")[0]);
+      setMachineID(Number(qrValue.split("-")[0]));
 
       // Eğer gelen ID 16,17,18 grubundaysa
       if (qrValue.split("-")[1] === "1") {
@@ -185,7 +201,7 @@ const CraneChecklist = () => {
 
     await axios
       .get(
-        `http://10.0.2.2:5509/WorkOrder/GetChecklistQuestion/${
+        `http://10.0.2.2:5506/Production/GetChecklistQuestion/${
           areaID + "-" + barcode
         }/${employeeID}`,
         {
@@ -207,7 +223,8 @@ const CraneChecklist = () => {
           setFilledQuestionList([]);
           setIsEdit(false);
         }
-      });
+      })
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -560,7 +577,7 @@ const CraneChecklist = () => {
                 <View style={{ margin: 20, alignItems: "center" }}>
                   <Button
                     status="primary"
-                    style={{ borderRadius: 50, width: "75%" }}
+                    style={{ borderRadius: 50, width: "75%", marginBottom: 30 }}
                     onPress={() => {
                       onSubmit();
                       setSelectedAreaID(null);

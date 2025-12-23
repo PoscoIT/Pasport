@@ -40,6 +40,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { CheckListScreen, LoginScreen } from "./screens";
 import Checklist from "./screens/Production/Checklist";
 import CraneChecklist from "./screens/Production/CraneChecklist";
+import SleeveCount from "./screens/Production/SleeveCount";
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -158,6 +159,7 @@ const Index = ({ navigation }) => {
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
             <Drawer.Screen name={t("myMachine")} component={MyMac} />
             <Drawer.Screen name="Vinç Checklist" component={CraneChecklist} />
+            <Drawer.Screen name="Sleeve Sayma" component={SleeveCount} />
             <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
 
             {/*<Drawer.Screen options={{*/}
