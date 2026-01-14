@@ -168,6 +168,20 @@
       "description": "Please Explain Your Reason",
       "createRequest": "Create Request"
     },
-    "description": "Description"
+    "description": "Description",
+    "sleeveCount": {
+      "scrapReason": "Scrap Reason",
+      "whichWeek": "Which Week",
+      "whichOrder": "Which Sleeve",
+      "definedPr": "Defined PR:",
+      "thickness": "Thickness",
+      "width": "Width",
+      "submit": "Submit",
+      "usage": "Usage",
+      "scrapOrCustomer": "Scrap or Customer",
+      "selectThickness": "Select Thickness",
+      "selectWidth": "Select Width",
+      "sleevePaper": "Sleeve Paper"
+    }
   }
 }

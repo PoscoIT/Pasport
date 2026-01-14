@@ -11,13 +11,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { HelperText, TextInput } from "react-native-paper";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Radio, RadioGroup } from "@ui-kitten/components";
 import axios from "axios";
 import {
   Camera,
   useCameraDevice,
   useCodeScanner,
+  CameraProps,
 } from "react-native-vision-camera";
 import { REACT_APP_SECRET_KEY } from "@env";
 import { useNavigation } from "@react-navigation/native";
@@ -25,7 +26,19 @@ import kumanda from "../../assets/kumanda.png";
 import kesiciSensor from "../../assets/kesiciSensor.png";
 import tongKanca from "../../assets/tongkanca.jpg";
 import kopruUzeri from "../../assets/kopruUzeri.png";
+import forklift from "../../assets/forklift.jpeg";
 import { sendUserInfoName } from "../../api/auth-api";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Reanimated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedProps,
+  useSharedValue,
+} from "react-native-reanimated";
+
+Reanimated.addWhitelistedNativeProps({ zoom: true });
+
+const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 
 const CraneChecklist = () => {
   const [permission, setPermission] = useState(false);
@@ -46,9 +59,26 @@ const CraneChecklist = () => {
   const [employeeID, setEmployeeId] = useState("");
   const navigation = useNavigation();
   const [filteredImageList, setFilteredImageList] = useState([]);
-  const checkErrors = (value) => {
-    return !value.includes("@");
-  };
+  const zoom = useSharedValue(device?.neutralZoom ?? 1);
+  const zoomOffset = useSharedValue(0);
+
+  const gesture = Gesture.Pinch()
+    .onBegin(() => {
+      zoomOffset.value = zoom.value;
+    })
+    .onUpdate((event) => {
+      const z = zoomOffset.value * event.scale;
+      zoom.value = interpolate(
+        z,
+        [1, 10],
+        [device.minZoom, device.maxZoom],
+        Extrapolation.CLAMP
+      );
+    });
+
+  const animatedProps = useAnimatedProps(() => ({
+    zoom: zoom.value,
+  }));
 
   // areadID'ler API'den gelen AreaID ile eşleşmeli
   const [imageList, setImageList] = useState([
@@ -84,6 +114,12 @@ const CraneChecklist = () => {
       url: kopruUzeri,
       title: "Vinç Üst Bölge Köprü Üzeri",
     },
+    {
+      id: 8,
+      areadID: 23,
+      url: forklift,
+      title: "Forklift",
+    },
   ]);
 
   const [formValues, setFormValues] = useState({});
@@ -100,6 +136,12 @@ const CraneChecklist = () => {
       },
     }));
   };
+  const handleFocus = useCallback(async ({ nativeEvent }) => {
+    await came?.current?.focus({
+      x: Math.round(nativeEvent.pageX),
+      y: Math.round(nativeEvent.pageX),
+    });
+  }, []);
 
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
@@ -160,7 +202,7 @@ const CraneChecklist = () => {
   };
 
   const codeScannner = useCodeScanner({
-    codeTypes: ["qr", "ean-13"], // Gereksizleri kısalttım performans için
+    codeTypes: ["qr", "ean-13"],
     onCodeScanned: (codes) => {
       setMachineID(null);
       setModalVisible(true);
@@ -176,15 +218,22 @@ const CraneChecklist = () => {
       setQrValue(
         codes[0]?.value.replace("https://poscoassan.com.tr/machineBarcode/", "")
       );
-      setMachineID(Number(qrValue.split("-")[0]));
+      setMachineID(
+        qrValue.startsWith("forklift")
+          ? Number(qrValue.split("-")[1])
+          : Number(qrValue.split("-")[0])
+      );
+      const isForklift = qrValue.startsWith("forklift");
 
       // Eğer gelen ID 16,17,18 grubundaysa
-      if (qrValue.split("-")[1] === "1") {
+      if (qrValue.split("-")[1] === "1" && !isForklift) {
         groupIDs = [16, 17, 18];
       }
       // Eğer gelen ID 19,20,21,22 grubundaysa
-      else if (qrValue.split("-")[1] === "2") {
+      else if (qrValue.split("-")[1] === "2" && !isForklift) {
         groupIDs = [19, 20, 21, 22];
+      } else if (isForklift) {
+        groupIDs = [23];
       }
 
       const filteredImages = imageList.filter((img) =>
@@ -201,7 +250,7 @@ const CraneChecklist = () => {
 
     await axios
       .get(
-        `http://10.0.2.2:5506/Production/GetChecklistQuestion/${
+        `https://tstapp.poscoassan.com.tr:8443/Production/GetChecklistQuestion/${
           areaID + "-" + barcode
         }/${employeeID}`,
         {
@@ -290,12 +339,15 @@ const CraneChecklist = () => {
   return (
     <View style={styles.view}>
       <View style={{ flex: 1, width: "100%", height: "100%" }}>
-        <Camera
-          style={StyleSheet.absoluteFill}
-          codeScanner={codeScannner}
-          device={device}
-          isActive={isActive}
-        />
+        <GestureDetector gesture={gesture}>
+          <ReanimatedCamera
+            style={StyleSheet.absoluteFill}
+            device={device}
+            isActive={isActive}
+            codeScanner={codeScannner}
+            animatedProps={animatedProps}
+          />
+        </GestureDetector>
       </View>
 
       {modalVisible && (
@@ -342,7 +394,7 @@ const CraneChecklist = () => {
                       style={{
                         width: "100%",
                         height: 120,
-                        resizeMode: "cover",
+                        resizeMode: "stretch",
                         borderTopLeftRadius: 10,
                         borderTopRightRadius: 10,
                       }}

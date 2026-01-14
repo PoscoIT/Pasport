@@ -81,9 +81,7 @@ const SafetyMainScreen = ({ route: { params }, navigation }) => {
       }));
 
       setData(mappedData);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const getData = async () => {

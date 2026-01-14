@@ -10,12 +10,19 @@ import {
   Dimensions,
   BackHandler,
   Linking,
+  KeyboardAvoidingView,
 } from "react-native";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Card } from "react-native-paper";
-import { Button } from "@ui-kitten/components";
+import {
+  Button,
+  IndexPath,
+  Input,
+  Select,
+  SelectItem,
+} from "@ui-kitten/components";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { sendUserInfoName } from "../../api/auth-api";
 import NetInfo from "@react-native-community/netinfo";
@@ -33,6 +40,7 @@ const PaperTracking = () => {
   const [count, setCount] = useState(0);
   const [netInfo, setNetInfo] = useState("");
   const [ScanResult, setScanResult] = useState(false);
+  const [departmentList, setDepartmentList] = useState([]);
   const [scan, setScan] = useState(false);
   const [data, setData] = useState([]);
   const [qrValue, setQrValue] = useState("");
@@ -40,6 +48,8 @@ const PaperTracking = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalVisible3, setModalVisible3] = useState(false);
+  const [description, setDescription] = useState("");
   const [employeeID, setEmployeeId] = useState("");
   const { width, height } = Dimensions.get("screen");
   const [selectedReturnMessage, setSelectedReturnMessage] = useState("");
@@ -48,6 +58,40 @@ const PaperTracking = () => {
   const url = "https://tstapp.poscoassan.com.tr:8443";
   const [returnMessage, setReturnMessage] = useState("");
   const device = useCameraDevice("back");
+  const [selectedIndexProductType, setSelectedIndexProductType] =
+    useState(null);
+  const [selectedIndexWidth, setSelectedIndexWidth] = useState("");
+  const [selectedIndexSurfaceDamageType, setSelectedIndexSurfaceDamageType] =
+    useState(null);
+  const [selectedIndexHumudityType, setSelectedIndexHumudityType] =
+    useState(null);
+  const [
+    selectedIndexPaperParticiplesType,
+    setSelectedIndexPaperParticiplesType,
+  ] = useState(null);
+  const [selectedIndexPaperSampleType, setSelectedIndexPaperSampleType] =
+    useState(null);
+  const [selectedIndexRatingType, setSelectedIndexRatingType] = useState(null);
+
+  const productTypes = [
+    "Billerud Beyaz Kağıt",
+    "Lenk Beyaz Kağıt",
+    "Billerud Kraft Kağıt",
+    "Lenk Kraft Kağıt",
+    "Ompack Vinil",
+    "Daein Vinil",
+  ];
+  const decisionOptions = ["Kabul", "Şartlı Kabul", "Red"];
+  const decisionOptionsSecond = ["Kabul", "Red"];
+  const yesNoOptions = ["Evet", "Hayır"];
+
+  const displayValueProductType =
+    selectedIndexProductType !== null
+      ? productTypes[selectedIndexProductType.row]
+      : "";
+
+  const getValue = (options, index) =>
+    index !== null ? options[index.row] : "";
 
   const getPermission = async (a) => {
     const cameraPermission = await Camera.requestCameraPermission();
@@ -107,6 +151,31 @@ const PaperTracking = () => {
     requestCameraPermission: true,
   });
 
+  const getDepartmentList = async () => {
+    try {
+      if (employeeID) {
+        await axios
+          .get(
+            `https://tstapp.poscoassan.com.tr:8443/UserAccount/GetDepartmentInfo`,
+            {
+              params: {
+                sicilNo: employeeID,
+              },
+              headers: {
+                "auth-token": REACT_APP_SECRET_KEY,
+              },
+            }
+          )
+          .then((res) => {
+            setDepartmentList(res.data[0]);
+          })
+          .catch((t) => setDepartmentList([]));
+      }
+    } catch (e) {
+      setDepartmentList([]);
+    }
+  };
+
   const getMessageCategory = async () => {
     await axios
       .get(`${url}/Production/GetReturnMessageCategory`, {
@@ -130,6 +199,91 @@ const PaperTracking = () => {
       .catch((err) => {
         setModalVisible(false);
       });
+  };
+  const getSelectedValue = (options, index) => {
+    if (!index) return null;
+    return options[index.row];
+  };
+  const inspectionAction = async () => {
+    if (
+      !selectedIndexWidth ||
+      !selectedIndexProductType ||
+      !selectedIndexSurfaceDamageType ||
+      !selectedIndexHumudityType ||
+      !selectedIndexPaperParticiplesType ||
+      !selectedIndexPaperSampleType ||
+      !selectedIndexRatingType
+    ) {
+      Alert.alert("Hata", "Lütfen Tüm Alanları Doldurunuz.");
+      return;
+    }
+
+    if (
+      getSelectedValue(decisionOptions, selectedIndexRatingType) === "Red" &&
+      description.length <= 0
+    ) {
+      Alert.alert("Hata", "Lütfen Not Giriniz.");
+      return;
+    }
+
+    const paper = {
+      barcode: qrValue,
+      empNo: employeeID,
+      width: selectedIndexWidth,
+      productType: getValue(productTypes, selectedIndexProductType),
+      damageSurface: getValue(yesNoOptions, selectedIndexSurfaceDamageType),
+      humudity: getValue(yesNoOptions, selectedIndexHumudityType),
+      paperParticiple: getValue(
+        yesNoOptions,
+        selectedIndexPaperParticiplesType
+      ),
+      paperSample: getValue(yesNoOptions, selectedIndexPaperSampleType),
+      description: description,
+      rating: getValue(decisionOptions, selectedIndexRatingType),
+    };
+    const formBody = Object.keys(paper)
+      .map(
+        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(paper[key])
+      )
+      .join("&");
+
+    await axios
+      .post(`${url}/Production/PaperInspection`, formBody, {
+        headers: {
+          "auth-token": REACT_APP_SECRET_KEY,
+        },
+      })
+      .then((res) => {
+        if (res.data.status == "success") {
+          setData([]);
+          setQrValue("");
+          setScan(true);
+          setReturnMessage("");
+          setSelectedReturnMessage("");
+          setSelectedIndexHumudityType(null);
+          setSelectedIndexPaperParticiplesType(null);
+          setSelectedIndexSurfaceDamageType(null);
+          setSelectedIndexPaperSampleType(null);
+          setSelectedIndexProductType(null);
+          setSelectedIndexRatingType(null);
+          setSelectedIndexWidth(null);
+          setDescription("");
+          setModalVisible(false);
+
+          Alert.alert("Başarılı", "Başarıyla Inspection Yapıldı");
+        } else if (res.data.status == "error") {
+          Alert.alert("Başarılı", "" + res.data.message);
+          return;
+        } else {
+          Alert.alert("Hata", "Lütfen bağlantınızı kontrol ediniz.");
+          return;
+        }
+      })
+      .catch((err) => {
+        Alert.alert("Hata", "Lütfen bağlantınızı kontrol ediniz.");
+        return;
+      })
+      .finally(() => {});
   };
 
   const counterAction = async () => {
@@ -222,27 +376,138 @@ const PaperTracking = () => {
         key={item.Id}
         style={{
           borderRadius: 20,
-          backgroundColor: "#f2f2f2",
-          width: "100%",
-          height: 400,
+          backgroundColor:
+            countMethod !== "inspection" ? "#f1f4f5ff" : "#fcfafaff",
+
+          width: width - 30,
+          height: countMethod !== "inspection" ? 450 : 680,
+
           marginTop: 30,
         }}
       >
-        <Text style={styles.modalText}>Kağıt Bilgileri</Text>
         <Text title="Barkod Numarası:" subtitle={item.Barcode} />
+
         <Card.Content>
           <Text style={styles.title}>Barkod Numarası: {item.Barcode}</Text>
-          <Text style={styles.title}>
-            Kağıt Tipi:{" "}
-            {item.PaperTypeName?.toString()?.toLowerCase() === "new paper"
-              ? "Sıfır Kağıt"
-              : "İkinci El"}
-          </Text>
-          <Text style={styles.title}>Renk :{item.PaperType2}</Text>
-          <Text style={styles.title}>Sarım Kodu :{item.StockCode}</Text>
-          <Text style={styles.title}>Gram: {item.Gram}</Text>
-          <Text style={styles.title}>Boyut: {item.Size}</Text>
-          <Text style={styles.title}>Ağırlık: {item.Weight}</Text>
+          {countMethod !== "inspection" ? (
+            <View>
+              <Text style={styles.title}>
+                Kağıt Tipi:{" "}
+                {item.PaperTypeName?.toString()?.toLowerCase() === "new paper"
+                  ? "Sıfır Kağıt"
+                  : "İkinci El"}
+              </Text>
+              <Text style={styles.title}>Renk :{item.PaperType2}</Text>
+              <Text style={styles.title}>Sarım Kodu :{item.StockCode}</Text>
+              <Text style={styles.title}>Gram: {item.Gram}</Text>
+              <Text style={styles.title}>Boyut: {item.Size}</Text>
+              <Text style={styles.title}>Ağırlık: {item.Weight}</Text>
+            </View>
+          ) : (
+            item.IsInspection !== 1 && (
+              <View>
+                <Select
+                  label="Ürün Tipi"
+                  style={{ marginTop: 10 }}
+                  placeholder={"Lütfen Seçiniz"}
+                  value={displayValueProductType}
+                  selectedIndex={selectedIndexProductType}
+                  onSelect={(index) => setSelectedIndexProductType(index)}
+                >
+                  {productTypes.map((item, index) => (
+                    <SelectItem key={index} title={item} />
+                  ))}
+                </Select>
+
+                <Input
+                  keyboardType="numeric"
+                  style={styles.input2}
+                  value={selectedIndexWidth}
+                  maxLength={4}
+                  onChangeText={(text) => {
+                    const numericText = text.replace(/[^0-9]/g, "");
+                    setSelectedIndexWidth(numericText);
+                  }}
+                  label="Genişlik Ölçümü (Tolerans: -3<Sipariş Genişliği<3)"
+                ></Input>
+
+                <Select
+                  style={{ marginTop: 10 }}
+                  label="Yüzey Hasay var mı?"
+                  placeholder={"Lütfen Seçiniz"}
+                  value={getValue(yesNoOptions, selectedIndexSurfaceDamageType)}
+                  selectedIndex={selectedIndexSurfaceDamageType}
+                  onSelect={setSelectedIndexSurfaceDamageType}
+                >
+                  {yesNoOptions.map((item, i) => (
+                    <SelectItem key={i} title={item} />
+                  ))}
+                </Select>
+
+                <Select
+                  style={{ marginTop: 10 }}
+                  label="Islaklık & Nemlilik var mı?"
+                  placeholder={"Lütfen Seçiniz"}
+                  value={getValue(yesNoOptions, selectedIndexHumudityType)}
+                  selectedIndex={selectedIndexHumudityType}
+                  onSelect={setSelectedIndexHumudityType}
+                >
+                  {yesNoOptions.map((item, i) => (
+                    <SelectItem key={i} title={item} />
+                  ))}
+                </Select>
+
+                <Select
+                  style={{ marginTop: 10 }}
+                  placeholder={"Lütfen Seçiniz"}
+                  label="Yan yüzeylerde kağıt partikülü var mı?"
+                  value={getValue(
+                    yesNoOptions,
+                    selectedIndexPaperParticiplesType
+                  )}
+                  selectedIndex={selectedIndexPaperParticiplesType}
+                  onSelect={setSelectedIndexPaperParticiplesType}
+                >
+                  {yesNoOptions.map((item, i) => (
+                    <SelectItem key={i} title={item} />
+                  ))}
+                </Select>
+
+                <Select
+                  style={{ marginTop: 10 }}
+                  label="Kağıt Numunesi Alındı mı?"
+                  placeholder={"Lütfen Seçiniz"}
+                  value={getValue(yesNoOptions, selectedIndexPaperSampleType)}
+                  selectedIndex={selectedIndexPaperSampleType}
+                  onSelect={setSelectedIndexPaperSampleType}
+                >
+                  {yesNoOptions.map((item, i) => (
+                    <SelectItem key={i} title={item} />
+                  ))}
+                </Select>
+
+                <Select
+                  style={{ marginTop: 10 }}
+                  label="Değerlendirme"
+                  placeholder={"Lütfen Seçiniz"}
+                  onSelect={setSelectedIndexRatingType}
+                  value={getValue(decisionOptions, selectedIndexRatingType)}
+                  selectedIndex={selectedIndexRatingType}
+                >
+                  {decisionOptions.map((item, i) => (
+                    <SelectItem key={i} title={item} />
+                  ))}
+                </Select>
+                <Input
+                  keyboardType="default"
+                  style={styles.input2}
+                  value={description}
+                  onChangeText={(text) => setDescription(text)}
+                  label="Açıklama"
+                ></Input>
+              </View>
+            )
+          )}
 
           {/*   <TextInput
                             style={styles.input1}
@@ -286,7 +551,7 @@ const PaperTracking = () => {
               right: (width * 2) / 8,
             }}
           >
-            {countMethod && item.IsStock != 1 ? (
+            {countMethod === true && item.IsStock != 1 ? (
               <Button
                 style={{
                   backgroundColor: "#f1a641",
@@ -297,11 +562,26 @@ const PaperTracking = () => {
               >
                 Say
               </Button>
-            ) : countMethod ? (
+            ) : countMethod === true ? (
               <View style={{ flex: 1, alignItems: "center" }}>
                 <FontAwesome name={"check"} size={60} color={"#105c1c"} />
                 <Text style={{ fontSize: 16 }}>Sayım Yapıldı</Text>
               </View>
+            ) : countMethod === "inspection" ? (
+              item.IsInspection !== 1 ? (
+                <View style={{ marginBottom: -10 }}>
+                  <Button
+                    style={{ borderRadius: 20 }}
+                    onPress={inspectionAction}
+                  >
+                    <Text>Inspectionı Tamamla</Text>
+                  </Button>
+                </View>
+              ) : (
+                <View>
+                  <Text>Inspectionı yapılmıştır.</Text>
+                </View>
+              )
             ) : (
               <Button
                 style={{
@@ -388,8 +668,49 @@ const PaperTracking = () => {
     getMessageCategory();
   }, []);
 
+  useEffect(() => {
+    getDepartmentList();
+  }, [employeeID]);
+
+  // useEffect(() => {
+  //   const values = [
+  //     getSelectedValue(decisionOptions, selectedIndexSurfaceDamageType),
+  //     getSelectedValue(decisionOptions, selectedIndexHumudityType),
+  //     getSelectedValue(decisionOptions, selectedIndexPaperParticiplesType),
+  //     getSelectedValue(yesNoOptions, selectedIndexPaperSampleType),
+  //   ];
+
+  //   // Hepsi seçilmeden değerlendirme yapma
+  //   if (values.some((v) => v === null)) {
+  //     setSelectedIndexRatingType(null);
+  //     return;
+  //   }
+
+  //   if (values.includes("Red") || values.includes("Hayır")) {
+  //     setSelectedIndexRatingType(new IndexPath(1)); // Red
+  //   }
+  //   // } else {
+  //   //   setSelectedIndexRatingType(new IndexPath(0));
+  //   // }
+  //   // Hepsi Kabul ise → Kabul
+  //   else if (
+  //     values.every((v) => v === "Kabul") ||
+  //     values.every((v) => v === "Evet")
+  //   ) {
+  //     setSelectedIndexRatingType(new IndexPath(0)); // Kabul
+  //   }
+  // }, [
+  //   selectedIndexSurfaceDamageType,
+  //   selectedIndexHumudityType,
+  //   selectedIndexPaperParticiplesType,
+  //   selectedIndexPaperSampleType,
+  // ]);
+
   return (
-    <View style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
       {!scan && (
         <View
           style={{ flex: 1, flexDirection: "column", alignItems: "center" }}
@@ -430,6 +751,21 @@ const PaperTracking = () => {
             }}
           >
             <Text style={styles.buttonTextStyle}>Manuel Sayım Yap</Text>
+          </Button>
+          <Button
+            appearance={"outline"}
+            status={"basic"}
+            disabled={
+              departmentList?.[0]?.SubTeamID !== 13 &&
+              departmentList?.[0]?.SubTeamID !== 7
+            }
+            style={styles.button5}
+            onPress={() => {
+              scanAgain("inspection");
+              setCountMethod("inspection");
+            }}
+          >
+            <Text>Inspection Yap</Text>
           </Button>
         </View>
       )}
@@ -479,6 +815,8 @@ const PaperTracking = () => {
                   width: "100%",
                   justifyContent: "flex-end",
                   alignItems: "flex-end",
+                  marginRight: 30,
+                  marginTop: 5,
                 }}
               >
                 <TouchableOpacity
@@ -639,7 +977,7 @@ const PaperTracking = () => {
           </View>
         </Modal>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 const styles = StyleSheet.create({
@@ -667,6 +1005,17 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
   },
+  input2: {
+    height: 45,
+    margin: 30,
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: 0,
+    marginRight: 0,
+    borderWidth: 1,
+    borderRadius: 5,
+    fontSize: 10,
+  },
   centeredViewManual: {
     flex: 1,
 
@@ -685,6 +1034,13 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: "#fff",
   },
+  button5: {
+    width: "70%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
+    color: "#fff",
+  },
   linearGradient: {
     flex: 1,
   },
@@ -694,8 +1050,6 @@ const styles = StyleSheet.create({
   modalView: {
     flex: 1,
     backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 35,
 
     width: "100%",
     alignItems: "center",
@@ -710,7 +1064,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
   },
   centerText: {
     flex: 1,

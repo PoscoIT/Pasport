@@ -168,5 +168,19 @@
       "createRequest": "Talep Oluştur"
     },
     "description": "Açıklama"
+  },
+  "sleeveCount": {
+    "scrapReason": "Hurdalama Nedeni",
+    "whichWeek": "Kaçıncı Hafta",
+    "whichOrder": "Kaçıncı Sleeve",
+    "definedPr": "Tanımlı PR:",
+    "thickness": "Kalınlık",
+    "width": "Genişlik",
+    "submit": "Kaydet",
+    "usage": "Kullanım",
+    "scrapOrCustomer": "Hurda ya da Müşteri",
+    "selectThickness": "Kalınlık Seçiniz",
+    "selectWidth": "Genişlik Seçiniz",
+    "sleevePaper": "Sleeve Kağıt"
   }
 }

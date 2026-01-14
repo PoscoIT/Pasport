@@ -6,10 +6,17 @@ import {
   Linking,
   Alert,
   BackHandler,
+  KeyboardAvoidingView,
 } from "react-native";
-import { HelperText, TextInput } from "react-native-paper";
-import { useEffect, useState } from "react";
-import { Button, Select, SelectItem } from "@ui-kitten/components";
+import { HelperText, TextInput, ActivityIndicator } from "react-native-paper";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Button,
+  Select,
+  SelectItem,
+  RadioGroup,
+  Radio,
+} from "@ui-kitten/components";
 import axios from "axios";
 import {
   Camera,
@@ -17,8 +24,9 @@ import {
   useCodeScanner,
 } from "react-native-vision-camera";
 import { REACT_APP_SECRET_KEY } from "@env";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { sendUserInfoName } from "../../api/auth-api";
+import { t } from "i18next";
 const SleeveCount = () => {
   const [permission, setPermission] = useState(false);
   const [qrCodeValue, setQrCodeValue] = useState([]);
@@ -34,6 +42,10 @@ const SleeveCount = () => {
   const [whichSleeve, setWhichSleeve] = useState("");
   const navigation = useNavigation();
   const [employeeID, setEmployeeId] = useState("");
+  const [usageValue, setUsageValue] = useState(0);
+  const [scrapReason, setScrapReason] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [departmentList, setDepartmentList] = useState([]);
   const isWhichSleeveInvalid = () => {
     if (!whichSleeve) return false;
 
@@ -62,6 +74,18 @@ const SleeveCount = () => {
   const onSubmit = () => {
     if (isWhichSleeveInvalid() || isWeekInvalid()) {
       Alert.alert("Hata", "Lütfen aralık dışında bir değer girmeyiniz.");
+    } else if (usageValue === 1 && scrapReason.length < 1) {
+      Alert.alert("Hata", "Lütfen Hurdalama sebebini belirtiniz");
+    } else if (usageValue === 1 && scrapReason.length > 255) {
+      Alert.alert("Hata", "Hurdalama sebebi 255 karakterden büyük olamaz");
+    } else if (usageValue === 2 && scrapReason.length < 1) {
+      Alert.alert("Hata", "Lütfen Not belirtiniz");
+    } else if (usageValue === 2 && scrapReason.length > 255) {
+      Alert.alert("Hata", "Not 255 karakterden büyük olamaz");
+    } else if (usageValue === 3 && scrapReason.length < 1) {
+      Alert.alert("Hata", "Lütfen Geri İade Nedeni belirtiniz");
+    } else if (usageValue === 3 && scrapReason.length > 255) {
+      Alert.alert("Hata", "Geri İade Nedeni 255 karakterden büyük olamaz");
     } else if (
       displayValue(thicknessData, selectedIndexThickness) &&
       displayValue(widthData, selectedIndexWidth) &&
@@ -101,15 +125,43 @@ const SleeveCount = () => {
       setModalVisible(true);
       setQrValue(codes[0]?.value);
       setIsActive(false);
-      getQrValue();
+      if (qrValue) getQrValue();
     },
     requestCameraPermission: true,
   });
 
+  const getDepartmentList = async () => {
+    try {
+      if (employeeID) {
+        await axios
+          .get(
+            `https://tstapp.poscoassan.com.tr:8443/UserAccount/GetDepartmentInfo`,
+            {
+              params: {
+                sicilNo: employeeID,
+              },
+              headers: {
+                "auth-token": REACT_APP_SECRET_KEY,
+              },
+            }
+          )
+          .then((res) => {
+            setDepartmentList(res.data[0]);
+          })
+          .catch((t) => setDepartmentList([]));
+      }
+    } catch (e) {
+      setDepartmentList([]);
+    }
+  };
+
   const getQrValue = async () => {
+    setQrCodeValue([]);
+    setLoading(true);
+
     await axios
       .get(
-        "https://tstapp.poscoassan.com.tr:8443/Production/GetSleeveData?qrCode=45023",
+        `https://tstapp.poscoassan.com.tr:8443/Production/GetSleeveData?qrCode=${qrValue}`,
         {
           headers: {
             "auth-token": REACT_APP_SECRET_KEY,
@@ -124,21 +176,14 @@ const SleeveCount = () => {
 
           setQrCodeValue([]);
         }
-      });
+      })
+      .catch((err) => {
+        setQrCodeValue([]);
+      })
+      .finally(() => setLoading(false));
   };
 
   const AddCount = async () => {
-    // const formData = new FormData();
-    // formData.append("width", displayValue(widthData, selectedIndexWidth));
-    // formData.append(
-    //   "thickness",
-    //   displayValue(thicknessData, selectedIndexThickness)
-    // );
-    // formData.append("whichWeek", whichWeek);
-    // formData.append("whichSleeve", whichSleeve);
-    // formData.append("prNo", qrValue);
-    // formData.append("createdID", employeeID);
-
     const body = {
       thickness: displayValue(thicknessData, selectedIndexThickness),
       width: displayValue(widthData, selectedIndexWidth),
@@ -146,6 +191,8 @@ const SleeveCount = () => {
       whichSleeve: whichSleeve,
       prNo: qrValue,
       createdID: employeeID,
+      scrapReason: scrapReason,
+      usage: usageValue,
     };
 
     const formBody = Object.keys(body)
@@ -177,15 +224,20 @@ const SleeveCount = () => {
                 setWhichWeek("");
                 setSelectedThickness("");
                 setSelectedIndexWidth("");
+                setScrapReason("");
               },
             },
           ]);
+        } else if (res.data.status === "warning") {
+          Alert.alert(
+            "Hata",
+            "Belirlenen tarih aralığında tekrar kayıt açılamaz"
+          );
         } else {
           Alert.alert("Hata", "Lütfen Tüm Alanları Doldurunuz.");
         }
       })
       .catch((err) => {
-        console.log(err);
         Alert.alert("Hata", "Lütfen Tüm Alanları Doldurunuz.");
       });
   };
@@ -209,6 +261,10 @@ const SleeveCount = () => {
   }, []);
 
   useEffect(() => {
+    getDepartmentList();
+  }, [employeeID]);
+
+  useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
@@ -218,6 +274,7 @@ const SleeveCount = () => {
           setWhichWeek("");
           setSelectedThickness("");
           setSelectedIndexWidth("");
+          setScrapReason("");
           navigation.goBack();
           return true;
         } else {
@@ -227,6 +284,7 @@ const SleeveCount = () => {
           setSelectedThickness("");
           setSelectedIndexWidth("");
           setModalVisible(false);
+          setScrapReason("");
 
           return true;
         }
@@ -235,14 +293,30 @@ const SleeveCount = () => {
     return () => backHandler.remove();
   }, [isActive]);
 
-  if (!device || !permission) {
-    return (
-      <Text onPress={() => Linking.openSettings()}>
-        Lütfen kameraya izin verin ve cihazın hazır olduğundan emin olun. İzin
-        vermek için tıklayınız.
-      </Text>
-    );
-  }
+  useFocusEffect(
+    useCallback(() => {
+      // BURASI: Sayfaya girildiğinde çalışır (Opsiyonel)
+      // console.log('Sayfaya girildi');
+      setIsActive(true);
+      return () => {
+        setModalVisible(false);
+        setWhichSleeve("");
+        setWhichWeek("");
+        setSelectedThickness("");
+        setSelectedIndexWidth("");
+        setScrapReason("");
+      };
+    }, [])
+  );
+
+  // if (!device || !permission) {
+  //   return (
+  //     <Text onPress={() => Linking.openSettings()}>
+  //       Lütfen kameraya izin verin ve cihazın hazır olduğundan emin olun. İzin
+  //       vermek için tıklayınız.
+  //     </Text>
+  //   );
+  // }
 
   return (
     <View style={styles.view}>
@@ -266,34 +340,118 @@ const SleeveCount = () => {
             backgroundColor: "white",
           }}
         >
-          {qrCodeValue.length > 0 ? (
-            <View style={{ flex: 1, backgroundColor: "#fff", height: 300 }}>
-              <Text style={styles.textCenter}>Sleeve Kağıt</Text>
+          {!loading && qrCodeValue.length > 0 ? (
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={{ flex: 1, backgroundColor: "#fff", height: "100%" }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                }}
+              >
+                <Button
+                  size="small"
+                  appearance="ghost"
+                  status="basic"
+                  onPress={() => {
+                    setIsActive(true);
+                    setWhichSleeve("");
+                    setWhichWeek("");
+                    setSelectedThickness("");
+                    setSelectedIndexWidth("");
+                    setModalVisible(false);
+                    setScrapReason("");
+                  }}
+                >
+                  {"< Geri Dön"}
+                </Button>
+                <Text style={[styles.textCenter]}>Sleeve Kağıt</Text>
+              </View>
+
               <Text style={{ fontSize: 13, marginBottom: 10 }}>
-                Tanımlı PR:{qrValue}
+                Tanımlı PR:
+                {"  "}
+                {qrValue.replace("-", " ").replace("i", "ı").toUpperCase()}
               </Text>
+              <View>
+                <RadioGroup
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "flex-start",
+                    flexWrap: "wrap",
+                  }}
+                  selectedIndex={usageValue}
+                  onChange={(index) => setUsageValue(index)}
+                >
+                  <Radio>Kullanım</Radio>
+
+                  <Radio
+                    disabled={
+                      departmentList?.[0]?.SubTeamID !== 13 &&
+                      departmentList?.[0]?.SubTeamID !== 7
+                    }
+                  >
+                    Hurda
+                  </Radio>
+
+                  <Radio>Müşteri</Radio>
+                  <Radio>Geri İade</Radio>
+                </RadioGroup>
+                {/* <RadioButton.Group
+                  onValueChange={(newValue) => setUsageValue(newValue)}
+                  value={usageValue}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <RadioButton value="1" />
+                      <Text>Kullanım</Text>
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginLeft: 30,
+                      }}
+                    >
+                      <RadioButton value="2" />
+                      <Text>Hurda ya da Müşteri</Text>
+                    </View>
+                  </View>
+                </RadioButton.Group> */}
+              </View>
+
               <Select
-                label={"Genişlik"}
-                placeholder={"Genişlik Seçiniz"}
+                label="Genişlik"
+                placeholder="Genişlik Seçiniz"
                 value={displayValue(widthData, selectedIndexWidth)}
                 onSelect={(index) => setSelectedIndexWidth(index)}
               >
                 {widthData.map(renderOption)}
               </Select>
               <Select
-                label={"Kalınlık"}
-                placeholder={"Kalınlık Seçiniz"}
+                label="Kalınlık"
+                placeholder="Kalınlık Seçiniz"
                 value={displayValue(thicknessData, selectedIndexThickness)}
                 style={{ marginTop: 20 }}
                 onSelect={(index) => setSelectedThickness(index)}
               >
                 {thicknessData.map(renderOption)}
               </Select>
+
               <TextInput
                 keyboardType="numeric"
                 style={styles.input}
                 value={whichWeek}
-                onChangeText={(text) => setWhichWeek(text)}
+                onChangeText={(text) => {
+                  const onlyInteger = text.replace(/[^0-9]/g, "");
+                  setWhichWeek(onlyInteger);
+                }}
                 error={isWeekInvalid()}
                 placeholder="Kaçıncı Hafta"
               ></TextInput>
@@ -319,12 +477,46 @@ const SleeveCount = () => {
                   Değer {qrCodeValue[0]?.TotalQuantity}'den fazla olamaz
                 </HelperText>
               ) : null}
+              {usageValue == 1 ? (
+                <View>
+                  <TextInput
+                    keyboardType="default"
+                    style={styles.input}
+                    value={scrapReason}
+                    onChangeText={(text) => setScrapReason(text)}
+                    placeholder="Hurdalama Nedeni"
+                  ></TextInput>
+                </View>
+              ) : null}
+              {usageValue == 2 ? (
+                <View>
+                  <TextInput
+                    keyboardType="default"
+                    style={styles.input}
+                    value={scrapReason}
+                    onChangeText={(text) => setScrapReason(text)}
+                    placeholder="Not"
+                  ></TextInput>
+                </View>
+              ) : null}
+              {usageValue == 3 ? (
+                <View>
+                  <TextInput
+                    keyboardType="default"
+                    style={styles.input}
+                    value={scrapReason}
+                    onChangeText={(text) => setScrapReason(text)}
+                    placeholder="Geri İade Nedeni"
+                  ></TextInput>
+                </View>
+              ) : null}
+
               <Button style={styles.submitButton} onPress={onSubmit}>
                 {" "}
                 Kaydet
               </Button>
-            </View>
-          ) : (
+            </KeyboardAvoidingView>
+          ) : qrCodeValue.length == 0 && !loading ? (
             <View>
               <Text
                 onPress={() => {
@@ -335,6 +527,12 @@ const SleeveCount = () => {
                 İlgili PR numarası bulunamadı. Tekrar Okutmak için Tıklayınız
               </Text>
             </View>
+          ) : (
+            <ActivityIndicator
+              animating={true}
+              size={35}
+              style={{ marginTop: 30 }}
+            />
           )}
         </ScrollView>
       )}
@@ -352,21 +550,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     fontWeight: "bold",
+    marginLeft: 50,
   },
   input: {
-    backgroundColor: "white",
-    marginVertical: 10,
-    marginTop: 20,
+    backgroundColor: "#FFFFFF",
+    marginVertical: 12,
     paddingHorizontal: 10,
 
     fontSize: 13,
-    borderRadius: 10,
+    color: "#333",
+
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#E0E0E0",
+
     shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    shadowOpacity: 0.02,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+
     elevation: 1,
   },
   radio: {

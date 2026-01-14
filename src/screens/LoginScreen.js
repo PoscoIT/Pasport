@@ -160,7 +160,7 @@ const LoginScreen = ({ navigation }) => {
                 marginVertical: 50,
               }}
             >
-              <Text>{t("loginScreen.version")} 44</Text>
+              <Text>{t("loginScreen.version")} 47</Text>
             </View>
           </View>
         </View>

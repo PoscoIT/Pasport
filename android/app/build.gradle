@@ -99,8 +99,8 @@ android {
         applicationId "com.pasport"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4194391
-        versionName "5.7.4"
+        versionCode 4194394
+        versionName "5.7.7"
         missingDimensionStrategy 'react-native-camera', 'general'
 
 

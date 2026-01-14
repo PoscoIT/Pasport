@@ -245,6 +245,7 @@ endif()
 # LIB_CUSTOM_SRCS at /Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/CMakeLists.txt:23 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/*.cpp")
 set(OLD_GLOB
+  "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSBottomTabsAccessoryShadowNode.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSBottomTabsShadowNode.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSBottomTabsState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSFullWindowOverlayShadowNode.cpp"
@@ -252,6 +253,7 @@ set(OLD_GLOB
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSSafeAreaViewShadowNode.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSSafeAreaViewState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSScreenShadowNode.cpp"
+  "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSScreenShadowNodeCommitHook.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSScreenStackHeaderConfigShadowNode.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSScreenStackHeaderConfigState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnscreens/RNSScreenStackHeaderSubviewShadowNode.cpp"
@@ -304,7 +306,6 @@ set(OLD_GLOB
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGImageShadowNode.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGImageState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGLayoutableShadowNode.cpp"
-  "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGLayoutableState.cpp"
   "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-svg/android/src/main/jni/../../../../common/cpp/react/renderer/components/rnsvg/RNSVGShadowNodes.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")

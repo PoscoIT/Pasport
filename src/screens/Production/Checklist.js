@@ -86,7 +86,6 @@ const Checklist = () => {
   useEffect(() => {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermission();
-      console.log("burda", cameraPermission);
 
       if (cameraPermission === "granted") {
         setPermission(true);

@@ -89,7 +89,7 @@ const Index = ({ navigation }) => {
             ])
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   44"} />
+        <DrawerItem label={t("loginScreen.version") + "   47"} />
       </DrawerContentScrollView>
     );
   };
@@ -97,7 +97,7 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 44) {
+        if (responsee.version > 47) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
@@ -158,8 +158,17 @@ const Index = ({ navigation }) => {
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
             <Drawer.Screen name={t("myMachine")} component={MyMac} />
-            <Drawer.Screen name="Vinç Checklist" component={CraneChecklist} />
-            <Drawer.Screen name="Sleeve Sayma" component={SleeveCount} />
+            <Drawer.Screen
+              name="Vinç-Forklift Checklist"
+              component={CraneChecklist}
+            />
+            <Drawer.Screen
+              name="605 Sleeve Sayım"
+              component={SleeveCount}
+              options={{
+                unmountOnBlur: true,
+              }}
+            />
             <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
 
             {/*<Drawer.Screen options={{*/}
