@@ -19,6 +19,7 @@ import { Layout, Avatar } from "@ui-kitten/components";
 import MentorStack from "./navigation/MentorStack";
 import GonuldenStack from "./navigation/GonuldenStack";
 import LineStack from "./navigation/LineStack";
+import CareSystemStack from "./navigation/CareSystemStack";
 // import auth from "@react-native-firebase/auth";
 import { auth } from "./database/firebaseDB";
 import { getVersionNo } from "./api/auth-api";
@@ -41,6 +42,7 @@ import { CheckListScreen, LoginScreen } from "./screens";
 import Checklist from "./screens/Production/Checklist";
 import CraneChecklist from "./screens/Production/CraneChecklist";
 import SleeveCount from "./screens/Production/SleeveCount";
+import CoilCarChecklist from "./screens/Production/CoilCarChecklist";
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -89,7 +91,7 @@ const Index = ({ navigation }) => {
             ])
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   47"} />
+        <DrawerItem label={t("loginScreen.version") + "   48"} />
       </DrawerContentScrollView>
     );
   };
@@ -97,11 +99,11 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 47) {
+        if (responsee.version > 48) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
-            (err) => console.error("Error", err)
+            (err) => console.error("Error", err),
           );
         } else {
         }
@@ -154,13 +156,17 @@ const Index = ({ navigation }) => {
             <Drawer.Screen name="SafetyMainScreen" component={MentorStack} />
 
             {/* <Drawer.Screen name="Checklist" component={Checklist} /> */}
-            {/* <Drawer.Screen  name="Checklist" component={CareSystemStack} />    */}
+            <Drawer.Screen name="Checklist" component={CareSystemStack} />
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
             <Drawer.Screen name={t("myMachine")} component={MyMac} />
             <Drawer.Screen
               name="Vinç-Forklift Checklist"
               component={CraneChecklist}
+            />
+            <Drawer.Screen
+              name="Coil Car Checklist"
+              component={CoilCarChecklist}
             />
             <Drawer.Screen
               name="605 Sleeve Sayım"

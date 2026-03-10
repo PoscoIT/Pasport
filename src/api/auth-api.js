@@ -2,7 +2,7 @@ import { Alert } from "react-native";
 // RNFB modülleri eklendi
 import { signInWithEmailAndPassword } from "@react-native-firebase/auth";
 import { database, auth } from "../database/firebaseDB";
-import firestore from "@react-native-firebase/firestore";
+import firestore, { Timestamp } from "@react-native-firebase/firestore";
 import messaging from "@react-native-firebase/messaging";
 // Diğer importlar korundu
 import axios from "axios";
@@ -76,13 +76,13 @@ export const sendMailForGonulden = async function (receiver, subjectMessage) {
       headers: {
         "auth-token": REACT_APP_SECRET_KEY,
       },
-    }
+    },
   );
 };
 //-----------------*******************-----------------*******************-----------------*******************
 export const sendMailForGonuldenLocalMail = async function (
   receiver,
-  subjectMessage
+  subjectMessage,
 ) {
   let user = auth.currentUser; // 👈 Değişti
   if (user) {
@@ -106,7 +106,7 @@ export const sendMailForGonuldenLocalMail = async function (
         "auth-token": REACT_APP_SECRET_KEY,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-    }
+    },
   );
 };
 //-----------------*******************-----------------*******************-----------------*******************
@@ -133,13 +133,13 @@ export const sendMailForAward = async function (receiver, subjectMessage) {
         "auth-token": REACT_APP_SECRET_KEY,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-    }
+    },
   );
 };
 //-----------------*******************-----------------*******************-----------------*******************
 export const sendMailForAwardSelected = async function (
   receiver,
-  subjectMessage
+  subjectMessage,
 ) {
   let user = auth.currentUser; // 👈 Değişti
   if (user) {
@@ -163,13 +163,13 @@ export const sendMailForAwardSelected = async function (
         "auth-token": REACT_APP_SECRET_KEY,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-    }
+    },
   );
 };
 //-----------------*******************-----------------*******************-----------------*******************
 export const sendMailForAwardLocalMail = async function (
   receiver,
-  subjectMessage
+  subjectMessage,
 ) {
   let user = auth.currentUser; // 👈 Değişti
   if (user) {
@@ -193,13 +193,13 @@ export const sendMailForAwardLocalMail = async function (
         "auth-token": REACT_APP_SECRET_KEY,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-    }
+    },
   );
 };
 //-----------------*******************-----------------*******************-----------------*******************
 export const sendMailForAwardLocalMailSelected = async function (
   receiver,
-  subjectMessage
+  subjectMessage,
 ) {
   let user = auth.currentUser; // 👈 Değişti
   if (user) {
@@ -224,7 +224,7 @@ export const sendMailForAwardLocalMailSelected = async function (
         "auth-token": REACT_APP_SECRET_KEY,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-    }
+    },
   );
 };
 
@@ -288,7 +288,7 @@ export const sendUserInfoName = async (callback) => {
         const dbQuery = query(
           dbRef,
           orderByChild("MailAdd"),
-          equalTo(responsed.uemail)
+          equalTo(responsed.uemail),
         );
 
         const snapshot = await get(dbQuery);
@@ -296,11 +296,13 @@ export const sendUserInfoName = async (callback) => {
         if (snapshot.exists()) {
           snapshot.forEach(function (childSnapshot) {
             const val = childSnapshot.val();
+
             uname = val.AdSoyad;
             empSicil = val.SicilNo;
             line = val.Line;
             credit = val.Credit;
             uemail = val.MailAdd;
+            //   disabled = val?.Disabled;
           });
         }
       }
@@ -312,6 +314,7 @@ export const sendUserInfoName = async (callback) => {
       uname: uname,
       empSicil: empSicil,
       line: line,
+      //  Disabled: disabled,
       credit: credit,
       uemail: uemail,
     });
@@ -364,7 +367,7 @@ export const updateUserToken = async (callback) => {
             childSnapshot.ref.update({
               Token: token,
               userid: response.userid,
-            })
+            }),
           );
         });
 
@@ -567,7 +570,7 @@ export const messageListener = async () => {
       title,
       body,
       [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-      { cancelable: false }
+      { cancelable: false },
     );
   });
 
@@ -579,7 +582,7 @@ export const messageListener = async () => {
       title,
       body,
       [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-      { cancelable: false }
+      { cancelable: false },
     );
   });
 
@@ -590,14 +593,14 @@ export const messageListener = async () => {
   if (initialNotification) {
     console.log(
       "Bildirimle uygulama açıldı (kapalı durum):",
-      initialNotification
+      initialNotification,
     );
     const { title, body } = initialNotification.notification;
     Alert.alert(
       title,
       body,
       [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-      { cancelable: false }
+      { cancelable: false },
     );
   }
 };
@@ -969,7 +972,7 @@ export const InsertSelectedAward = async ({
           brand +
           "<br/><b>Seçilen Ödül ID:</b> " +
           selectedId +
-          "<br/><b>Gönderen: </b> "
+          "<br/><b>Gönderen: </b> ",
       );
       sendMailForAwardLocalMailSelected(
         sendResponse.uemail + ";ibrahim.ulus@poscoassan.com",
@@ -979,7 +982,7 @@ export const InsertSelectedAward = async ({
           brand +
           "<br/><b>Seçilen Ödül ID:</b> " +
           selectedId +
-          "<br/><b>Gönderen: </b> "
+          "<br/><b>Gönderen: </b> ",
       );
     });
 
@@ -1118,6 +1121,11 @@ export const loginUser = async ({ email, password }) => {
         return {
           error: "Hatalı kullanıcı adı veya şifre.",
         };
+      case "auth/user-disabled":
+        return {
+          error: "Kullanıcı Pasif Durumdadır.",
+        };
+
       case "auth/too-many-requests":
         return {
           error: "Çok fazla hatalı deneme!",
@@ -1386,6 +1394,29 @@ export const InsertNewRecordSafetyFirstApplication = async ({
     };
   }
 };
+export const getServerDateHttp = async () => {
+  try {
+    const res = await axios.get(
+      "https://tstapp.poscoassan.com.tr:8443/Mobile/getTime",
+      {
+        headers: {
+          "Content-type": "application/json",
+          "auth-token": REACT_APP_SECRET_KEY,
+        },
+        timeout: 2500,
+      },
+    );
+    return res?.data?.time ? moment(res.data.time) : m.toDate();
+  } catch (error) {
+    let today = new Date(Date.now());
+    let mm = String(today.getMonth() + 1).padStart(2, "0");
+    let yyyy = today.getFullYear();
+    let dd = String(today.getDate()).padStart(2, "0");
+    today = mm + "-" + dd + "-" + yyyy;
+
+    return today;
+  }
+};
 
 export const getListeStatus = async (callback) => {
   var isseqId = 100;
@@ -1393,129 +1424,82 @@ export const getListeStatus = async (callback) => {
   var checked = false;
 
   // Changed: Replaced Timestamp.now() and convertTimestamp with new Date()
-  var todayDate = new Date();
-  var mm = String(todayDate.getMonth() + 1).padStart(2, "0");
-  var yyyy = todayDate.getFullYear();
-  var dd = String(todayDate.getDate()).padStart(2, "0");
-  var today = mm + "-" + dd + "-" + yyyy;
+  let today = new Date(Date.now());
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var yyyy = today.getFullYear();
+  var dd = String(today.getDate()).padStart(2, "0");
+  today = mm + "-" + dd + "-" + yyyy;
+
+  const m = await getServerDateHttp();
+
+  // const todayDefault = m ? m : today;
+  const todayDefault = today;
+
+  const [mmDefault, ddDefault, yyyyDefault] = todayDefault
+    ? todayDefault.split("-")
+    : today.split("-");
   let lister = [];
 
   await sendUserInfoName(async (sendResponse) => {
-    if (sendResponse.line == "TNPC") {
-      // --- TNPC Path ---
+    // --- ELSE Path ---
 
-      // Changed: Replaced `await onValue(ref...` with `await database().ref().once('value')`
-      // This correctly implements a one-time async data fetch.
-      const safetyResultRef = database.ref(`SafetyResultTNPC/${yyyy}_${mm}`);
-      const safetyResultSnapshot = await safetyResultRef.once("value");
+    const safetyResultRef = database.ref(
+      `SafetyResult/${yyyyDefault}_${mmDefault}`,
+    );
 
-      safetyResultSnapshot.forEach((childes) => {
-        if (
-          sendResponse.uname === childes.val().fromUname &&
-          today === childes.val().relatedDate
-        ) {
-          checked = true;
-        }
-      });
+    const safetyResultSnapshot = await safetyResultRef.once("value");
 
-      // Changed: De-nested and used `await .once('value')`
-      const safetyPivotRef = database.ref(`SafetyPivotTNPC/${yyyy}_${mm}`);
-      const safetyPivotSnapshot = await safetyPivotRef.once("value");
-
-      if (lister.length > 0) {
-        lister = [];
+    safetyResultSnapshot.forEach((childes) => {
+      if (
+        sendResponse.uname === childes.val().fromUname &&
+        todayDefault === childes.val().relatedDate
+      ) {
+        checked = true;
       }
-      safetyPivotSnapshot.forEach((childed) => {
-        lister.push(childed);
-      });
+    });
 
-      if (lister.length > 0) {
-        lister.sort(function (a, b) {
-          if (a.val().totalPoint > b.val().totalPoint) {
-            return -1;
-          } else {
-            return 1;
-          }
-        });
+    // Changed: De-nested and used `await .once('value')`
+    const safetyPivotRef = database.ref(
+      `SafetyPivot/${yyyyDefault}_${mmDefault}/`,
+    );
+    const safetyPivotSnapshot = await safetyPivotRef.once("value");
 
-        isseqId = lister.findIndex(
-          (obj) => obj.val().fromMail === sendResponse.uemail
-        );
-        if (isseqId < 0) {
-          isTotalPoint = 0;
-        } else {
-          isTotalPoint =
-            lister[
-              lister.findIndex(
-                (obj) => obj.val().fromMail === sendResponse.uemail
-              )
-            ].val().totalPoint;
-        }
-      }
-      callback({
-        isseqId: isseqId,
-        isTotalPoint: isTotalPoint,
-        checked: checked,
-        liste: lister,
-      });
-    } else {
-      // --- ELSE Path ---
-
-      // Changed: Replaced `onValue(ref...` with `await database().ref().once('value')`
-
-      const safetyResultRef = database.ref(`SafetyResult/${yyyy}_${mm}`);
-      const safetyResultSnapshot = await safetyResultRef.once("value");
-
-      safetyResultSnapshot.forEach((childes) => {
-        if (
-          sendResponse.uname === childes.val().fromUname &&
-          today === childes.val().relatedDate
-        ) {
-          checked = true;
-        }
-      });
-
-      // Changed: De-nested and used `await .once('value')`
-      const safetyPivotRef = database.ref(`SafetyPivot/${yyyy}_${mm}/`);
-      const safetyPivotSnapshot = await safetyPivotRef.once("value");
-
-      if (lister.length > 0) {
-        lister = [];
-      }
-      safetyPivotSnapshot.forEach((childed) => {
-        lister.push(childed);
-      });
-
-      if (lister.length > 0) {
-        lister.sort(function (a, b) {
-          if (a.val().totalPoint > b.val().totalPoint) {
-            return -1;
-          } else {
-            return 1;
-          }
-        });
-
-        isseqId = lister.findIndex(
-          (obj) => obj.val().fromMail === sendResponse.uemail
-        );
-        if (isseqId < 0) {
-          isTotalPoint = 0;
-        } else {
-          isTotalPoint =
-            lister[
-              lister.findIndex(
-                (obj) => obj.val().fromMail === sendResponse.uemail
-              )
-            ].val().totalPoint;
-        }
-      }
-      callback({
-        isseqId: isseqId,
-        isTotalPoint: isTotalPoint,
-        checked: checked,
-        liste: lister,
-      });
+    if (lister.length > 0) {
+      lister = [];
     }
+    safetyPivotSnapshot.forEach((childed) => {
+      lister.push(childed);
+    });
+
+    if (lister.length > 0) {
+      lister.sort(function (a, b) {
+        if (a.val().totalPoint > b.val().totalPoint) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+
+      isseqId = lister.findIndex(
+        (obj) => obj.val().fromMail === sendResponse.uemail,
+      );
+      if (isseqId < 0) {
+        isTotalPoint = 0;
+      } else {
+        isTotalPoint =
+          lister[
+            lister.findIndex(
+              (obj) => obj.val().fromMail === sendResponse.uemail,
+            )
+          ].val().totalPoint;
+      }
+    }
+    callback({
+      isseqId: isseqId,
+      isTotalPoint: isTotalPoint,
+      checked: checked,
+      liste: lister,
+    });
   });
 };
 
@@ -1704,7 +1688,7 @@ export const InsertSafetyRuleCheck = async ({
       // Changed: Use database().ref().update()
       await database
         .ref(
-          `${renderName}${yyyy}_${mm}_${dd}/${sendResponse.empSicil}/${appHead}/`
+          `${renderName}${yyyy}_${mm}_${dd}/${sendResponse.empSicil}/${appHead}/`,
         )
         .update({
           ch0: ch0,

@@ -10,7 +10,7 @@ import { Provider as PaperProvider, MD3LightTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
-
+import ToastManager from "toastify-react-native";
 import SplashNavigator from "./src/navigation/SplashNavigator";
 import { decode, encode } from "base-64";
 
@@ -36,6 +36,7 @@ const Main = () => {
             </NavigationContainer>
           </PaperProvider>
         </ApplicationProvider>
+        <ToastManager />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

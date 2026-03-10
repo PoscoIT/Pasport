@@ -36,8 +36,8 @@ const SleeveCount = () => {
   const [qrValue, setQrValue] = useState("");
   const [isActive, setIsActive] = useState(true);
   const device = useCameraDevice("back");
-  const widthData = ["1010", "1280", "1535"];
-  const thicknessData = ["10", "15"];
+  const [widthData, setWidthData] = useState([]);
+  const [thicknessData, setThichknessData] = useState([]);
   const [whichWeek, setWhichWeek] = useState("");
   const [whichSleeve, setWhichSleeve] = useState("");
   const navigation = useNavigation();
@@ -49,23 +49,31 @@ const SleeveCount = () => {
   const isWhichSleeveInvalid = () => {
     if (!whichSleeve) return false;
 
-    const numVal = parseFloat(whichSleeve.toString().replace(",", "."));
+    const strVal = whichSleeve.toString().trim();
+
+    if (!/^[1-9]\d*$/.test(strVal)) return true;
+
+    const numVal = Number(strVal);
     const min = 0;
-    const max = parseFloat(qrCodeValue[0]?.TotalQuantity);
 
-    if (isNaN(numVal) || isNaN(max)) return false;
+    const maxStr = qrCodeValue[0]?.TotalQuantity?.toString().trim();
+    if (!/^\d+$/.test(maxStr)) return true;
 
-    return numVal < min || numVal > max;
+    const max = Number(maxStr);
+
+    return numVal <= min || numVal > max;
   };
 
   const isWeekInvalid = () => {
     if (!whichWeek) return false;
 
-    const numVal = parseFloat(whichWeek.toString().replace(",", "."));
+    const strVal = whichWeek.toString().trim();
+
+    if (!/^[1-9]\d*$/.test(strVal)) return true;
+
+    const numVal = Number(strVal);
     const min = 0;
     const max = 52;
-
-    if (isNaN(numVal) || isNaN(max)) return false;
 
     return numVal <= min || numVal > max;
   };
@@ -99,7 +107,7 @@ const SleeveCount = () => {
   };
   const renderOption = (title) => <SelectItem title={title} />;
   const displayValue = (data, selectedIndex) => {
-    return data[selectedIndex.row];
+    return data[selectedIndex?.row];
   };
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
@@ -143,7 +151,7 @@ const SleeveCount = () => {
               headers: {
                 "auth-token": REACT_APP_SECRET_KEY,
               },
-            }
+            },
           )
           .then((res) => {
             setDepartmentList(res.data[0]);
@@ -166,11 +174,13 @@ const SleeveCount = () => {
           headers: {
             "auth-token": REACT_APP_SECRET_KEY,
           },
-        }
+        },
       )
       .then((res) => {
         if (res.data?.status === "success") {
           setQrCodeValue(res.data.data);
+          setWidthData(res.data.value?.Width);
+          setThichknessData(res.data.value?.thickness);
         } else {
           setIsActive(false);
 
@@ -197,7 +207,7 @@ const SleeveCount = () => {
 
     const formBody = Object.keys(body)
       .map(
-        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(body[key])
+        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(body[key]),
       )
       .join("&");
 
@@ -210,7 +220,7 @@ const SleeveCount = () => {
             "auth-token": REACT_APP_SECRET_KEY,
             "Content-Type": "application/x-www-form-urlencoded",
           },
-        }
+        },
       )
       .then((res) => {
         if (res.data.status === "success") {
@@ -231,7 +241,7 @@ const SleeveCount = () => {
         } else if (res.data.status === "warning") {
           Alert.alert(
             "Hata",
-            "Belirlenen tarih aralığında tekrar kayıt açılamaz"
+            "Belirlenen tarih aralığında tekrar kayıt açılamaz",
           );
         } else {
           Alert.alert("Hata", "Lütfen Tüm Alanları Doldurunuz.");
@@ -288,7 +298,7 @@ const SleeveCount = () => {
 
           return true;
         }
-      }
+      },
     );
     return () => backHandler.remove();
   }, [isActive]);
@@ -306,7 +316,7 @@ const SleeveCount = () => {
         setSelectedIndexWidth("");
         setScrapReason("");
       };
-    }, [])
+    }, []),
   );
 
   // if (!device || !permission) {

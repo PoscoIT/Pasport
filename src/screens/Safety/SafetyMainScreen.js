@@ -116,7 +116,7 @@ const SafetyMainScreen = ({ route: { params }, navigation }) => {
 
   const languageData = useMemo(
     () => data.filter((item) => item.Type === 4),
-    [data]
+    [data],
   );
 
   useEffect(() => {

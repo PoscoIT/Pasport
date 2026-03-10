@@ -1,13 +1,26 @@
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import PickerModal from "react-native-picker-modal-view";
 import { REACT_APP_SECRET_KEY } from "@env";
 import axios from "axios";
-import { ScrollView } from "react-native-gesture-handler";
+
+import { Button } from "@ui-kitten/components";
 import { Card } from "react-native-paper";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import moment from "moment";
+import CareSystemChecklist from "./CareSystemChecklist";
+import { Gesture, GestureDetector, ScrollView } from "react-native-gesture-handler";
+import Reanimated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedProps,
+  useSharedValue,
+} from "react-native-reanimated";
+import { Camera, useCameraDevice, useCodeScanner } from "react-native-vision-camera";
 
+Reanimated.addWhitelistedNativeProps({ zoom: true });
+
+const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 const CustomCard = ({ item }) => {
   return (
     <Card
@@ -45,183 +58,78 @@ const CareSystemPeriodicControl = () => {
   const [qrCodeZone, setQrCodeZone] = useState([]);
   const [checklistByLine, setChecklistByLine] = useState([]);
   const [selectedQrCodeZone, setSelectedQrCodeZone] = useState([]);
+  const [isActive,setIsActive] = useState(true)
   const pickerRef = useRef(null);
+    const device = useCameraDevice("back");
+  const [showCamera, setShowCamera] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [qrValue,setQrValue] = useState("")
+
+   const zoom = useSharedValue(device?.neutralZoom ?? 1);
+  const zoomOffset = useSharedValue(0);
+
+  const gesture = Gesture.Pinch()
+    .onBegin(() => {
+      zoomOffset.value = zoom.value;
+    })
+    .onUpdate((event) => {
+      const z = zoomOffset.value * event.scale;
+      zoom.value = interpolate(
+        z,
+        [1, 10],
+        [device.minZoom, device.maxZoom],
+        Extrapolation.CLAMP,
+      );
+    });
+
+  const animatedProps = useAnimatedProps(() => ({
+    zoom: zoom.value,
+  }));
 
   const url = "https://tstapp.poscoassan.com.tr:8443";
-  const getMMSList = async () => {
-    try {
-      await axios
-        .get(`${url}/WorkOrder/MMS/Lines`, {
-          headers: {
-            "auth-token": REACT_APP_SECRET_KEY,
-          },
-        })
-        .then((res) => {
-          setMMSLines(
-            res?.data?.data?.map(
-              (item) =>
-                [
-                  {
-                    value: item.Line_ID,
-                    Name: item.Line,
-                  },
-                ][0]
-            )
-          );
-        })
-        .catch((t) => console.warn("selammm"));
-    } catch (e) {
-      setMMSLines([]);
-    }
-  };
-  const getChecklistByZone = async () => {
-    try {
-      await axios
-        .get(
-          `${url}/WorkOrder/MMS/GetCareSystemChecklistByZoneName/${selectedMMSLine.value}`,
-          {
-            headers: {
-              "auth-token": REACT_APP_SECRET_KEY,
-            },
-          }
-        )
-        .then((res) => {
-          setQrCodeZone(
-            res?.data?.data?.map(
-              (item, index) =>
-                [
-                  {
-                    Id: index,
-                    value: item.EQUIPMENTQRCODEZONENAME,
-                    Name: item.EQUIPMENTQRCODEZONENAME,
-                    Percentage: item.Percentage,
-                  },
-                ][0]
-            )
-          );
-        })
-        .catch((t) => console.warn("selammm"));
-    } catch (e) {
-      setQrCodeZone([]);
-    }
-  };
-  const getChecklistByLine = async () => {
-    try {
-      await axios
-        .get(
-          `${url}/WorkOrder/MMS/GetCareSystemChecklistByLine/${selectedMMSLine.value}/${selectedQrCodeZone.value}`,
-          {
-            headers: {
-              "auth-token": REACT_APP_SECRET_KEY,
-            },
-          }
-        )
-        .then((res) => {
-          setChecklistByLine(res.data.data);
-        })
-        .catch((t) => console.warn("selammm"));
-    } catch (e) {
-      setChecklistByLine([]);
-    }
-  };
 
-  //      const getChecklistByLine = useMemo(async () => {
-  //         console.warn("burda",selectedMMSLine)
-  //        try {
-  //            const apiResponse = await axios.get(`${url}/WorkOrder/MMS/GetCareSystemChecklistByLine/${selectedMMSLine.value}`);
-  //            console.warn(apiResponse.data.data)
-  //            return setChecklistByLine(apiResponse.data.data)
-  //        } catch (error) {
-  //            return setChecklistByLine([])
-  //        }
-  //    }, [selectedMMSLine]);
 
-  useEffect(() => {
-    getMMSList();
-  }, []);
+  const codeScannner = useCodeScanner({
+      codeTypes: ["qr", "ean-13"],
+      onCodeScanned: (codes) => {
+      setQrValue(codes[0]?.value)
+      setModalVisible(true)
+      },
+      requestCameraPermission: true,
+    });
 
-  useEffect(() => {
-    if (selectedMMSLine && selectedQrCodeZone) getChecklistByLine();
-  }, [selectedMMSLine, selectedQrCodeZone]);
-  useEffect(() => {
-    getChecklistByZone();
-  }, [selectedMMSLine]);
+
+
 
   return (
-    <ScrollView style={{ backgroundColor: "white" }}>
-      <PickerModal
-        style={{ width: "100%", backgroundColor: "black" }}
-        Autocomplete={false}
-        items={mmsLines}
-        sortingLanguage={"tr"}
-        showToTopButton={true}
-        showAlphabeticalIndex={true}
-        selected={selectedMMSLine}
-        autoGenerateAlphabeticalIndex={true}
-        selectPlaceholderText={<Text>Hat Seçiniz</Text>}
-        searchPlaceholderText={"Hat Seçiniz"}
-        requireSelection={false}
-        autoSort={true}
-        onSelected={(item) => setSelectedMMSLine(item)}
-      />
+    <View style={styles.view}>
+      <View style={{ flex: 1, width: "100%", height: "100%" }}>
+        <GestureDetector gesture={gesture}>
+          <ReanimatedCamera
+            style={StyleSheet.absoluteFill}
+            device={device}
+            isActive={isActive}
+            codeScanner={codeScannner}
+            animatedProps={animatedProps}
+          />
+        </GestureDetector>
+      </View>
 
-      <PickerModal
-        style={{ width: "100%", backgroundColor: "black" }}
-        Autocomplete={false}
-        items={qrCodeZone}
-        sortingLanguage={"tr"}
-        showToTopButton={true}
-        showAlphabeticalIndex={true}
-        autoSort={true}
-        ref={pickerRef}
-        selected={selectedQrCodeZone}
-        autoGenerateAlphabeticalIndex={true}
-        //                                            renderListItem={(selectedItem, listItem) => {
-
-        //     if (!listItem) return null;
-        //     return (
-        //       <TouchableOpacity
-        //         style={{ padding: 10, borderBottomWidth: 0.5, borderColor: "#ddd" }}
-        //         onPress={() => {
-
-        //              if (pickerRef.current && typeof pickerRef.current.onClose === "function") {
-        //                  console.log(listItem,selectedQrCodeZone)
-        //                    setSelectedQrCodeZone(listItem);
-        //                   pickerRef.current.onClose();
-        //                 }
-        //          } }
-        //       >
-        //         <Text
-        //           style={{ flexWrap: "wrap", flexShrink: 1, fontSize: 13 }}
-        //           numberOfLines={0}
-        //         >
-        //           {listItem.Name}
-        //         </Text>
-        //       </TouchableOpacity>
-        //     );
-        //   }}
-
-        selectPlaceholderText={<Text>Checklist Seçiniz</Text>}
-        searchPlaceholderText={"Checklist Seçiniz"}
-        requireSelection={false}
-        onSelected={(item) => setSelectedQrCodeZone(item)}
-      />
-
-      <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "bold" }}>
-        Checklist Maddeleri
-      </Text>
-      {checklistByLine.length > 0 ? (
-        <Text style={{ fontWeight: "bold", margin: 10 }}>
-          Tamamlanma Yüzdesi: %{selectedQrCodeZone.Percentage}
-        </Text>
-      ) : null}
-
-      {selectedMMSLine && selectedQrCodeZone
-        ? checklistByLine?.map((item) => (
-            <CustomCard key={item.uID} item={item}></CustomCard>
-          ))
-        : null}
-    </ScrollView>
+      {modalVisible && (
+        <ScrollView
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "white",
+          }}
+        >
+         <CareSystemChecklist selectedQrCodeZone={qrValue} />
+        </ScrollView>
+      )}
+    </View>
   );
 };
 
@@ -235,9 +143,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: "#ccc",
   },
+   view: {
+    flex: 1,
+    backgroundColor: "white",
+  },
   itemText: {
     fontSize: 16,
     flexWrap: "wrap", // Uzun metinleri sar
+  },
+  button3: {
+    width: "70%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 25,
   },
 });
 

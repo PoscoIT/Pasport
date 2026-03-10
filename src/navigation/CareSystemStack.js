@@ -1,8 +1,9 @@
-import {createStackNavigator} from '@react-navigation/stack';
-import ChecklistDetails from '../screens/Maintenance/ChecklistDetails';
-import CareSystemChecklist from '../screens/Maintenance/CareSystemChecklist';
-import CareSystemMainScreen from '../screens/Maintenance/CareSystemMainScreen';
-import CareSystemPeriodicControl from '../screens/Maintenance/CareSystemPeriodicControl';
+import { createStackNavigator } from "@react-navigation/stack";
+import ChecklistDetails from "../screens/Maintenance/ChecklistDetails";
+import CareSystemChecklist from "../screens/Maintenance/CareSystemChecklist";
+import CareSystemMainScreen from "../screens/Maintenance/CareSystemMainScreen";
+import CareSystemPeriodicControl from "../screens/Maintenance/CareSystemPeriodicControl";
+import CareSystemChecklistRoute from "../screens/Maintenance/CareSystemChecklistRoute";
 
 const CareSystemStack = () => {
   const Stack = createStackNavigator();
@@ -11,27 +12,25 @@ const CareSystemStack = () => {
       initialRouteName="CareSystemMainScreen"
       screenOptions={{
         headerShown: false,
-      }}>
-         <Stack.Screen
+      }}
+    >
+      <Stack.Screen
         name="CareSystemMainScreen"
         component={CareSystemMainScreen}
-  
       />
-         <Stack.Screen
+      <Stack.Screen
         name="CareSystemPeriodicControl"
         component={CareSystemPeriodicControl}
-  
       />
       <Stack.Screen
         name="CareSystemChecklist"
         component={CareSystemChecklist}
-  
       />
       <Stack.Screen
-        name="ChecklistDetails"
-        component={ChecklistDetails}
-       
+        name="CareSystemChecklistRoute"
+        component={CareSystemChecklistRoute}
       />
+      <Stack.Screen name="ChecklistDetails" component={ChecklistDetails} />
     </Stack.Navigator>
   );
 };

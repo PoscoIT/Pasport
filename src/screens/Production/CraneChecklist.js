@@ -72,7 +72,7 @@ const CraneChecklist = () => {
         z,
         [1, 10],
         [device.minZoom, device.maxZoom],
-        Extrapolation.CLAMP
+        Extrapolation.CLAMP,
       );
     });
 
@@ -136,12 +136,6 @@ const CraneChecklist = () => {
       },
     }));
   };
-  const handleFocus = useCallback(async ({ nativeEvent }) => {
-    await came?.current?.focus({
-      x: Math.round(nativeEvent.pageX),
-      y: Math.round(nativeEvent.pageX),
-    });
-  }, []);
 
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
@@ -151,7 +145,7 @@ const CraneChecklist = () => {
 
   const onSubmit = async () => {
     const allFieldsFilled = questionList.every(
-      (item) => String(formValues[item.ID]?.Answer || "").trim() !== ""
+      (item) => String(formValues[item.ID]?.Answer || "").trim() !== "",
     );
     if (allFieldsFilled) {
       const formData = new FormData();
@@ -162,7 +156,8 @@ const CraneChecklist = () => {
 
       const formBody = Object.keys(body)
         .map(
-          (key) => encodeURIComponent(key) + "=" + encodeURIComponent(body[key])
+          (key) =>
+            encodeURIComponent(key) + "=" + encodeURIComponent(body[key]),
         )
         .join("&");
 
@@ -175,7 +170,7 @@ const CraneChecklist = () => {
               "auth-token": REACT_APP_SECRET_KEY,
               "Content-Type": "application/x-www-form-urlencoded",
             },
-          }
+          },
         )
         .then((res) => {
           if (res.data) {
@@ -216,13 +211,17 @@ const CraneChecklist = () => {
       let groupIDs = [];
 
       setQrValue(
-        codes[0]?.value.replace("https://poscoassan.com.tr/machineBarcode/", "")
+        codes[0]?.value.replace(
+          "https://poscoassan.com.tr/machineBarcode/",
+          "",
+        ),
       );
       setMachineID(
         qrValue.startsWith("forklift")
           ? Number(qrValue.split("-")[1])
-          : Number(qrValue.split("-")[0])
+          : Number(qrValue.split("-")[0]),
       );
+
       const isForklift = qrValue.startsWith("forklift");
 
       // Eğer gelen ID 16,17,18 grubundaysa
@@ -237,7 +236,7 @@ const CraneChecklist = () => {
       }
 
       const filteredImages = imageList.filter((img) =>
-        groupIDs.includes(img.areadID)
+        groupIDs.includes(img.areadID),
       );
 
       setFilteredImageList(filteredImages);
@@ -257,7 +256,7 @@ const CraneChecklist = () => {
           headers: {
             "auth-token": REACT_APP_SECRET_KEY,
           },
-        }
+        },
       )
       .then((res) => {
         if (res.data?.status === "success") {
@@ -315,7 +314,7 @@ const CraneChecklist = () => {
           setIsEdit(false);
           return true;
         }
-      }
+      },
     );
     return () => backHandler.remove();
   }, [selectedAreaID, isActive]);
@@ -328,9 +327,7 @@ const CraneChecklist = () => {
     );
   }
 
-  // YARDIMCI FONKSİYON: Bölge Seçimi
   const handleAreaSelect = (areaID) => {
-    // Burada o bölgeye ait soru var mı kontrolü yapılabilir
     setSelectedAreaID(areaID);
 
     getQuestionList(areaID, qrValue);
@@ -448,11 +445,11 @@ const CraneChecklist = () => {
               {questionList.length > 0 &&
                 questionList
                   .filter((q) => q.AreaID === selectedAreaID) // Sadece seçili bölge
-                  .map((item) => {
+                  .map((item, index) => {
                     const answers = Object.entries(item)
                       .filter(
                         ([key, value]) =>
-                          key.includes("Answer") && value !== null
+                          key.includes("Answer") && value !== null,
                       )
                       .map(([key, value]) => ({ key, value }));
 
@@ -469,7 +466,7 @@ const CraneChecklist = () => {
                                   ? answers.findIndex(
                                       (ans) =>
                                         ans.value ===
-                                        formValues[item.ID]?.Answer
+                                        formValues[item.ID]?.Answer,
                                     )
                                   : null
                               }
@@ -477,7 +474,7 @@ const CraneChecklist = () => {
                                 handleAnswerChange(
                                   item.ID,
                                   answers[index].value,
-                                  item.AreaID
+                                  item.AreaID,
                                 );
                               }}
                               style={styles.radio}
@@ -505,23 +502,17 @@ const CraneChecklist = () => {
                               // Hata varsa inputun rengini kırmızı yapar (Opsiyonel)
                               error={(() => {
                                 const val = formValues[item.ID]?.Answer;
-                                if (!val) return false;
-                                // Virgülü noktaya çevirip sayıya dönüştürüyoruz (Tr klavye önlemi)
-                                const numVal = parseFloat(
-                                  val.toString().replace(",", ".")
-                                );
-                                const min = parseFloat(item.MinimumValue);
-                                const max = parseFloat(item.MaximumValue);
 
-                                // Min ve Max tanımlıysa ve değer aralık dışındaysa true döner
-                                if (
-                                  !isNaN(min) &&
-                                  !isNaN(max) &&
-                                  !isNaN(numVal)
-                                ) {
-                                  return numVal < min || numVal > max;
-                                }
-                                return false;
+                                if (!val) return false;
+
+                                const strVal = val
+                                  .toString()
+                                  .trim()
+                                  .replace(",", ".");
+
+                                const numVal = Number(strVal);
+
+                                return Number.isNaN(numVal);
                               })()}
                             />
 
@@ -530,29 +521,21 @@ const CraneChecklist = () => {
                               type="error"
                               visible={(() => {
                                 const val = formValues[item.ID]?.Answer;
-                                // Değer boşsa hata gösterme
+
                                 if (!val) return false;
 
-                                const numVal = parseFloat(
-                                  val.toString().replace(",", ".")
-                                );
-                                const min = parseFloat(item.MinimumValue);
-                                const max = parseFloat(item.MaximumValue);
+                                const strVal = val
+                                  .toString()
+                                  .trim()
+                                  .replace(",", ".");
 
-                                // Min ve Max API'den geliyorsa ve sayı ise kontrol et
-                                if (
-                                  !isNaN(min) &&
-                                  !isNaN(max) &&
-                                  !isNaN(numVal)
-                                ) {
-                                  return numVal < min || numVal > max;
-                                }
-                                return false;
+                                const numVal = Number(strVal);
+
+                                return Number.isNaN(numVal);
                               })()}
                             >
                               {/* Dinamik Hata Mesajı */}
-                              Değer {item.MinimumValue} ile {item.MaximumValue}{" "}
-                              arasında olmalıdır!
+                              Değer tam sayı olmalıdır!
                             </HelperText>
                           </View>
                         )}
@@ -569,7 +552,7 @@ const CraneChecklist = () => {
                     const answers = Object.entries(item)
                       .filter(
                         ([key, value]) =>
-                          key.startsWith("Answer") && value !== null
+                          key.startsWith("Answer") && value !== null,
                       )
                       .map(([key, value]) => ({ key, value }));
 
@@ -593,7 +576,7 @@ const CraneChecklist = () => {
 
                               timeZone: "UTC",
                             }).format(
-                              new Date(filledQuestionList[0]?.CreatedAt)
+                              new Date(filledQuestionList[0]?.CreatedAt),
                             )}
                           </Text>
                         ) : null}
@@ -604,7 +587,7 @@ const CraneChecklist = () => {
                             selectedIndex={answers.findIndex(
                               (ans) =>
                                 ans.value?.toLowerCase()?.trim() ===
-                                item.ChecklistAnswer?.toLowerCase()?.trim()
+                                item.ChecklistAnswer?.toLowerCase()?.trim(),
                             )}
                           >
                             {answers.map((ans) => (

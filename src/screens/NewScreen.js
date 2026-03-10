@@ -58,7 +58,7 @@ export const TopNavigationImageTitleShowcase = (navigation) => {
   const onItemSelect = (index) => {
     if (index.row === 1) {
       Linking.openURL("https://poscoassan.com.tr/download.html").catch((err) =>
-        console.error("Error", err)
+        console.error("Error", err),
       );
     } else if (index.row === 2) {
       logoutUser("TST");
@@ -81,7 +81,7 @@ export const TopNavigationImageTitleShowcase = (navigation) => {
       >
         <MenuItem
           accessoryLeft={InfoIcon}
-          title={`${t("loginScreen.version")} 47`}
+          title={`${t("loginScreen.version")} 48`}
         />
         <MenuItem accessoryLeft={InfoIcon} title={t("general.updateApp")} />
         <MenuItem accessoryLeft={LogoutIcon} title={t("general.logOut")} />

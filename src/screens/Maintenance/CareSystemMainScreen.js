@@ -47,10 +47,10 @@ const CareSystemMainScreen = () => {
             status={"danger"}
             style={styles.button3}
             onPress={() => {
-              navigation.navigate("CareSystemChecklist");
+              navigation.navigate("CareSystemChecklistRoute");
             }}
           >
-            <Text style={styles.buttonTextStyle}> Okut</Text>
+            <Text style={styles.buttonTextStyle}> Rota Oluştur</Text>
           </Button>
         </View>
       )}
