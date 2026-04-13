@@ -21,7 +21,13 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { sendUserInfoName } from "../../api/auth-api";
 import { REACT_APP_SECRET_KEY } from "@env";
 import { t } from "i18next";
-
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Reanimated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedProps,
+  useSharedValue,
+} from "react-native-reanimated";
 import { database } from "../../database/firebaseDB";
 
 import {
@@ -36,6 +42,10 @@ import {
   useCameraDevice,
   useCodeScanner,
 } from "react-native-vision-camera";
+
+Reanimated.addWhitelistedNativeProps({ zoom: true });
+
+const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 
 const FireEquipmentChecklist = () => {
   const [count, setCount] = useState(0);
@@ -69,20 +79,34 @@ const FireEquipmentChecklist = () => {
   const isFocused = useIsFocused();
   const [checked, setChecked] = useState(false);
 
+    const zoom = useSharedValue(device?.neutralZoom ?? 1);
+    const zoomOffset = useSharedValue(0);
+  
+    const gesture = Gesture.Pinch()
+      .onBegin(() => {
+        zoomOffset.value = zoom.value;
+      })
+      .onUpdate((event) => {
+        const z = zoomOffset.value * event.scale;
+        zoom.value = interpolate(
+          z,
+          [1, 10],
+          [device.minZoom, device.maxZoom],
+          Extrapolation.CLAMP,
+        );
+      });
+  
+    const animatedProps = useAnimatedProps(() => ({
+      zoom: zoom.value,
+    }));
+
   let scanAgain = (a = false) => {
     setCountMethod(a);
     setScan(true);
     setScanResult(false);
   };
 
-  const onSuccess = (e) => {
-    setModalVisible(true);
-
-    setQrValue(e.data);
-
-    setScan(false);
-    setScanResult(true);
-  };
+ 
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
       setEmployeeId(sendResponse.empSicil);
@@ -453,12 +477,15 @@ const FireEquipmentChecklist = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1, width: "100%", height: "100%" }}>
-        <Camera
-          style={StyleSheet.absoluteFill}
-          codeScanner={codeScannner}
-          device={device}
-          isActive={scan}
-        />
+      <GestureDetector gesture={gesture}>
+                <ReanimatedCamera
+                  style={StyleSheet.absoluteFill}
+                  device={device}
+                  isActive={scan}
+                  codeScanner={codeScannner}
+                  animatedProps={animatedProps}
+                />
+              </GestureDetector>
 
         <Modal
           animationType="fade"

@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   FlatList,
+  Platform,
   StyleSheet,
+
   Text,
   TouchableOpacity,
   View,
@@ -19,20 +21,23 @@ import {
   Checkbox,
   MD2Colors,
   TextInput,
+    Switch
 } from "react-native-paper";
 import { Toast } from "toastify-react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { t } from "i18next";
+import { useNavigation } from "@react-navigation/native";
 
 const CareSystemChecklistRoute = () => {
+
   const [mmsLines, setMMSLines] = useState([]);
   const [selectedMMSLine, setSelectedMMSLine] = useState([]);
   const [qrCodeZone, setQrCodeZone] = useState([]);
-  const [checklistByLine, setChecklistByLine] = useState([]);
-  const [selectedQrCodeZone, setSelectedQrCodeZone] = useState([]);
+
   const [employeeID, setEmployeeID] = useState("");
     const [assignEmployeeID, setAssignEmployeeID] = useState("");
   const [loading, setLoading] = useState(false);
-  const pickerRef = useRef(null);
+ const navigation = useNavigation()
   const [disabled, setDisabled] = useState(false);
   const [showSearchButton, setShowSearchButton] = useState(true);
   const [showAddButton, setShowAddButton] = useState(true);
@@ -42,7 +47,7 @@ const CareSystemChecklistRoute = () => {
       setEmployeeID(sendResponse.empSicil);
     });
   };
-  // const url = "https://tstapp.poscoassan.com.tr:8443";
+ // const url = "https://tstapp.poscoassan.com.tr:8443";
   const url = "http://10.0.2.2:5509";
   const [data, setData] = useState([
     { id: 1, name: "Elma" },
@@ -77,17 +82,17 @@ const CareSystemChecklistRoute = () => {
         .then((res) => {
           if (res.data) {
             if (res.data.status === "Success") {
-              Toast.success("Başarıyla Kayıt Yapılmıştır.");
+              Toast.success(t("safetyControlScreen.savedSuccesffuly"));
                 getChecklistByZone();
             }
           } else {
-            Toast.error("Hata ile karşılaşıldı.");
+            Toast.error(t("safetyControlScreen.errorMessage"));
           }
         })
-        .catch((err) => Toast.error("Bağlantı problemi", err))
+        .catch((err) => Toast.error(t("careSystem.connectionProblem"), err))
         .finally(() => setDisabled(false));
     } else {
-      Toast.error("Lütfen en az 1 tane seçim yapınız.");
+      Toast.error(t("careSystem.pleaseValidSelect"));
       setDisabled(false);
     }
   };
@@ -103,6 +108,7 @@ const CareSystemChecklistRoute = () => {
           padding: 12,
         }}
       >
+        
         <View style={{ flex: 1, marginRight: 2 }}>
           <Text style={{ flexShrink: 1, textAlign: "left", fontSize: 13 }}>
             {item.EQUIPMENTQRCODEZONENAME}
@@ -136,8 +142,9 @@ const CareSystemChecklistRoute = () => {
             </Text>
           </View>
         </View>
-        {item.disabled===false?<Checkbox
-          style={{ alignSelf: "center" }}
+        {item.disabled===false&& Platform.OS==="android"?<Checkbox
+          style={{ alignSelf: "center"}}
+    
           status={item.checked ? "checked" : "unchecked"}
           disabled={item.disabled}
           onPress={() => 
@@ -148,7 +155,13 @@ const CareSystemChecklistRoute = () => {
           
         
           
-        />:<Icon name="check" size={20} color={"#4b8046"} />}
+        />:item.disabled===false&& Platform.OS==="ios"?  <Switch
+       
+        value={item.checked}
+          disabled={item.disabled}
+                      trackColor={{ true: "green", false: "red" }}
+                      onChange={() => toggleItem(item.EQUIPMENTQRCODEZONENAME)}
+                    />:<Icon name="check" size={20} color={"#4b8046"} />}
 
         
       </TouchableOpacity>
@@ -273,6 +286,10 @@ const CareSystemChecklistRoute = () => {
 
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
+   <TouchableOpacity style={{width:"100%",flexDirection:"row",alignItems:"center"}} onPress={() => navigation.goBack()}>
+        <Icon name="angle-left" size={22} color="#000" />
+        <Text style={[styles.backText,{marginLeft:5}]}>Geri Dön</Text>
+      </TouchableOpacity>
       <Card style={styles.card}>
       <Card.Content>
 
@@ -280,11 +297,11 @@ const CareSystemChecklistRoute = () => {
 
         <TextInput
           mode="outlined"
-          label="Employee ID"
+          label={t("careSystem.employeeID")}
           value={assignEmployeeID}
           keyboardType="numeric"
           maxLength={6}
-          placeholder="Enter Employee ID"
+          placeholder={t("careSystem.enterEmployeeID")}
           left={<TextInput.Icon icon="account-outline" />}
           style={styles.input}
           outlineStyle={styles.inputOutline}
@@ -307,7 +324,7 @@ const CareSystemChecklistRoute = () => {
             autoSort={true}
             Autocomplete={false}
             requireSelection={false}
-            selectPlaceholderText={<Text style={styles.placeholder}>Hat Seçiniz</Text>}
+            selectPlaceholderText={<Text style={styles.placeholder}>{t("careSystem.selectLine")}</Text>}
             searchPlaceholderText={"Hat Ara"}
             onSelected={(item) => {
               setSelectedMMSLine(item);
@@ -363,37 +380,45 @@ const CareSystemChecklistRoute = () => {
               setShowAddButton(true);
             }}
           >
-            Search
+            {t("careSystem.search")}
           </Button>
         )}
       </View>
       {!loading && qrCodeZone.length >= 0 ? (
         <View style={{ flex: 1, borderTopWidth: 0.5 }}>
-          <FlatList
-            data={qrCodeZone}
-            keyExtractor={(item) => item?.EQUIPMENTQRCODEZONENAME?.toString()}
-            renderItem={renderItem}
-            style={{ flex: 1 }}
-            ListEmptyComponent={<Text style={{textAlign:"center",marginTop:15}}>İlgili Alan Bulunamadı.</Text>}
-            ListFooterComponent={
-              showAddButton && qrCodeZone.length>0 &&(
-                <Button
-                  disabled={disabled}
-                  style={{
-                    marginBottom: 20,
-                    marginHorizontal: 90,
-                    marginVertical: 20,
-                    borderRadius: 20,
-                    backgroundColor: "#2156b1",
-                    borderColor: "#2156b1",
-                  }}
-                  onPress={() => onSubmit()}
-                >
-                  Rota Oluştur
-                </Button>
-              )
-            }
-          />
+         <FlatList
+    data={qrCodeZone}
+    keyExtractor={(item) => item?.EQUIPMENTQRCODEZONENAME?.toString()}
+    renderItem={renderItem}
+    contentContainerStyle={{ paddingBottom: 100 }} // buton için boşluk
+    ListEmptyComponent={
+      <Text style={{ textAlign: "center", marginTop: 15 }}>
+        {t("careSystem.relatedAreaNotFound")}
+      </Text>
+    }
+  />
+
+  {showAddButton && qrCodeZone.length > 0 && (
+    <Button
+      disabled={disabled}
+      style={{
+        position: "absolute",
+        bottom: 50,
+       
+        borderRadius: 20,
+        backgroundColor: "#2156b1",
+        borderColor: "#2156b1",
+        width:"75%",
+        alignItems:"center",
+        justifyContent:"center",
+        alignSelf:"center",
+        flex:1
+      }}
+      onPress={onSubmit}
+    >
+      {t("careSystem.createRoute")}
+    </Button>
+  )}
         </View>
       ) : loading ? (
         <ActivityIndicator animating={true} color={MD2Colors.blue800} />

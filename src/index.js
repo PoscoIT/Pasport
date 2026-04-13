@@ -43,6 +43,7 @@ import Checklist from "./screens/Production/Checklist";
 import CraneChecklist from "./screens/Production/CraneChecklist";
 import SleeveCount from "./screens/Production/SleeveCount";
 import CoilCarChecklist from "./screens/Production/CoilCarChecklist";
+import PaperTrackingSecond from "./screens/Production/PaperTrackingSecond";
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -148,6 +149,7 @@ const Index = ({ navigation }) => {
             screenOptions={({ route, navigation }) => ({
               headerTitle: "",
               gestureEnabled: true,
+              drawerType:"slide",
               ...TransitionPresets.ModalPresentationIOS,
             })}
             initialRouteName="SafetyMainScreen"
@@ -156,7 +158,7 @@ const Index = ({ navigation }) => {
             <Drawer.Screen name="SafetyMainScreen" component={MentorStack} />
 
             {/* <Drawer.Screen name="Checklist" component={Checklist} /> */}
-            <Drawer.Screen name="Checklist" component={CareSystemStack} />
+            <Drawer.Screen name="Care System Checklist" component={CareSystemStack} />
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
             <Drawer.Screen name={t("myMachine")} component={MyMac} />
@@ -176,6 +178,7 @@ const Index = ({ navigation }) => {
               }}
             />
             <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
+             <Drawer.Screen name="Second Hand Paper Tracking" component={PaperTrackingSecond} />
 
             {/*<Drawer.Screen options={{*/}
 

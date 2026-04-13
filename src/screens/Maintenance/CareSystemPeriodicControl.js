@@ -1,109 +1,236 @@
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import PickerModal from "react-native-picker-modal-view";
+import {  useEffect, useRef, useState } from "react";
+import {  FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { REACT_APP_SECRET_KEY } from "@env";
 import axios from "axios";
+import { Swipeable } from "react-native-gesture-handler";
+import { ActivityIndicator,  MD2Colors } from "react-native-paper";
+import {  useCameraDevice } from "react-native-vision-camera";
+import {  useIsFocused, useNavigation } from "@react-navigation/native";
+import { Toast } from "toastify-react-native";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { sendUserInfoName } from "../../api/auth-api";
 
-import { Button } from "@ui-kitten/components";
-import { Card } from "react-native-paper";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import moment from "moment";
-import CareSystemChecklist from "./CareSystemChecklist";
-import { Gesture, GestureDetector, ScrollView } from "react-native-gesture-handler";
-import Reanimated, {
-  Extrapolation,
-  interpolate,
-  useAnimatedProps,
-  useSharedValue,
-} from "react-native-reanimated";
-import { Camera, useCameraDevice, useCodeScanner } from "react-native-vision-camera";
 
-Reanimated.addWhitelistedNativeProps({ zoom: true });
 
-const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
-const CustomCard = ({ item }) => {
+const CareSystemPeriodicControl = () => {
+  const [qrCodeZone, setQrCodeZone] = useState([]);
+
+    const [employeeID, setEmployeeID] = useState("");
+  const [loading,setLoading] = useState(true)
+
+
+ //  const url = "https://tstapp.poscoassan.com.tr:8443";
+ const url = "http://10.0.2.2:5509"
+    const navigation = useNavigation()
+    const isFocused = useIsFocused();
+
+    const handleDelete = async(item) => {
+   
+const data = {
+  QrCode:item.EQUIPMENTQRCODEZONENAME,
+  employeeID:employeeID
+}
+
+  await axios.post(`${url}/WorkOrder/MMS/RemoveChecklistRoute`,data,
+          {
+            headers: {
+              "auth-token": REACT_APP_SECRET_KEY,
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          },).then((res)=>{
+            if(res.data.status==="Success"){
+  setQrCodeZone(prev => prev.filter(i => i.EQUIPMENTQRCODEZONENAME !== item.EQUIPMENTQRCODEZONENAME));
+  Toast.success("Başarıyla silindi")
+            }
+            else{
+  Toast.error("Hata ile karşılaşıldı")
+            }
+          }).catch(err=>{
+              Toast.error("Hata ile karşılaşıldı")
+          })
+
+
+};
+
+    const renderRightActions = (item) => {
   return (
-    <Card
+    <TouchableOpacity
+      onPress={() => handleDelete(item)}
       style={{
-        marginVertical: 15,
-        backgroundColor: "#f8f8f8ff",
-        borderRadius: 20,
+        backgroundColor: '#ea8076',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        paddingHorizontal: 20,
+      
+        flex: 1,
       }}
     >
-      <Card.Content>
-        <Text variant="titleLarge">
-          <Text style={{ fontWeight: "bold" }}>Checklist Madde:</Text>
-          {item.CheckItem}
-        </Text>
-        {/* <Text variant="bodyMedium"><Text style={{fontWeight:"bold"}}>Checklist:</Text>{item.EQUIPMENTQRCODEZONENAME}</Text> */}
-        <Text variant="bodyMedium">
-          <Text style={{ fontWeight: "bold" }}>Son Kontrol Tarihi:</Text>
-          {moment(item?.LastCheckDate)?.format("DD.MM.YYYY")}
-        </Text>
-        <Text variant="bodyMedium">
-          <Text style={{ fontWeight: "bold" }}>Period:</Text> {item.Period} Gün{" "}
-          {item.IsValid ? (
-            <FontAwesome name={"check"} size={20} color={"#105c1c"} />
-          ) : (
-            <FontAwesome name={"close"} size={20} color={"#a21414ff"} />
-          )}{" "}
-        </Text>
-      </Card.Content>
-    </Card>
+      <Icon name="close" size={20}/>
+      <Text style={{ color: 'black', fontWeight: 'bold' }}>
+        Sil
+      </Text>
+    </TouchableOpacity>
   );
 };
-const CareSystemPeriodicControl = () => {
-  const [mmsLines, setMMSLines] = useState([]);
-  const [selectedMMSLine, setSelectedMMSLine] = useState([]);
-  const [qrCodeZone, setQrCodeZone] = useState([]);
-  const [checklistByLine, setChecklistByLine] = useState([]);
-  const [selectedQrCodeZone, setSelectedQrCodeZone] = useState([]);
-  const [isActive,setIsActive] = useState(true)
-  const pickerRef = useRef(null);
-    const device = useCameraDevice("back");
-  const [showCamera, setShowCamera] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [qrValue,setQrValue] = useState("")
 
-   const zoom = useSharedValue(device?.neutralZoom ?? 1);
-  const zoomOffset = useSharedValue(0);
-
-  const gesture = Gesture.Pinch()
-    .onBegin(() => {
-      zoomOffset.value = zoom.value;
-    })
-    .onUpdate((event) => {
-      const z = zoomOffset.value * event.scale;
-      zoom.value = interpolate(
-        z,
-        [1, 10],
-        [device.minZoom, device.maxZoom],
-        Extrapolation.CLAMP,
-      );
+ const getUser = async () => {
+    await sendUserInfoName((sendResponse) => {
+      setEmployeeID(sendResponse.empSicil);
     });
+  };
+const renderLeftActions = (item) => {
+  return (
+    <TouchableOpacity
+      onPress={() => handleDelete(item)}
+      style={{
+        backgroundColor: '#ea8076',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        paddingHorizontal: 20,
+      
+        flex: 1,
+      }}
+    >
+      <Icon name="close" size={20}/>
+      <Text style={{ color: 'black', fontWeight: 'bold' }}>
+        Sil
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
-  const animatedProps = useAnimatedProps(() => ({
-    zoom: zoom.value,
-  }));
+ const toggleItem = (uID) => {
+   navigation.navigate("CareSystemChecklist",{uID})
+  };
 
-  const url = "https://tstapp.poscoassan.com.tr:8443";
+    const renderItem = ({ item }) => {
+      
+     
+    return (
+      <Swipeable renderRightActions={() => renderRightActions(item)} renderLeftActions={()=>renderLeftActions(item)}>
+      <TouchableOpacity
+        onPress={() => {
+          if (Number(item.Percentage) < 100) {
+            toggleItem(item.EQUIPMENTQRCODEZONENAME);
+          } else {
+            Toast.error("Doldurulacak Checklist Maddesi Bulunmamaktadır");
+          }
+        }}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: 12,
+          backgroundColor: "#fff",
+        }}
+      >
+        <View style={{ flex: 1, marginRight: 2 }}>
+          <Text style={{ fontSize: 13 }}>
+            {item.EQUIPMENTQRCODEZONENAME}
+          </Text>
+
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}>
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor:
+                    item.Percentage >= 80
+                      ? "#D1FAE5"
+                      : item.Percentage >= 50
+                      ? "#FEF3C7"
+                      : "#FEE2E2",
+                  marginTop: 5,
+                },
+              ]}
+            >
+              <Text style={{
+                color:
+                  item.Percentage >= 80
+                    ? "#065F46"
+                    : item.Percentage >= 50
+                    ? "#92400E"
+                    : "#991B1B",
+                fontWeight: "700",
+              }}>
+                Tamamlanma: {item.Percentage}%
+              </Text>
+            </View>
+
+            <View style={[styles.badge, { marginTop: 5 }]}>
+              <Text>
+                Tamamlanmayan: {item.RatioUncompletedText}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
+    );
+  };
+
+const getChecklistByZone = async () => {
+    setLoading(true);
+    try {
+      await axios
+        .get(
+          `${url}/WorkOrder/MMS/GetCareSystemChecklistDaily?UserID=${employeeID}`,
+          {
+            headers: {
+          "auth-token": REACT_APP_SECRET_KEY,
+        },
+          },
+        )
+        .then((res) => {
+       
+          if (res.data.status === "Success") {
+       
+            setQrCodeZone(
+             res.data.data[0]
+
+            );
+          } else {
+            setQrCodeZone([]);
+          }
+        })
+        .catch((t) => {})
+    } catch (e) {
+   
+      setQrCodeZone([]);
+    }
+    setLoading(false);
+  };
 
 
-  const codeScannner = useCodeScanner({
-      codeTypes: ["qr", "ean-13"],
-      onCodeScanned: (codes) => {
-      setQrValue(codes[0]?.value)
-      setModalVisible(true)
-      },
-      requestCameraPermission: true,
-    });
+ useEffect(() => {
+  if (isFocused) {
+   
+    getChecklistByZone();
+  }
+  
+}, [isFocused,employeeID]);
+
+  useEffect(() => {
+    getUser();
+  }, [employeeID]);
+ 
 
 
+if(loading){
+   return  <ActivityIndicator animating={true} color={MD2Colors.blue800} />
+}
 
 
   return (
     <View style={styles.view}>
-      <View style={{ flex: 1, width: "100%", height: "100%" }}>
+       <TouchableOpacity style={{width:"100%",flexDirection:"row",alignItems:"center"}} onPress={() => navigation.goBack()}>
+        <Icon name="angle-left" size={22} color="#000" />
+        <Text style={[styles.backText,{marginLeft:5}]}>Geri Dön</Text>
+      </TouchableOpacity>
+      {/* <View style={{ flex: 1, width: "100%", height: "100%" }}>
         <GestureDetector gesture={gesture}>
           <ReanimatedCamera
             style={StyleSheet.absoluteFill}
@@ -113,22 +240,25 @@ const CareSystemPeriodicControl = () => {
             animatedProps={animatedProps}
           />
         </GestureDetector>
-      </View>
+      </View> */}
 
-      {modalVisible && (
-        <ScrollView
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "white",
-          }}
-        >
-         <CareSystemChecklist selectedQrCodeZone={qrValue} />
-        </ScrollView>
-      )}
+        {qrCodeZone.length>0?<Text style={{fontSize:15,alignSelf:"center",margin:10,fontWeight:600}}>Günlük Checklist Listesi</Text>:null}
+       
+           <FlatList
+             data={qrCodeZone}
+             keyExtractor={(item) => item?.EQUIPMENTQRCODEZONENAME?.toString()}
+             renderItem={renderItem}
+             contentContainerStyle={{ paddingBottom: 100 }} // buton için boşluk
+             ListEmptyComponent={
+               <Text style={{ textAlign: "center", marginTop: 15 }}>
+                Lütfen Checklist Rotası Oluşturunuz
+               </Text>
+             }
+           /> 
+
+         {/* <CareSystemChecklist selectedQrCodeZone={qrValue} /> */}
+      
+      
     </View>
   );
 };
@@ -156,6 +286,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 25,
+  },
+   itemContainer: {
+    paddingVertical: 16, // Satır yüksekliği
+    paddingHorizontal: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#ccc",
+  },
+  badge: {
+    backgroundColor: "#E6F0FF",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+  },
+
+  badgeText: {
+    color: "#1E3A8A",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  itemText: {
+    fontSize: 16,
+    flexWrap: "wrap", // Uzun metinleri sar
   },
 });
 

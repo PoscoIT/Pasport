@@ -222,7 +222,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "appmodules::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-appmodules-Debug-0f1b75e36f4a20c51051.json",
+					"jsonFile" : "target-appmodules-Debug-39a21a869398e50d58fa.json",
 					"name" : "appmodules",
 					"projectIndex" : 0
 				},
@@ -278,21 +278,21 @@
 				{
 					"directoryIndex" : 9,
 					"id" : "react_codegen_rnscreens::@25bcbd507e98d3a854ad",
-					"jsonFile" : "target-react_codegen_rnscreens-Debug-ebf11564eaf411f2256e.json",
+					"jsonFile" : "target-react_codegen_rnscreens-Debug-69f1cc716766a6123cd8.json",
 					"name" : "react_codegen_rnscreens",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 10,
 					"id" : "react_codegen_rnsvg::@4f40eb209d0c0b4a3b65",
-					"jsonFile" : "target-react_codegen_rnsvg-Debug-9fd9d09f40393b60a18c.json",
+					"jsonFile" : "target-react_codegen_rnsvg-Debug-7d760b96d0e316633bd7.json",
 					"name" : "react_codegen_rnsvg",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 8,
 					"id" : "react_codegen_safeareacontext::@7984cd80db47aa7b952a",
-					"jsonFile" : "target-react_codegen_safeareacontext-Debug-120903679abd49ef935d.json",
+					"jsonFile" : "target-react_codegen_safeareacontext-Debug-36c058f36d51a1e67337.json",
 					"name" : "react_codegen_safeareacontext",
 					"projectIndex" : 0
 				}
@@ -302,7 +302,7 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/android/app/.cxx/Debug/3t3c67b2/x86_64",
+		"build" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/android/app/.cxx/Debug/3t3c67b2/arm64-v8a",
 		"source" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native/ReactAndroid/cmake-utils/default-app-setup"
 	},
 	"version" : 

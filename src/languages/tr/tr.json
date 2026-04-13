@@ -167,20 +167,35 @@
       "description": "Nedeninizi Açıklayınız",
       "createRequest": "Talep Oluştur"
     },
-    "description": "Açıklama"
-  },
-  "sleeveCount": {
-    "scrapReason": "Hurdalama Nedeni",
-    "whichWeek": "Kaçıncı Hafta",
-    "whichOrder": "Kaçıncı Sleeve",
-    "definedPr": "Tanımlı PR:",
-    "thickness": "Kalınlık",
-    "width": "Genişlik",
-    "submit": "Kaydet",
-    "usage": "Kullanım",
-    "scrapOrCustomer": "Hurda ya da Müşteri",
-    "selectThickness": "Kalınlık Seçiniz",
-    "selectWidth": "Genişlik Seçiniz",
-    "sleevePaper": "Sleeve Kağıt"
+    "description": "Açıklama",
+
+    "sleeveCount": {
+      "scrapReason": "Hurdalama Nedeni",
+      "whichWeek": "Kaçıncı Hafta",
+      "whichOrder": "Kaçıncı Sleeve",
+      "definedPr": "Tanımlı PR:",
+      "thickness": "Kalınlık",
+      "width": "Genişlik",
+      "submit": "Kaydet",
+      "usage": "Kullanım",
+      "scrapOrCustomer": "Hurda ya da Müşteri",
+      "selectThickness": "Kalınlık Seçiniz",
+      "selectWidth": "Genişlik Seçiniz",
+      "sleevePaper": "Sleeve Kağıt"
+    },
+    "careSystem": {
+      "periodicControl": "Periyodik Checklist Kontrolü",
+      "createRoute": "Rota Oluştur",
+      "selectLine": "Lütfen Hat Seçiniz",
+      "search": "Ara",
+      "relatedAreaNotFound": "İlgili Alan Bulunamadı",
+      "enterEmployeeID": "Sicil No Giriniz",
+      "employeeID": "Sicil No",
+      "connectionProblem": "Bağlantı Problemi",
+      "pleaseValidSelect": "Lütfen en az 1 tane seçim yapınız.",
+      "pleaseEnterValue": "Lütfen İlgili Alanları Doldurunuz.",
+      "completeChecklist": "Checklisti Tamamla",
+      "addImage": "Görsel Ekle"
+    }
   }
 }

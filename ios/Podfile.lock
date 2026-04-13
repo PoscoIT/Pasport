@@ -1411,20 +1411,20 @@ PODS:
     - gRPC-Core/Privacy (= 1.69.0)
   - gRPC-Core/Interface (1.69.0)
   - gRPC-Core/Privacy (1.69.0)
-  - GTMSessionFetcher/Core (5.0.0)
+  - GTMSessionFetcher/Core (5.2.0)
   - hermes-engine (0.81.5):
     - hermes-engine/Pre-built (= 0.81.5)
   - hermes-engine/Pre-built (0.81.5)
   - leveldb-library (1.22.6)
-  - lottie-ios (4.5.0)
-  - lottie-react-native (7.3.4):
+  - lottie-ios (4.6.0)
+  - lottie-react-native (7.3.6):
     - boost
     - DoubleConversion
     - fast_float
     - fmt
     - glog
     - hermes-engine
-    - lottie-ios (= 4.5.0)
+    - lottie-ios (= 4.6.0)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -3309,7 +3309,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-video (6.18.0):
+  - react-native-video (6.19.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3327,7 +3327,7 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-video/Video (= 6.18.0)
+    - react-native-video/Video (= 6.19.1)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -3338,7 +3338,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-video/Fabric (6.18.0):
+  - react-native-video/Fabric (6.19.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3366,7 +3366,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-video/Video (6.18.0):
+  - react-native-video/Video (6.19.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -4183,7 +4183,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNScreens (4.19.0):
+  - RNScreens (4.24.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -4210,10 +4210,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.19.0)
+    - RNScreens/common (= 4.24.0)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.19.0):
+  - RNScreens/common (4.24.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -4242,7 +4242,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNSVG (15.15.1):
+  - RNSVG (15.15.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -4268,10 +4268,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNSVG/common (= 15.15.1)
+    - RNSVG/common (= 15.15.3)
     - SocketRocket
     - Yoga
-  - RNSVG/common (15.15.1):
+  - RNSVG/common (15.15.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -4647,11 +4647,11 @@ SPEC CHECKSUMS:
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   "gRPC-C++": cc207623316fb041a7a3e774c252cf68a058b9e8
   gRPC-Core: 860978b7db482de8b4f5e10677216309b5ff6330
-  GTMSessionFetcher: 02d6e866e90bc236f48a703a041dfe43e6221a29
+  GTMSessionFetcher: 904bdd2a82c635bcd6f44edf94cc8775c5d1d6e6
   hermes-engine: 9f4dfe93326146a1c99eb535b1cb0b857a3cd172
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
-  lottie-ios: a881093fab623c467d3bce374367755c272bdd59
-  lottie-react-native: a236ef9840b0e49f55fc0db365dfaa7bc14424c6
+  lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
+  lottie-react-native: a2e73ead497511a11d9b5dc520e79343f17529ed
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 59ec0ac1f2f39672a0c6e6cecdd39383b764646f
@@ -4690,7 +4690,7 @@ SPEC CHECKSUMS:
   react-native-image-picker: 86bf00a37006892936db36eb85f219f3084694fe
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
   react-native-safe-area-context: 9c4af81e2f37bcb251946f3dba42c2eeedfad59a
-  react-native-video: f9758cda5b9dd6fd378389002f28f3f19017a406
+  react-native-video: deda3dbd14c35feece29f246ff772d29c061d428
   React-NativeModulesApple: 8ce162c145e6b9767bb37a090c77d3d28f7d32b5
   React-oscompat: eb0626e8ba1a2c61673c991bf9dc21834898475d
   React-perflogger: d0d0d1b884120fa0a13bd38ac5e9c3c8e8bfe82a
@@ -4732,13 +4732,13 @@ SPEC CHECKSUMS:
   RNLocalize: 0aa716b7d0f1316ca5f8f16ed42b79b9e3093279
   RNPermissions: 4c963fcc063e6a11111cae0567b69479edcd5412
   RNReanimated: 75067db60d5d2a4b8a2df6d9cb4b0af1ff17a556
-  RNScreens: c73f6bcfc19e209736c4e069f62b0f274535214b
-  RNSVG: 46be54b3378a27b412e0c290e41fecd69ffa1171
+  RNScreens: 656e050942ae9445f5cc45d05d57f13ce7a4c8e4
+  RNSVG: c5c7114bf0cd57e71509fbad6146180bce61416d
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   VisionCamera: 3ea10c46a5c612f5f89fb46a54bef4a0de8b58a7
   Yoga: cc4a6600d61e4e9276e860d4d68eebb834a050ba
 
-PODFILE CHECKSUM: 1e2752539f19b8aeab08568b59bb775eace041d6
+PODFILE CHECKSUM: 2d77d7d04223e7e71dc1923d0968c38784edb2cf
 
 COCOAPODS: 1.16.2

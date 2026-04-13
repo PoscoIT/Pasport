@@ -303,24 +303,6 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSBottomTabsAccessoryShadowNode.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSBottomTabsShadowNode.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSBottomTabsState.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
 			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSFullWindowOverlayShadowNode.cpp",
 			"sourceGroupIndex" : 0
 		},
@@ -388,6 +370,24 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSSplitViewScreenShadowNode.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSTabsBottomAccessoryShadowNode.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSTabsHostShadowNode.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-screens/common/cpp/react/renderer/components/rnscreens/RNSTabsHostState.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

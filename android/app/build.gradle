@@ -70,7 +70,7 @@ project.ext.react = [
     entryFile: "index.js",
      useCodegen: true,
     bundleInDebug: true,
-     nodeExecutableAndArgs: ["/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"] 
+  nodeExecutableAndArgs: ["/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"]
 ]
 
 def enableSeparateBuildPerCPUArchitecture = false

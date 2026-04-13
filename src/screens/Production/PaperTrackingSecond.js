@@ -8,35 +8,28 @@ import {
   FlatList,
   Alert,
   Dimensions,
-  BackHandler,
   Linking,
   KeyboardAvoidingView,
 } from "react-native";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {  useEffect,  useState } from "react";
 import axios from "axios";
 import { Card } from "react-native-paper";
 import {
   Button,
-  IndexPath,
-  Input,
-  Select,
-  SelectItem,
 } from "@ui-kitten/components";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { sendUserInfoName } from "../../api/auth-api";
 import NetInfo from "@react-native-community/netinfo";
-import PickerModal from "react-native-picker-modal-view";
 import { REACT_APP_SECRET_KEY } from "@env";
 import {
   Camera,
   useCameraDevice,
   useCodeScanner,
 } from "react-native-vision-camera";
-import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
 
-const PaperTracking = () => {
-  const navigation = useNavigation();
+
+const PaperTrackingSecond = () => {
   const [count, setCount] = useState(0);
   const [netInfo, setNetInfo] = useState("");
   const [ScanResult, setScanResult] = useState(false);
@@ -48,31 +41,17 @@ const PaperTracking = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
-  const [description, setDescription] = useState("");
   const [employeeID, setEmployeeId] = useState("");
   const { width, height } = Dimensions.get("screen");
-  const [selectedReturnMessage, setSelectedReturnMessage] = useState("");
-    const [selectedLine, setSelectedLine] = useState("");
+
+
   const [returnMessageData, setReturnMessageData] = useState([]);
-    const [lineData, setLineData] = useState([]);
   const [countMethod, setCountMethod] = useState(false);
   const url = "https://tstapp.poscoassan.com.tr:8443";
   const [returnMessage, setReturnMessage] = useState("");
   const device = useCameraDevice("back");
-  const [selectedIndexProductType, setSelectedIndexProductType] =
-    useState(null);
-  const [selectedIndexWidth, setSelectedIndexWidth] = useState("");
-  const [selectedIndexSurfaceDamageType, setSelectedIndexSurfaceDamageType] =
-    useState(null);
-  const [selectedIndexHumudityType, setSelectedIndexHumudityType] =
-    useState(null);
-  const [
-    selectedIndexPaperParticiplesType,
-    setSelectedIndexPaperParticiplesType,
-  ] = useState(null);
-  const [selectedIndexPaperSampleType, setSelectedIndexPaperSampleType] =
-    useState(null);
-  const [selectedIndexRatingType, setSelectedIndexRatingType] = useState(null);
+
+  
 
   const productTypes = [
     "Billerud Beyaz Kağıt",
@@ -82,17 +61,9 @@ const PaperTracking = () => {
     "Ompack Vinil",
     "Daein Vinil",
   ];
-  const decisionOptions = ["Kabul", "Şartlı Kabul", "Red"];
-  const decisionOptionsSecond = ["Kabul", "Red"];
-  const yesNoOptions = ["Evet", "Hayır"];
 
-  const displayValueProductType =
-    selectedIndexProductType !== null
-      ? productTypes[selectedIndexProductType.row]
-      : "";
 
-  const getValue = (options, index) =>
-    index !== null ? options[index.row] : "";
+ 
 
   const getPermission = async (a) => {
     const cameraPermission = await Camera.requestCameraPermission();
@@ -194,118 +165,12 @@ const PaperTracking = () => {
         setModalVisible(false);
       });
   };
-  const getLineData = async () => {
-    
-    await axios
-      .get(`${url}/Production/GetLineData`, {
-        headers: {
-          "auth-token": REACT_APP_SECRET_KEY,
-        },
-      })
-      .then((res) => {
-        setLineData(
-          res?.data?.map(
-            (item) =>
-              [
-                {
-                  value: item.ID,
-                  Name: item.NameTr,
-                },
-              ][0]
-          )
-        );
-      })
-      .catch((err) => {
-        setModalVisible(false);
-      });
-  };
+ 
   const getSelectedValue = (options, index) => {
     if (!index) return null;
     return options[index.row];
   };
-  const inspectionAction = async () => {
-    if (
-      !selectedIndexWidth ||
-      !selectedIndexProductType ||
-      !selectedIndexSurfaceDamageType ||
-      !selectedIndexHumudityType ||
-      !selectedIndexPaperParticiplesType ||
-      !selectedIndexPaperSampleType ||
-      !selectedIndexRatingType
-    ) {
-      Alert.alert("Hata", "Lütfen Tüm Alanları Doldurunuz.");
-      return;
-    }
-
-    if (
-      getSelectedValue(decisionOptions, selectedIndexRatingType) === "Red" &&
-      description.length <= 0
-    ) {
-      Alert.alert("Hata", "Lütfen Not Giriniz.");
-      return;
-    }
-
-    const paper = {
-      barcode: qrValue,
-      empNo: employeeID,
-      width: selectedIndexWidth,
-      productType: getValue(productTypes, selectedIndexProductType),
-      damageSurface: getValue(yesNoOptions, selectedIndexSurfaceDamageType),
-      humudity: getValue(yesNoOptions, selectedIndexHumudityType),
-      paperParticiple: getValue(
-        yesNoOptions,
-        selectedIndexPaperParticiplesType
-      ),
-      paperSample: getValue(yesNoOptions, selectedIndexPaperSampleType),
-      description: description,
-      rating: getValue(decisionOptions, selectedIndexRatingType),
-    };
-    const formBody = Object.keys(paper)
-      .map(
-        (key) => encodeURIComponent(key) + "=" + encodeURIComponent(paper[key])
-      )
-      .join("&");
-
-    await axios
-      .post(`${url}/Production/PaperInspection`, formBody, {
-        headers: {
-          "auth-token": REACT_APP_SECRET_KEY,
-        },
-      })
-      .then((res) => {
-        if (res.data.status == "success") {
-          setData([]);
-          setQrValue("");
-          setScan(true);
-          setReturnMessage("");
-          setSelectedReturnMessage("");
-          setSelectedLine("")
-          setSelectedIndexHumudityType(null);
-          setSelectedIndexPaperParticiplesType(null);
-          setSelectedIndexSurfaceDamageType(null);
-          setSelectedIndexPaperSampleType(null);
-          setSelectedIndexProductType(null);
-          setSelectedIndexRatingType(null);
-          setSelectedIndexWidth(null);
-          setDescription("");
-          setModalVisible(false);
-
-          Alert.alert("Başarılı", "Başarıyla Inspection Yapıldı");
-        } else if (res.data.status == "error") {
-          Alert.alert("Başarılı", "" + res.data.message);
-          return;
-        } else {
-          Alert.alert("Hata", "Lütfen bağlantınızı kontrol ediniz.");
-          return;
-        }
-      })
-      .catch((err) => {
-        Alert.alert("Hata", "Lütfen bağlantınızı kontrol ediniz.");
-        return;
-      })
-      .finally(() => {});
-  };
-
+ 
   const counterAction = async () => {
     const paper = {
       barcode: qrValue,
@@ -330,8 +195,8 @@ const PaperTracking = () => {
           setQrValue("");
           setScan(true);
           setReturnMessage("");
-          setSelectedReturnMessage("");
-          setSelectedLine("")
+       
+   
 
           Alert.alert("Başarılı", "Başarıyla Sayım Yapıldı");
         } else {
@@ -345,22 +210,14 @@ const PaperTracking = () => {
   };
 
   const dropPaper = async (status) => {
-    if (status === 1 && selectedReturnMessage?.Name?.length === 0) {
-      alert("Geri alma nedeni girmelisiniz");
-      return;
-    } else {
-  if (status === 0 && selectedLine?.Name?.length === 0) {
-      alert("Düşüm yapılacak hattı seçiniz");
-      return;
-    }
-    console.log(selectedLine)
+
+   
 
       const paper = {
         barcode: qrValue,
         empNo: employeeID,
         status: status,
-        returnMessage: selectedReturnMessage.Name,
-        selectedTeam:selectedLine.value
+  
       };
       const formBody = Object.keys(paper)
         .map(
@@ -382,9 +239,9 @@ const PaperTracking = () => {
               setData([]);
               setQrValue("");
               setScan(true);
-              setReturnMessage("");
-              setSelectedReturnMessage("");
-              setSelectedLine("")
+          
+          
+           
             } else {
               alert("Bir hata oluştu. IT ile Görüşünüz");
             }
@@ -396,7 +253,7 @@ const PaperTracking = () => {
       } catch (e) {
         alert("Bir hata oluştu. IT ile Görüşünüz");
       }
-    }
+    
   };
 
   const renderItem = ({ item }) => {
@@ -433,157 +290,13 @@ const PaperTracking = () => {
               <Text style={styles.title}>Ağırlık: {item.Weight}</Text>
             </View>
           ) : (
-            item.IsInspection !== 1 && (
-              <View>
-                <Select
-                  label="Ürün Tipi"
-                  style={{ marginTop: 10 }}
-                  placeholder={"Lütfen Seçiniz"}
-                  value={displayValueProductType}
-                  selectedIndex={selectedIndexProductType}
-                  onSelect={(index) => setSelectedIndexProductType(index)}
-                >
-                  {productTypes.map((item, index) => (
-                    <SelectItem key={index} title={item} />
-                  ))}
-                </Select>
-
-                <Input
-                  keyboardType="numeric"
-                  style={styles.input2}
-                  value={selectedIndexWidth}
-                  maxLength={4}
-                  onChangeText={(text) => {
-                    const numericText = text.replace(/[^0-9]/g, "");
-                    setSelectedIndexWidth(numericText);
-                  }}
-                  label="Genişlik Ölçümü (Tolerans: -3<Sipariş Genişliği<3)"
-                ></Input>
-
-                <Select
-                  style={{ marginTop: 10 }}
-                  label="Yüzey Hasay var mı?"
-                  placeholder={"Lütfen Seçiniz"}
-                  value={getValue(yesNoOptions, selectedIndexSurfaceDamageType)}
-                  selectedIndex={selectedIndexSurfaceDamageType}
-                  onSelect={setSelectedIndexSurfaceDamageType}
-                >
-                  {yesNoOptions.map((item, i) => (
-                    <SelectItem key={i} title={item} />
-                  ))}
-                </Select>
-
-                <Select
-                  style={{ marginTop: 10 }}
-                  label="Islaklık & Nemlilik var mı?"
-                  placeholder={"Lütfen Seçiniz"}
-                  value={getValue(yesNoOptions, selectedIndexHumudityType)}
-                  selectedIndex={selectedIndexHumudityType}
-                  onSelect={setSelectedIndexHumudityType}
-                >
-                  {yesNoOptions.map((item, i) => (
-                    <SelectItem key={i} title={item} />
-                  ))}
-                </Select>
-
-                <Select
-                  style={{ marginTop: 10 }}
-                  placeholder={"Lütfen Seçiniz"}
-                  label="Yan yüzeylerde kağıt partikülü var mı?"
-                  value={getValue(
-                    yesNoOptions,
-                    selectedIndexPaperParticiplesType
-                  )}
-                  selectedIndex={selectedIndexPaperParticiplesType}
-                  onSelect={setSelectedIndexPaperParticiplesType}
-                >
-                  {yesNoOptions.map((item, i) => (
-                    <SelectItem key={i} title={item} />
-                  ))}
-                </Select>
-
-                <Select
-                  style={{ marginTop: 10 }}
-                  label="Kağıt Numunesi Alındı mı?"
-                  placeholder={"Lütfen Seçiniz"}
-                  value={getValue(yesNoOptions, selectedIndexPaperSampleType)}
-                  selectedIndex={selectedIndexPaperSampleType}
-                  onSelect={setSelectedIndexPaperSampleType}
-                >
-                  {yesNoOptions.map((item, i) => (
-                    <SelectItem key={i} title={item} />
-                  ))}
-                </Select>
-
-                <Select
-                  style={{ marginTop: 10 }}
-                  label="Değerlendirme"
-                  placeholder={"Lütfen Seçiniz"}
-                  onSelect={setSelectedIndexRatingType}
-                  value={getValue(decisionOptions, selectedIndexRatingType)}
-                  selectedIndex={selectedIndexRatingType}
-                >
-                  {decisionOptions.map((item, i) => (
-                    <SelectItem key={i} title={item} />
-                  ))}
-                </Select>
-                <Input 
-                  keyboardType="default"
-                  style={styles.input2}
-                  value={description}
-                  onChangeText={(text) => setDescription(text)}
-                  label="Açıklama"
-                ></Input>
-              </View>
-            )
+           null
           )}
 
-          {/*   <TextInput
-                            style={styles.input1}
-                            value={returnMessage}
-                            onChangeText={(text) => setReturnMessage(text)}
-                            placeholder="Geri Alma Nedeni"
-                        ></TextInput>*/}
-          {/* {returnMessageData?.map(item=>(
-                                <SelectItem key={item.id} title={item.title} />
-                            ))}*/}
+      
 
-          <View>
-            {item.StatusCode === 1 && !countMethod ? (
-              <PickerModal
-                style={{ width: "100%", backgroundColor: "black" }}
-                Autocomplete={false}
-                items={returnMessageData}
-                sortingLanguage={"tr"}
-                showToTopButton={true}
-                showAlphabeticalIndex={true}
-                selected={selectedReturnMessage}
-                autoGenerateAlphabeticalIndex={true}
-                selectPlaceholderText={<Text>Geri Alma Nedeni Seçiniz</Text>}
-                searchPlaceholderText={"Geri Alma Nedeni Seçiniz"}
-                requireSelection={false}
-                autoSort={true}
-                onSelected={(item) => setSelectedReturnMessage(item)}
-              />
-            ) : null}
-          </View>
-          <View style={{marginTop:10}}>
-            {item.StatusCode === 0 ?<PickerModal
-                style={{ width: "100%", backgroundColor: "black" }}
-                Autocomplete={false}
-                items={lineData}
-                sortingLanguage={"tr"}
-                showToTopButton={true}
-                showAlphabeticalIndex={true}
-                selected={selectedLine}
-                autoGenerateAlphabeticalIndex={true}
-                selectPlaceholderText={<Text>Düşüm Yapılacak Hattı Seçiniz</Text>}
-                searchPlaceholderText={"Düşüm Yapılacak Hattı Seçiniz"}
-                requireSelection={false}
-                autoSort={true}
-                onSelected={(item) => setSelectedLine(item)}
-              />:null}
-          </View>
+        
+         
         </Card.Content>
 
         <Card.Actions>
@@ -705,25 +418,12 @@ const PaperTracking = () => {
     getMessageCategory();
   }, []);
 
-  useEffect(()=>{
-    getLineData()
-  },[])
 
   useEffect(() => {
     getDepartmentList();
   }, [employeeID]);
 
-useEffect(() => {
-  const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-    if (modalVisible) {
-      setModalVisible(false);
-      return true;
-    }
-    return false;
-  });
 
-  return () => sub.remove();
-}, [modalVisible]);
   // useEffect(() => {
   //   const values = [
   //     getSelectedValue(decisionOptions, selectedIndexSurfaceDamageType),
@@ -808,27 +508,7 @@ useEffect(() => {
           >
             <Text style={styles.buttonTextStyle}>Manuel Sayım Yap</Text>
           </Button>
-          <Button
-            appearance={"outline"}
-            status={"basic"}
-            disabled={
-            !(
-    departmentList?.[0]?.SubTeamID === 13 ||
-    departmentList?.[0]?.SubTeamID === 7 ||
-    (
-      departmentList?.[0]?.TeamID === 30 &&
-      departmentList?.[0]?.PositionID === 21
-    )
-  )
-            }
-            style={styles.button5}
-            onPress={() => {
-              scanAgain("inspection");
-              setCountMethod("inspection");
-            }}
-          >
-            <Text>Inspection Yap</Text>
-          </Button>
+        
         </View>
       )}
 
@@ -1168,4 +848,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PaperTracking;
+export default PaperTrackingSecond;

@@ -182,6 +182,20 @@
       "selectThickness": "Select Thickness",
       "selectWidth": "Select Width",
       "sleevePaper": "Sleeve Paper"
+    },
+    "careSystem": {
+      "periodicControl": "Periodic Checklist Review",
+      "createRoute": "Create Route",
+      "selectLine": "Please select a line",
+      "search": "Search",
+      "relatedAreaNotFound": "Related Area Not Found",
+      "enterEmployeeID": "Enter Employee ID",
+      "employeeID": "Employee ID",
+      "connectionProblem": "Connection Problem",
+      "pleaseValidSelect": "Please select at least one option",
+      "pleaseEnterValue": "Please fill in the relevant fields.",
+      "completeChecklist": "Complete Checklist",
+      "addImage": "Add Image"
     }
   }
 }
