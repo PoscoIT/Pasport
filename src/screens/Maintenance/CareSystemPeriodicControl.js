@@ -20,7 +20,7 @@ const CareSystemPeriodicControl = () => {
 
 
  //  const url = "https://tstapp.poscoassan.com.tr:8443";
- const url = "http://10.0.2.2:5509"
+ const url = "http://localhost:5509"
     const navigation = useNavigation()
     const isFocused = useIsFocused();
 

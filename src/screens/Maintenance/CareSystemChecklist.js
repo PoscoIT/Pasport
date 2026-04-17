@@ -40,42 +40,45 @@ const CareSystemChecklist = ({ route }) => {
     const device = useCameraDevice("back");
     const {t} = useTranslation()
   //  const url = "https://tstapp.poscoassan.com.tr:8443"
-const url = "http://10.0.2.2:5509"
+const url = "http://localhost:5509"
 
   const answers = [
     { label: "OK", value: "OK" },
     { label: "NOT OK", value: "NOTOK" },
   ];
 
-   const handleAnswerChange = (
-  uID,
-  index2,
-  value,
-  WBS,
-  Wo_Path,
-  CheckItem,
-  Description,
-  filePath
-) => {
-  setFormValues(prev => ({
-    ...prev,
-    [uID]: {
-      ...prev[uID],
-      [index2]: {
-        ...prev[uID]?.[index2],
-        Answer: value ?? prev[uID]?.[index2]?.Answer,
-        Description: Description ?? prev[uID]?.[index2]?.Description,
-        filePath: filePath ?? prev[uID]?.[index2]?.filePath,
-        WBS,
-        uID,
-        CreatedID: employeeID,
-        CreatedName: employeeName,
-        Wo_Path,
-        CheckItem,
-      }
-    }
-  }));
-};
+  // 🔥 State update
+  const handleAnswerChange = (
+    uID,
+    index2,
+    value,
+    WBS,
+    Wo_Path,
+    CheckItem,
+    Description,
+    filePath
+  ) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [uID]: {
+        ...prev[uID],
+        [index2]: {
+          ...prev[uID]?.[index2],
+          Answer: value ?? prev[uID]?.[index2]?.Answer,
+          Description:
+            Description ?? prev[uID]?.[index2]?.Description,
+          filePath: filePath ?? prev[uID]?.[index2]?.filePath,
+          WBS,
+          uID,
+          Wo_Path,
+          CheckItem,
+          CreatedID: employeeID, 
+          CreatedName: employeeName,
+        },
+      },
+    }));
+  };
+
 //  const handleAnswerChange = (
 //   uID,
 //   index2,
@@ -166,75 +169,37 @@ const url = "http://10.0.2.2:5509"
 };
 
 
-  // const captureImage = async (selectedItem) => {
-  //  const hasPermission = await requestCameraPermission();
+ const captureImage = async (item, index2 = -1) => {
+  let options = {
+    mediaType: "photo",
+    maxWidth: 400,
+    maxHeight: 550,
+    includeBase64: true,
+    quality: 1,
+  };
 
+  await launchCamera(options, (response) => {
+    if (response.didCancel) return;
+    if (response.errorCode) {
+      alert(response.errorMessage);
+      return;
+    }
 
-  // if (!hasPermission) {
-  //   alert("Kamera izni verilmedi");
-  //   return;
-  // }
-  // setCameraVisible(true);
-  // setActiveItem(selectedItem); // 👈 item + index burada tutuluyor
+    const photo = response.assets[0];
 
-  // };
-
-   const captureImage = async (item) => {
-  
-      let options = {
-        mediaType: "photo",
-        maxWidth: 400,
-        maxHeight: 550,
-        includeBase64: true,
-        quality: 1,
-        videoQuality: "low",
-        durationLimit: 30,
-        saveToPhotos: true,
-        
-      };
-      
-      let isCameraPermitted = await requestCameraPermission();
-    
-      //   let isStoragePermitted = await requestExternalWritePermission();
-      if (isCameraPermitted) {
-     
-        await launchCamera(options, (response) => {
-          if (response.didCancel) {
-            return;
-          } else if (response.errorCode == "camera_unavailable") {
-            alert("Camera not available on device");
-            return;
-          } else if (response.errorCode == "permission") {
-            alert("Permission not satisfied");
-            return;
-          } else if (response.errorCode == "others") {
-            alert(response.errorMessage);
-            return;
-          }
-     const photo = response.assets[0];
-
-  //   // 🔥 BURASI ÖNEMLİ
-   handleAnswerChange(
-  item.uID,
-  0, // ✅ null yerine 0
-  formValues[item.uID]?.[0]?.Answer,
-  item.WBS,
-  item.Wo_Path,
-  item.CheckItem,
-  formValues[item.uID]?.[0]?.Description,
-  photo
-);
+    handleAnswerChange(
+      item.uID,
+      index2,
+      formValues[item.uID]?.[index2]?.Answer,
+      item.WBS,
+      item.Wo_Path,
+      index2 === -1 ? null : item.CheckItem[index2],
+      formValues[item.uID]?.[index2]?.Description,
+      photo
+    );
   });
+};
 
-  
-        
-}
-else{
-  Toast.error("Lütfen kamera izni veriniz")
-}
-    };
-
-    
 
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
@@ -244,47 +209,55 @@ else{
   };
   const [formValues, setFormValues] = useState({});
   const onSubmit = async () => {
-    const allFieldsFilled = questionList.data.every(
-      (item) => String(formValues[item.uID]?.Answer || "").trim() !== "",
-    );
+   const flatList = [];
 
-    const formData = new FormData();
-
-const flatList = [];
-
-
-// flatten
-Object.values(formValues).forEach(group => {
-  Object.values(group).forEach(item => {
-    flatList.push(item);
+Object.entries(formValues).forEach(([uID, group]) => {
+  Object.entries(group).forEach(([index, item]) => {
+    flatList.push({
+      ...item,
+      uID,
+      index: Number(index), // -1 = genel
+      isGeneral: Number(index) === -1,
+    });
   });
 });
 
-// JSON olarak ekle
-formData.append("formValues", JSON.stringify(flatList));
 
-// image’ları ekle (uID ile bağlayacağız)
-flatList.forEach((item, index) => {
-  if (item.filePath?.uri) {
-    formData.append(`${item.uID}_${index}`, {
-      uri: item.filePath.uri,
-      name: item.filePath.fileName,
-      type: item.filePath.type,
-    });
-  }
+// 🔥 VALIDATION
+const hasEmptyAnswer = flatList.some(item => {
+  if (item.isGeneral) return false; // genel için answer zorunlu değil
+  return String(item.Answer || "").trim() === "";
 });
 
-const hasMissingFile = flatList.some(item => !item.filePath?.uri);
+if (hasEmptyAnswer) {
+  Toast.error("Lütfen tüm cevapları giriniz.");
+  return;
+}
 
-const hasMissingDescription = flatList.some(item => {
-  console.log(item)
-  const answer = String(item.Answer || "").trim();
+const hasMissingDescription = flatList.some((item, index2) => {
+  if (item.isGeneral) return false;
 
-  // Eğer Not Ok ise description zorunlu değil
+  const answerRaw = item.Answer;
+  const answer = String(answerRaw || "").trim();
+  const descriptionEmpty = String(item.Description || "").trim() === "";
+
+
   if (answer === "OK") return false;
 
-  // Diğer durumlarda description boşsa hata
-  return String(item.Description || "").trim() === "";
+
+  const isMeasureOutOfRange =
+    item?.Method?.toString() === "Measure" &&
+    answer !== "" &&
+    (
+      Number(answer) < Number(item.Criteria_LL) ||
+      Number(answer) > Number(item.Criteria_HH)
+    );
+
+
+  return (
+    (answer !== "" && descriptionEmpty) ||
+    (isMeasureOutOfRange && descriptionEmpty)
+  );
 });
 
 if (hasMissingDescription) {
@@ -292,15 +265,51 @@ if (hasMissingDescription) {
   return;
 }
 
-if(flatList.length===0){
-    Toast.error("Lütfen maddeleri doldurunuz");
+const usedUIDs = [
+  ...new Set(
+    flatList
+      .filter(item => item.index !== -1 && String(item.Answer || "").trim() !== "")
+      .map(item => item.uID)
+  ),
+];
+
+const hasMissingGeneralImage = usedUIDs.some((uID) => {
+  const generalItem = flatList.find(
+    (item) => item.uID === uID && item.index === -1
+  );
+
+  return !generalItem?.filePath?.uri;
+});
+
+if (hasMissingGeneralImage) {
+  Toast.error("Doldurulan kayıtlar için genel görsel zorunludur.");
   return;
 }
 
-if (hasMissingFile) {
-  Toast.error("Lütfen doldurulan alanlar için dosya ekleyin.");
+if (flatList.length === 0) {
+  Toast.error("Lütfen maddeleri doldurunuz");
   return;
 }
+
+
+
+const formData = new FormData();
+
+// JSON payload
+formData.append("formValues", JSON.stringify(flatList));
+
+// 🔥 IMAGE EKLE (KEY ÇAKIŞMAZ)
+flatList.forEach((item) => {
+  if (item.filePath?.uri) {
+    const key = `${item.uID}_${item.index}`; // 🔥 artık unique
+
+    formData.append(key, {
+      uri: item.filePath.uri,
+      name: item.filePath.fileName || `${key}.jpg`,
+      type: item.filePath.type || "image/jpeg",
+    });
+  }
+});
 
 
 
@@ -378,10 +387,6 @@ if (hasMissingFile) {
 
 
 
-
-
-
-  if (device == null) return <Text>Kamera bulunamadı</Text>;
   return (
 
              
@@ -425,7 +430,7 @@ if (hasMissingFile) {
 
     <Text
       style={{
-        fontSize: 16,
+        fontSize: 13,
         fontWeight: "600",
         color: "#111827",
       }}
@@ -458,16 +463,36 @@ if (hasMissingFile) {
                   {item.CheckItem.map((item2,index2)=>
                   <View key={index2}>
                       {item2 && (
-                        <View style={{flex:1,flexDirection:"row",alignItems:"flex-end",justifyContent:"flex-start"}}>
+                        <View style={{flex:1,flexDirection:"column",alignItems:"flex-start",justifyContent:"flex-start"}}>
                 <Text style={styles.title}>{item2} 
-                   {/* {item.IsValid===1?
-                 <View style={{flex:1,alignItems:"center",justifyContent:"center",alignSelf:"flex-start",flexDirection:"row"}}>
-                  <Text>Girişi Yapılmıştır</Text>
-                  <Icon name="check" size={20} color={"#4b8046"} />
-                  </View>
-                :<Icon name="close" size={20} color={"#ef443f"} />}  */}
+             
                 </Text>
-               
+                <View>
+                  {item.CheckItem.length>1? <TouchableOpacity
+                 disabled={item.IsValid===1}
+  style={[styles.imageButton,{height:formValues[item.uID]?.[index2]?.filePath?125:50,width:formValues[item.uID]?.[index2]?.filePath?125:100}]}
+  onPress={() => {
+    setActiveItem(null);
+     captureImage(item, index2)
+  }}
+>
+   {formValues[item.uID]?.[index2]?.filePath ?  (
+  <Image
+    source={{ uri:    formValues[item.uID]?.[index2]   
+                          ?.filePath?.uri}}
+    style={[styles.thumbnail,{height:formValues[item.uID]?.[index2]?.filePath?125:50,width:formValues[item.uID]?.[index2]?.filePath?125:100}]}
+  />
+  ) : (
+    <>
+      <Icon name="image" size={18} color="#fff" />
+      <Text style={styles.imageButtonText}>
+        {t("careSystem.addImage")}
+      </Text>
+    </>
+  )}
+</TouchableOpacity>:null}
+                  
+</View>
                 </View>
               )}
                      {item?.Method?.toString() === "Measure" ? (
@@ -527,7 +552,7 @@ if (hasMissingFile) {
                       </RadioGroup>
                     </View>
                   )}
-                  {formValues[item.uID]?.[index2]?.Answer.trim()==="NOTOK"&&  <TextInput mode="outlined" style={styles.descriptionInput} disabled={item.IsValid===1} value={ formValues[item.uID]?.[index2]?.Description || ""|| ""} 
+                  {formValues[item.uID]?.[index2]?.Answer?.trim()==="NOTOK" || (item?.Method?.toString() === "Measure"  && (formValues[item.uID]?.[index2]?.Answer?.trim()<item.Criteria_LL || formValues[item.uID]?.[index2]?.Answer?.trim()>item.Criteria_HH )) &&  <TextInput mode="outlined" style={styles.descriptionInput} disabled={item.IsValid===1} value={ formValues[item.uID]?.[index2]?.Description || ""|| ""} 
                    onChangeText={(text) =>
       handleAnswerChange(
         item.uID,
@@ -554,19 +579,16 @@ if (hasMissingFile) {
                 
                 <TouchableOpacity
                  disabled={item.IsValid===1}
-  style={[styles.imageButton,{height:formValues[item.uID]?.[0]?.filePath?125:50,width:formValues[item.uID]?.[0]?.filePath?125:100}]}
+  style={[styles.imageButton,{height:formValues[item.uID]?.[-1]?.filePath?125:50,width:formValues[item.uID]?.[-1]?.filePath?125:100}]}
   onPress={() => {
     setActiveItem(null);
-    captureImage({
-      ...item,
-      index: item.uID,
-    });
+      captureImage(item, -1);
   }}
 >
-  {formValues[item.uID]?.[0]?.filePath ? (
+  {formValues[item.uID]?.[-1]?.filePath ? (
   <Image
-    source={{ uri: formValues[item.uID]?.[0]?.filePath?.uri }}
-    style={[styles.thumbnail,{height:formValues[item.uID]?.[0]?.filePath?125:50,width:formValues[item.uID]?.[0]?.filePath?125:100}]}
+    source={{ uri: formValues[item.uID]?.[-1]?.filePath?.uri }}
+    style={[styles.thumbnail,{height:formValues[item.uID]?.[-1]?.filePath?125:50,width:formValues[item.uID]?.[-1]?.filePath?125:100}]}
   />
   ) : (
     <>
@@ -634,9 +656,9 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "500",
-    marginBottom: 0,
+    marginBottom: 5,
     color: "#222",
     textAlign: "justify",
   
