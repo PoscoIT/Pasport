@@ -27,6 +27,7 @@ import {
   useCameraDevice,
   useCodeScanner,
 } from "react-native-vision-camera";
+import { Toast } from "toastify-react-native";
 
 
 const PaperTrackingSecond = () => {
@@ -47,7 +48,8 @@ const PaperTrackingSecond = () => {
 
   const [returnMessageData, setReturnMessageData] = useState([]);
   const [countMethod, setCountMethod] = useState(false);
-  const url = "https://tstapp.poscoassan.com.tr:8443";
+ const url = "https://tstapp.poscoassan.com.tr:8443";
+ //const url = "http://10.0.2.2:5506"
   const [returnMessage, setReturnMessage] = useState("");
   const device = useCameraDevice("back");
 
@@ -141,40 +143,18 @@ const PaperTrackingSecond = () => {
     }
   };
 
-  const getMessageCategory = async () => {
-    await axios
-      .get(`${url}/Production/GetReturnMessageCategory`, {
-        headers: {
-          "auth-token": REACT_APP_SECRET_KEY,
-        },
-      })
-      .then((res) => {
-        setReturnMessageData(
-          res?.data?.map(
-            (item) =>
-              [
-                {
-                  value: item.id,
-                  Name: item.title,
-                },
-              ][0]
-          )
-        );
-      })
-      .catch((err) => {
-        setModalVisible(false);
-      });
-  };
+  
  
   const getSelectedValue = (options, index) => {
     if (!index) return null;
     return options[index.row];
   };
  
-  const counterAction = async () => {
+  const counterAction = async (status) => {
     const paper = {
       barcode: qrValue,
       empNo: employeeID,
+      Status2:status
     };
     const formBody = Object.keys(paper)
       .map(
@@ -183,7 +163,7 @@ const PaperTrackingSecond = () => {
       .join("&");
 
     await axios
-      .post(`${url}/Production/CountPaper`, formBody, {
+      .post(`${url}/Production/CountPaperSecond`, formBody, {
         headers: {
           "auth-token": REACT_APP_SECRET_KEY,
         },
@@ -216,7 +196,7 @@ const PaperTrackingSecond = () => {
       const paper = {
         barcode: qrValue,
         empNo: employeeID,
-        status: status,
+        Status2: status,
   
       };
       const formBody = Object.keys(paper)
@@ -227,7 +207,7 @@ const PaperTrackingSecond = () => {
         .join("&");
       try {
         await axios
-          .post(`${url}/Production/DropPaper`, formBody, {
+          .post(`${url}/Production/DropPaperSecond`, formBody, {
             headers: {
               "auth-token": REACT_APP_SECRET_KEY,
             },
@@ -263,10 +243,10 @@ const PaperTrackingSecond = () => {
         style={{
           borderRadius: 20,
           backgroundColor:
-            countMethod !== "inspection" ? "#f1f4f5ff" : "#fcfafaff",
+            "#f1f4f5ff" ,
 
           width: width - 30,
-          height: countMethod !== "inspection" ? 450 : 680,
+          height: countMethod !== "inspection" ? 300 : 680,
 
           marginTop: 30,
         }}
@@ -275,13 +255,11 @@ const PaperTrackingSecond = () => {
 
         <Card.Content>
           <Text style={styles.title}>Barkod Numarası: {item.Barcode}</Text>
-          {countMethod !== "inspection" ? (
+     
             <View>
               <Text style={styles.title}>
                 Kağıt Tipi:{" "}
-                {item.PaperTypeName?.toString()?.toLowerCase() === "new paper"
-                  ? "Sıfır Kağıt"
-                  : "İkinci El"}
+                İkinci El
               </Text>
               <Text style={styles.title}>Renk :{item.PaperType2}</Text>
               <Text style={styles.title}>Sarım Kodu :{item.StockCode}</Text>
@@ -289,14 +267,7 @@ const PaperTrackingSecond = () => {
               <Text style={styles.title}>Boyut: {item.Size}</Text>
               <Text style={styles.title}>Ağırlık: {item.Weight}</Text>
             </View>
-          ) : (
-           null
-          )}
-
-      
-
-        
-         
+   
         </Card.Content>
 
         <Card.Actions>
@@ -310,62 +281,43 @@ const PaperTrackingSecond = () => {
               right: (width * 2) / 8,
             }}
           >
-            {countMethod === true && item.IsStock != 1 ? (
+            {item.Status2 === 1 ? (
               <Button
                 style={{
-                  backgroundColor: "#f1a641",
-                  borderColor: "#f1a641",
-                  width: 100,
+                  backgroundColor:
+                   "#1b9dce" ,
+                  borderColor:"#1b9dce" ,
+                  width: 150,
                 }}
-                onPress={() => counterAction()}
+                onPress={() => counterAction(3)}
               >
-                Say
+                Stoğa Al
               </Button>
-            ) : countMethod === true ? (
-              <View style={{ flex: 1, alignItems: "center" }}>
-                <FontAwesome name={"check"} size={60} color={"#105c1c"} />
-                <Text style={{ fontSize: 16 }}>Sayım Yapıldı</Text>
-              </View>
-            ) : countMethod === "inspection" ? (
-              item.IsInspection !== 1 ? (
-                <View style={{ marginBottom: -10 }}>
-                  <Button
-                    style={{ borderRadius: 20 }}
-                    onPress={inspectionAction}
-                  >
-                    <Text>Inspectionı Tamamla</Text>
-                  </Button>
-                </View>
-              ) : (
-                <View>
-                  <Text>Inspectionı yapılmıştır.</Text>
-                </View>
-              )
-            ) : (
+            ) :  (
               <Button
                 style={{
                  width:150,
                   backgroundColor:
-                    item.StatusCode === 0 ? "#1b9dce" : "#396E3C",
-                  borderColor: item.StatusCode === 0 ? "#1b9dce" : "#396E3C",
+                  "#1b9dce" ,
+                  borderColor:   "#1b9dce" ,
                 }}
+              
                 onPress={() => {
-                  dropPaper(item.StatusCode);
+                  if(item.Status2===3){
+dropPaper(4);
+                  }
+                  else{
+                    Alert.alert("İşlem yapılamamaktadır.")
+                  }
+                  
                 }}
               >
-                {item.StatusCode === 0 ? "Düşüm Yap" : "Stoğa Al"}
+                {item.Status2 === 1 ? "Stoğa Al" :item.Status2===3? "Stoktan Düş":item.Status2===4?"Stoktan Düşüldü":null}
               </Button>
             )}
           </View>
 
-          {/*  :countMethod?
-                    <View style={{flex:1,alignItems:"center"}}>
-                        <FontAwesome name={"check"} size={60} color={"#105c1c"}/>
-                        <Text style={{fontSize:16}}>Sayım Yapıldı</Text>
-                    </View>:  <Button style={{backgroundColor:item.StatusCode===0?"#1b9dce":"#396E3C",borderColor:item.StatusCode===0?"#1b9dce":"#396E3C"}}  onPress={ ()=>{
-                    dropPaper(item.StatusCode)
-
-                }}>{item.StatusCode===0?"Düşüm Yap":"Stoğa Al"}</Button>*/}
+     
         </Card.Actions>
       </Card>
     );
@@ -376,7 +328,7 @@ const PaperTrackingSecond = () => {
     if (!barcodeParam && !countMethod) return;
 
     try {
-      const res = await axios.get(`${url}/Production/GetAllPaper`, {
+      const res = await axios.get(`${url}/Production/GetAllPaperSecond`, {
         params: {
           barcode: barcodeParam,
         },
@@ -385,11 +337,20 @@ const PaperTrackingSecond = () => {
         },
       });
 
-      // Veri geldiyse state'i güncelle
-      setData(res.data);
+if(res.data){
+  if(res.data[0]?.PaperTypeName==="Recycling Paper"){
+   setData(res.data);
+  }
+  else{
+    Toast.error("Sadece ikinci el kağıt işlemi yapılmalıdır.")
+  }
+     
 
-      // Modal'ı veri geldikten veya istek tamamlandıktan sonra açmak daha güvenlidir
-      // Ancak sizin akışınızda modal zaten açık olabilir, sorun değil.
+}
+  
+
+
+  
     } catch (err) {
       console.error(err);
       Alert.alert("Hata", "Veri çekilemedi.");
@@ -414,49 +375,8 @@ const PaperTrackingSecond = () => {
     getUser();
   }, []);
 
-  useEffect(() => {
-    getMessageCategory();
-  }, []);
 
 
-  useEffect(() => {
-    getDepartmentList();
-  }, [employeeID]);
-
-
-  // useEffect(() => {
-  //   const values = [
-  //     getSelectedValue(decisionOptions, selectedIndexSurfaceDamageType),
-  //     getSelectedValue(decisionOptions, selectedIndexHumudityType),
-  //     getSelectedValue(decisionOptions, selectedIndexPaperParticiplesType),
-  //     getSelectedValue(yesNoOptions, selectedIndexPaperSampleType),
-  //   ];
-
-  //   // Hepsi seçilmeden değerlendirme yapma
-  //   if (values.some((v) => v === null)) {
-  //     setSelectedIndexRatingType(null);
-  //     return;
-  //   }
-
-  //   if (values.includes("Red") || values.includes("Hayır")) {
-  //     setSelectedIndexRatingType(new IndexPath(1)); // Red
-  //   }
-  //   // } else {
-  //   //   setSelectedIndexRatingType(new IndexPath(0));
-  //   // }
-  //   // Hepsi Kabul ise → Kabul
-  //   else if (
-  //     values.every((v) => v === "Kabul") ||
-  //     values.every((v) => v === "Evet")
-  //   ) {
-  //     setSelectedIndexRatingType(new IndexPath(0)); // Kabul
-  //   }
-  // }, [
-  //   selectedIndexSurfaceDamageType,
-  //   selectedIndexHumudityType,
-  //   selectedIndexPaperParticiplesType,
-  //   selectedIndexPaperSampleType,
-  // ]);
 
   return (
     <KeyboardAvoidingView
@@ -472,7 +392,7 @@ const PaperTrackingSecond = () => {
             style={styles.button3}
             onPress={() => scanAgain(false)}
           >
-            <Text style={styles.buttonTextStyle}>Okut</Text>
+            <Text style={styles.buttonTextStyle}>Stoğa Al</Text>
           </Button>
           <Button
             appearance={"outline"}
@@ -486,7 +406,7 @@ const PaperTrackingSecond = () => {
               setCountMethod(false);
             }}
           >
-            <Text style={styles.buttonTextStyle}>Manuel Okut</Text>
+            <Text style={styles.buttonTextStyle}>Manuel Stoğa Al</Text>
           </Button>
           <Button
             appearance={"outline"}
@@ -494,7 +414,7 @@ const PaperTrackingSecond = () => {
             style={styles.button4}
             onPress={() => scanAgain(true)}
           >
-            <Text style={styles.buttonTextStyle}>Sayım Yap</Text>
+            <Text style={styles.buttonTextStyle}>Stoktan Düş</Text>
           </Button>
           <Button
             appearance={"outline"}
@@ -506,7 +426,7 @@ const PaperTrackingSecond = () => {
               setCountMethod(true);
             }}
           >
-            <Text style={styles.buttonTextStyle}>Manuel Sayım Yap</Text>
+            <Text style={styles.buttonTextStyle}>Manuel Stoktan Düş</Text>
           </Button>
         
         </View>

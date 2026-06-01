@@ -39,8 +39,8 @@ const CareSystemChecklist = ({ route }) => {
   const navigation = useNavigation()
     const device = useCameraDevice("back");
     const {t} = useTranslation()
-  //  const url = "https://tstapp.poscoassan.com.tr:8443"
-const url = "http://localhost:5509"
+   const url = "https://tstapp.poscoassan.com.tr:8443"
+ //const url = "http://10.0.2.2:5509"
 
   const answers = [
     { label: "OK", value: "OK" },
@@ -170,6 +170,12 @@ const url = "http://localhost:5509"
 
 
  const captureImage = async (item, index2 = -1) => {
+  const hasPermission = await requestCameraPermission();
+
+  if (!hasPermission) {
+    return;
+  }
+
   let options = {
     mediaType: "photo",
     maxWidth: 400,
@@ -178,14 +184,17 @@ const url = "http://localhost:5509"
     quality: 1,
   };
 
-  await launchCamera(options, (response) => {
+  launchCamera(options, (response) => {
     if (response.didCancel) return;
+
     if (response.errorCode) {
       alert(response.errorMessage);
       return;
     }
 
-    const photo = response.assets[0];
+    const photo = response.assets?.[0];
+
+    if (!photo) return;
 
     handleAnswerChange(
       item.uID,
@@ -347,9 +356,10 @@ flatList.forEach((item) => {
   const getQuestionList = async () => {
   
     if (selectedQrCodeZone) {
+      const encodedSelectedQrCodeZone = encodeURIComponent(selectedQrCodeZone);
       await axios
         .get(
-          `${url}/WorkOrder/MMS/GetCareSystemData/${selectedQrCodeZone}`,
+          `${url}/WorkOrder/MMS/GetCareSystemData/${encodedSelectedQrCodeZone}`,
           {
             headers: {
               "auth-token": REACT_APP_SECRET_KEY,
@@ -394,7 +404,7 @@ flatList.forEach((item) => {
     <View style={{ flex: 1, width: "100%", height: "100%",paddingBottom:130,backgroundColor:"#fff" }}    behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <TouchableOpacity style={{width:"100%",flexDirection:"row",alignItems:"center"}} onPress={() => navigation.goBack()}>
         <Icon name="angle-left" size={22} color="#000" />
-        <Text style={[styles.backText,{marginLeft:5}]}>Geri Dön</Text>
+        <Text style={[styles.backText,{marginLeft:5}]}>{t("goBack")}</Text>
       </TouchableOpacity>
 
 <KeyboardAwareScrollView style={styles.view}    enableOnAndroid={true}
@@ -514,7 +524,7 @@ flatList.forEach((item) => {
   )
 }
                       right={<TextInput.Affix text={item.Unit} />}
-                      label="Değer"
+                      label={t("careSystem.value")}
                       keyboardType="numeric"
                       outlineStyle={styles.inputOutline}
                     />
@@ -552,7 +562,7 @@ flatList.forEach((item) => {
                       </RadioGroup>
                     </View>
                   )}
-                  {formValues[item.uID]?.[index2]?.Answer?.trim()==="NOTOK" || (item?.Method?.toString() === "Measure"  && (formValues[item.uID]?.[index2]?.Answer?.trim()<item.Criteria_LL || formValues[item.uID]?.[index2]?.Answer?.trim()>item.Criteria_HH )) &&  <TextInput mode="outlined" style={styles.descriptionInput} disabled={item.IsValid===1} value={ formValues[item.uID]?.[index2]?.Description || ""|| ""} 
+                  {/* {formValues[item.uID]?.[index2]?.Answer?.trim()==="NOTOK" || (item?.Method?.toString() === "Measure"  && (formValues[item.uID]?.[index2]?.Answer?.trim()<item.Criteria_LL || formValues[item.uID]?.[index2]?.Answer?.trim()>item.Criteria_HH )) &&  <TextInput mode="outlined" style={styles.descriptionInput} disabled={item.IsValid===1} value={ formValues[item.uID]?.[index2]?.Description || ""|| ""} 
                    onChangeText={(text) =>
       handleAnswerChange(
         item.uID,
@@ -565,7 +575,21 @@ flatList.forEach((item) => {
         formValues[item.uID]?.[index2]?.filePath
       )
     }
-                  label={t("description")} multiline numberOfLines={3} outlineStyle={styles.inputOutline} />}
+                  label={t("description")} multiline numberOfLines={3} outlineStyle={styles.inputOutline} />} */}
+                  <TextInput mode="outlined" style={styles.descriptionInput} disabled={item.IsValid===1} value={ formValues[item.uID]?.[index2]?.Description || ""|| ""} 
+                   onChangeText={(text) =>
+      handleAnswerChange(
+        item.uID,
+        index2,
+        formValues[item.uID]?.[index2]?.Answer,
+        item.WBS,
+        item.Wo_Path,
+        item2,
+        text,
+        formValues[item.uID]?.[index2]?.filePath
+      )
+    }
+                  label={t("description")} multiline numberOfLines={3} outlineStyle={styles.inputOutline} />
                  
 
              
@@ -612,10 +636,7 @@ flatList.forEach((item) => {
       :!loading && questionList.length===0?(
         <View>
        
-          <TouchableOpacity style={{width:"100%",flexDirection:"row",alignItems:"center"}} onPress={() => navigation.goBack()}>
-               <Icon name="angle-left" size={22} color="#000" />
-               <Text style={[styles.backText,{marginLeft:5}]}>Geri Dön</Text>
-             </TouchableOpacity>
+      
    <Text style={{textAlign:"center"}}>      {t("careSystem.relatedAreaNotFound")}</Text>
         </View>
       ):null}

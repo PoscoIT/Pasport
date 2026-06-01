@@ -9,6 +9,7 @@ import {  useIsFocused, useNavigation } from "@react-navigation/native";
 import { Toast } from "toastify-react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { sendUserInfoName } from "../../api/auth-api";
+import { t } from "i18next";
 
 
 
@@ -19,8 +20,8 @@ const CareSystemPeriodicControl = () => {
   const [loading,setLoading] = useState(true)
 
 
- //  const url = "https://tstapp.poscoassan.com.tr:8443";
- const url = "http://localhost:5509"
+  const url = "https://tstapp.poscoassan.com.tr:8443";
+ // const url = "http://10.0.2.2:5509"
     const navigation = useNavigation()
     const isFocused = useIsFocused();
 
@@ -174,17 +175,22 @@ const renderLeftActions = (item) => {
 
 const getChecklistByZone = async () => {
     setLoading(true);
+   
     try {
       await axios
         .get(
-          `${url}/WorkOrder/MMS/GetCareSystemChecklistDaily?UserID=${employeeID}`,
+          `${url}/WorkOrder/MMS/GetCareSystemChecklistDaily`,
           {
+            params:{
+UserID:employeeID
+            },
             headers: {
           "auth-token": REACT_APP_SECRET_KEY,
         },
           },
         )
         .then((res) => {
+          console.log(res.data)
        
           if (res.data.status === "Success") {
        
@@ -228,7 +234,7 @@ if(loading){
     <View style={styles.view}>
        <TouchableOpacity style={{width:"100%",flexDirection:"row",alignItems:"center"}} onPress={() => navigation.goBack()}>
         <Icon name="angle-left" size={22} color="#000" />
-        <Text style={[styles.backText,{marginLeft:5}]}>Geri Dön</Text>
+        <Text style={[styles.backText,{marginLeft:5}]}>{t("goBack")}</Text>
       </TouchableOpacity>
       {/* <View style={{ flex: 1, width: "100%", height: "100%" }}>
         <GestureDetector gesture={gesture}>
@@ -242,7 +248,7 @@ if(loading){
         </GestureDetector>
       </View> */}
 
-        {qrCodeZone.length>0?<Text style={{fontSize:15,alignSelf:"center",margin:10,fontWeight:600}}>Günlük Checklist Listesi</Text>:null}
+        {qrCodeZone.length>0?<Text style={{fontSize:15,alignSelf:"center",margin:10,fontWeight:600}}>{t("careSystem.dailyChecklist")}</Text>:null}
        
            <FlatList
              data={qrCodeZone}
@@ -251,7 +257,7 @@ if(loading){
              contentContainerStyle={{ paddingBottom: 100 }} // buton için boşluk
              ListEmptyComponent={
                <Text style={{ textAlign: "center", marginTop: 15 }}>
-                Lütfen Checklist Rotası Oluşturunuz
+              {t("careSystem.pleaseRoute")}
                </Text>
              }
            /> 
@@ -310,6 +316,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flexWrap: "wrap", // Uzun metinleri sar
   },
+  backText: {
+  marginLeft: 5,
+  fontSize: 16,
+  color: "#000",
+  fontWeight: "500",
+},
 });
 
 export default CareSystemPeriodicControl;

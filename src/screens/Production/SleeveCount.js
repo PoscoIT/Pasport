@@ -409,6 +409,11 @@ const SleeveCount = () => {
 
                   <Radio>Müşteri</Radio>
                   <Radio>Geri İade</Radio>
+                      <Radio
+                   
+                  >
+                    Ebat Düşümü
+                  </Radio>
                 </RadioGroup>
                 {/* <RadioButton.Group
                   onValueChange={(newValue) => setUsageValue(newValue)}

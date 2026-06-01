@@ -34,6 +34,7 @@ import {
   useCodeScanner,
 } from "react-native-vision-camera";
 import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
+import { Toast } from "toastify-react-native";
 
 const PaperTracking = () => {
   const navigation = useNavigation();
@@ -353,7 +354,7 @@ const PaperTracking = () => {
       alert("Düşüm yapılacak hattı seçiniz");
       return;
     }
-    console.log(selectedLine)
+    
 
       const paper = {
         barcode: qrValue,
@@ -671,9 +672,22 @@ const PaperTracking = () => {
           "auth-token": REACT_APP_SECRET_KEY,
         },
       });
-
-      // Veri geldiyse state'i güncelle
-      setData(res.data);
+      if(res.data[0]){
+    if(res.data[0]?.PaperTypeName!=="Recycling Paper"){
+   setData(res.data);
+  }
+  else{
+            console.log(res.data,"burda")
+    Toast.error("İkinci el kağıt işlemi Canlı Kağıt Stok Durumu Ekranından Yapılmalıdır")
+  }
+      }
+      else{
+           Toast.error("Okutulan barkod bulunamadı. İkinci el kağıt işlemi Canlı Kağıt Stok Durumu Ekranından Yapılmalıdır")
+      }
+    
+     
+           
+     
 
       // Modal'ı veri geldikten veya istek tamamlandıktan sonra açmak daha güvenlidir
       // Ancak sizin akışınızda modal zaten açık olabilir, sorun değil.

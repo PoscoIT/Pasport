@@ -103,7 +103,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 marginVertical: 50,
               }}
             >
-              <Text>{t("loginScreen.version")} 48</Text>
+              <Text>{t("loginScreen.version")} 51</Text>
             </View>
           </View>
         </View>

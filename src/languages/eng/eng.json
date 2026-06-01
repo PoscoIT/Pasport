@@ -195,7 +195,10 @@
       "pleaseValidSelect": "Please select at least one option",
       "pleaseEnterValue": "Please fill in the relevant fields.",
       "completeChecklist": "Complete Checklist",
-      "addImage": "Add Image"
+      "addImage": "Add Image",
+      "value": "Value",
+      "dailyChecklist": "Daily Checklist",
+      "pleaseRoute": "Please Create Checklist Route"
     }
   }
 }

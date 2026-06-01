@@ -47,8 +47,8 @@ const CareSystemChecklistRoute = () => {
       setEmployeeID(sendResponse.empSicil);
     });
   };
- // const url = "https://tstapp.poscoassan.com.tr:8443";
-  const url = "http://10.0.2.2:5509";
+  const url = "https://tstapp.poscoassan.com.tr:8443";
+  //const url = "http://10.0.2.2:5509";
   const [data, setData] = useState([
     { id: 1, name: "Elma" },
     { id: 2, name: "Armut" },
@@ -288,7 +288,7 @@ const CareSystemChecklistRoute = () => {
     <View style={{ backgroundColor: "white", flex: 1 }}>
    <TouchableOpacity style={{width:"100%",flexDirection:"row",alignItems:"center"}} onPress={() => navigation.goBack()}>
         <Icon name="angle-left" size={22} color="#000" />
-        <Text style={[styles.backText,{marginLeft:5}]}>Geri Dön</Text>
+        <Text style={[styles.backText,{marginLeft:5}]}>{t("goBack")}</Text>
       </TouchableOpacity>
       <Card style={styles.card}>
       <Card.Content>
@@ -477,7 +477,13 @@ const styles = StyleSheet.create({
   
     backgroundColor: "#fff",
   
-  }
+  },
+  backText: {
+  marginLeft: 5,
+  fontSize: 16,
+  color: "#000",
+  fontWeight: "500",
+},
  
 });
 

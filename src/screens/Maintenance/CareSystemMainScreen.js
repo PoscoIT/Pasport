@@ -6,6 +6,7 @@ import { Button } from "@ui-kitten/components";
 
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 
@@ -25,7 +26,8 @@ const CareSystemMainScreen = () => {
       style={styles.button}
       onPress={() => navigation.navigate("CareSystemPeriodicControl")}
     >
-      <Text style={styles.buttonText}>
+      <Icon name="briefcase" size={16}  />
+      <Text style={styles.buttonText} style={{paddingLeft:30}}>
      
    {t("careSystem.periodicControl")}
       </Text>
@@ -37,6 +39,7 @@ const CareSystemMainScreen = () => {
       style={styles.button}
       onPress={() => navigation.navigate("CareSystemChecklistRoute")}
     >
+      <Icon name="location-arrow" size={16} style={{paddingLeft:10}} />
       <Text style={styles.buttonText}>
    {t("careSystem.createRoute")}
       </Text>
@@ -50,7 +53,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#f2f4f8",
+    backgroundColor: "#fff",
     padding: 20,
   },
 
@@ -70,6 +73,8 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 10,
     borderRadius: 10,
+ 
+    marginHorizontal:15
   },
 
   buttonText: {

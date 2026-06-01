@@ -195,7 +195,10 @@
       "pleaseValidSelect": "Lütfen en az 1 tane seçim yapınız.",
       "pleaseEnterValue": "Lütfen İlgili Alanları Doldurunuz.",
       "completeChecklist": "Checklisti Tamamla",
-      "addImage": "Görsel Ekle"
+      "addImage": "Görsel Ekle",
+      "value": "Değer",
+      "dailyChecklist": "Günlük Checklist",
+      "pleaseRoute": "Lütfen Checklist Rotası Oluşturunuz"
     }
   }
 }

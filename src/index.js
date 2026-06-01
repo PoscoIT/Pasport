@@ -92,7 +92,7 @@ const Index = ({ navigation }) => {
             ])
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   48"} />
+        <DrawerItem label={t("loginScreen.version") + "   5510"} />
       </DrawerContentScrollView>
     );
   };
@@ -100,7 +100,7 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 48) {
+        if (responsee.version > 51) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
@@ -178,7 +178,7 @@ const Index = ({ navigation }) => {
               }}
             />
             <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
-             <Drawer.Screen name="Second Hand Paper Tracking" component={PaperTrackingSecond} />
+             <Drawer.Screen name="Canlı Kağıt Stok Durumu" component={PaperTrackingSecond} />
 
             {/*<Drawer.Screen options={{*/}
 
