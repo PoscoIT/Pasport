@@ -9,7 +9,7 @@ import com.swmansion.rnscreens.fragment.restoration.RNScreensFragmentFactory;
 
 class MainActivity : ReactActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-          supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
+         supportFragmentManager.fragmentFactory = RNScreensFragmentFactory()
       super.onCreate(savedInstanceState);
     }
 

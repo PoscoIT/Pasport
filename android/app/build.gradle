@@ -65,13 +65,7 @@ def isNewArchitectureEnabled() {
 }
 
 // React Native config
-project.ext.react = [
-    enableHermes: true,
-    entryFile: "index.js",
-     useCodegen: true,
-    bundleInDebug: true,
-  nodeExecutableAndArgs: ["/Users/fatih/.nvm/versions/node/v20.13.1/bin/node"]
-]
+
 
 def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
