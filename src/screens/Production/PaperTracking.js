@@ -827,7 +827,7 @@ useEffect(() => {
             status={"basic"}
             disabled={
             !(
-    departmentList?.[0]?.SubTeamID === 13 ||
+    departmentList?.[0]?.SubTeamID === 13 ||  departmentList?.[0]?.TeamID === 10 || departmentList?.[0]?.TeamID === 24 ||
     departmentList?.[0]?.SubTeamID === 7 ||
     (
       departmentList?.[0]?.TeamID === 30 &&

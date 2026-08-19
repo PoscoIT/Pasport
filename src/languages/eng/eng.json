@@ -187,6 +187,7 @@
       "periodicControl": "Periodic Checklist Review",
       "createRoute": "Create Route",
       "selectLine": "Please select a line",
+      "selectCheckTime": "Please select a Check Time",
       "search": "Search",
       "relatedAreaNotFound": "Related Area Not Found",
       "enterEmployeeID": "Enter Employee ID",

@@ -50,7 +50,7 @@ const CareSystemPeriodicControlOld2 = () => {
   const [selectedQrCodeZone, setSelectedQrCodeZone] = useState([]);
   const pickerRef = useRef(null);
   const [showCamera, setShowCamera] = useState(false);
-
+  //const url = "http://localhost:5509"
   const url = "https://tstapp.poscoassan.com.tr:8443";
   const getMMSList = async () => {
     try {

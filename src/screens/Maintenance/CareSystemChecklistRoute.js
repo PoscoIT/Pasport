@@ -33,7 +33,7 @@ const CareSystemChecklistRoute = () => {
   const [mmsLines, setMMSLines] = useState([]);
   const [selectedMMSLine, setSelectedMMSLine] = useState([]);
   const [qrCodeZone, setQrCodeZone] = useState([]);
-
+  const [checkTimes,setCheckTimes] = useState([])
   const [employeeID, setEmployeeID] = useState("");
     const [assignEmployeeID, setAssignEmployeeID] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,6 +41,7 @@ const CareSystemChecklistRoute = () => {
   const [disabled, setDisabled] = useState(false);
   const [showSearchButton, setShowSearchButton] = useState(true);
   const [showAddButton, setShowAddButton] = useState(true);
+  const [selectedCheckTime,setSelectedCheckTime] = useState("")
 
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
@@ -48,23 +49,20 @@ const CareSystemChecklistRoute = () => {
     });
   };
   const url = "https://tstapp.poscoassan.com.tr:8443";
-  //const url = "http://10.0.2.2:5509";
-  const [data, setData] = useState([
-    { id: 1, name: "Elma" },
-    { id: 2, name: "Armut" },
-    { id: 3, name: "Muz" },
-  ]);
+  //const url = "http://localhost:5509";
+
   const toggleItem = (uID) => {
     setQrCodeZone((prev) =>
       prev.map((item) =>
         item.EQUIPMENTQRCODEZONENAME === uID
-          ? { ...item, checked: !item.checked, WorkAssignedID:assignEmployeeID ,CreatedID:employeeID }
+          ? { ...item, checked: !item.checked, WorkAssignedID:assignEmployeeID ,CreatedID:employeeID,CheckTime:selectedCheckTime.value }
           : item,
       ),
     );
   };
   const onSubmit = async () => {
     setDisabled(true);
+   
     const filteredData = qrCodeZone.filter((item) => item.checked === true);
 
     if (filteredData.length > 0) {
@@ -194,6 +192,32 @@ const CareSystemChecklistRoute = () => {
       setMMSLines([]);
     }
   };
+    const getCheckTimes = async () => {
+    try {
+      await axios
+        .get(`${url}/WorkOrder/MMS/CheckTimes`, {
+          headers: {
+            "auth-token": REACT_APP_SECRET_KEY,
+          },
+        })
+        .then((res) => {
+          setCheckTimes(
+            res?.data?.data?.map(
+              (item) =>
+                [
+                  {
+                    value: item.CheckTime,
+                    Name: item.CheckTime,
+                  },
+                ][0],
+            ),
+          );
+        })
+        .catch((t) => console.warn("selammm"));
+    } catch (e) {
+      setCheckTimes([]);
+    }
+  };
   // const getChecklistByLine = async () => {
   //   setLoading(true);
   //   if (selectedMMSLine.value && employeeID.length === 6) {
@@ -229,7 +253,7 @@ const CareSystemChecklistRoute = () => {
     try {
       await axios
         .get(
-          `${url}/WorkOrder/MMS/GetCareSystemChecklistByZoneName/${selectedMMSLine.value}/${assignEmployeeID}`,
+          `${url}/WorkOrder/MMS/GetCareSystemChecklistByZoneName/${selectedMMSLine.value}/${assignEmployeeID}/${selectedCheckTime.value}`,
           {
             headers: {
               "auth-token": REACT_APP_SECRET_KEY,
@@ -271,6 +295,9 @@ const CareSystemChecklistRoute = () => {
 
   useEffect(() => {
     getMMSList();
+  }, []);
+    useEffect(() => {
+    getCheckTimes();
   }, []);
   useEffect(() => {
     getUser();
@@ -314,6 +341,25 @@ const CareSystemChecklistRoute = () => {
         />
 
         <View style={[styles.pickerContainer,{marginTop:15,backgroundColor:"#fff"}]}>
+ <PickerModal
+            items={checkTimes}
+            selected={selectedCheckTime}
+            sortingLanguage={"tr"}
+            showToTopButton={true}
+            showAlphabeticalIndex={true}
+            autoGenerateAlphabeticalIndex={true}
+            autoSort={true}
+            Autocomplete={false}
+            requireSelection={false}
+            selectPlaceholderText={<Text style={styles.placeholder}>{t("careSystem.selectCheckTime")}</Text>}
+            searchPlaceholderText={"Check Time Seçiniz"}
+            onSelected={(item) => {
+              setSelectedCheckTime(item);
+            setShowSearchButton(true);
+            
+            }}
+          />
+
           <PickerModal
             items={mmsLines}
             selected={selectedMMSLine}
@@ -332,6 +378,7 @@ const CareSystemChecklistRoute = () => {
               setShowAddButton(false);
             }}
           />
+          
         </View>
 
       </Card.Content>

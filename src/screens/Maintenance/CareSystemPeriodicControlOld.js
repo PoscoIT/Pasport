@@ -47,7 +47,8 @@ const CareSystemPeriodicControlOld = () => {
   const [selectedQrCodeZone, setSelectedQrCodeZone] = useState([]);
   const pickerRef = useRef(null);
 
-  const url = "https://tstapp.poscoassan.com.tr:8443";
+   const url = "https://tstapp.poscoassan.com.tr:8443";
+ // const url = "http://localhost:5509"
   const getMMSList = async () => {
     try {
       await axios

@@ -1414,7 +1414,7 @@ PODS:
   - hermes-engine/Pre-built (250829098.0.10)
   - leveldb-library (1.22.6)
   - lottie-ios (4.6.0)
-  - lottie-react-native (7.3.8):
+  - lottie-react-native (7.4.0):
     - hermes-engine
     - lottie-ios (= 4.6.0)
     - RCTRequired
@@ -3651,7 +3651,7 @@ PODS:
     - Yoga
   - RNVectorIcons (9.2.0):
     - React-Core
-  - RNWorklets (0.9.2):
+  - RNWorklets (0.9.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -3672,10 +3672,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/apple (= 0.9.2)
-    - RNWorklets/common (= 0.9.2)
+    - RNWorklets/apple (= 0.9.3)
+    - RNWorklets/common (= 0.9.3)
     - Yoga
-  - RNWorklets/apple (0.9.2):
+  - RNWorklets/apple (0.9.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -3697,7 +3697,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets/common (0.9.2):
+  - RNWorklets/common (0.9.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -4078,7 +4078,7 @@ SPEC CHECKSUMS:
   hermes-engine: c54f137cf11c2ed01d1e9c1e5e35404d0026025a
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
-  lottie-react-native: 956d353a780afcaf2b519ac7a5639fbe5be48bfa
+  lottie-react-native: 703e5d782470ed784f397779ba71ef3452893efd
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
   RCTDeprecation: 225e022b85a206cf0883a909c4a114159783363c
@@ -4169,7 +4169,7 @@ SPEC CHECKSUMS:
   RNScreens: 4f8237da8f9f7aaac0f375bb61efe6011f5cd13b
   RNSVG: 172a2719af10d149d611ae2f090d4f07cf79b42d
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
-  RNWorklets: 3af77a2f7988ccd8439a61b66c09b68c86e6d99e
+  RNWorklets: d7e8c64e96ffdfecd818fbe617a9bef2d557e67a
   VisionCamera: 3ea10c46a5c612f5f89fb46a54bef4a0de8b58a7
   Yoga: 9d8e8094a2bed6a175d9e6001a0546d5dae663ee
 

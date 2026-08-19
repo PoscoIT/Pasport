@@ -5,11 +5,15 @@ import {
   ScrollView,
   Linking,
   Alert,
+  Modal,
   BackHandler,
+  Image,
   KeyboardAvoidingView,
+  TouchableOpacity,
 } from "react-native";
 import { HelperText, TextInput, ActivityIndicator } from "react-native-paper";
 import { useCallback, useEffect, useState } from "react";
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import {
   Button,
   Select,
@@ -27,14 +31,96 @@ import { REACT_APP_SECRET_KEY } from "@env";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { sendUserInfoName } from "../../api/auth-api";
 import { t } from "i18next";
+import { FlatList } from "react-native-gesture-handler";
+
+
+const CustomAlert = ({ visibleMethod,message,onClose }) => {
+  return (
+    <Modal transparent={true} visible={visibleMethod} animationType="fade">
+      <View style={styles.overlay}>
+        <View style={styles.alertBox}>
+          
+        
+          <Image 
+            source={require("../../assets/poscoAlert.jpeg")} 
+            style={styles.image} 
+          />
+          
+          <Text style={styles.title}>{message}</Text>
+       
+          
+          {/* Action Button */}
+          <TouchableOpacity style={styles.button} onPress={onClose}>
+            <Text style={styles.buttonText}>OK</Text>
+          </TouchableOpacity>
+          
+        </View>
+      </View>
+    </Modal>
+  );
+};
+const Item = ({ item, onPress, backgroundColor, textColor }) => {
+  return (
+ <TouchableOpacity
+  onPress={onPress}
+  activeOpacity={0.85}
+  style={[
+    styles.card,
+    { backgroundColor: backgroundColor || "#fff" }
+  ]}
+>
+  <View style={styles.header}>
+    <View style={styles.iconBox}>
+      <Text style={styles.iconText}>PR</Text>
+    </View>
+
+    <View style={styles.headerContent}>
+      <Text style={[styles.title, { color: textColor || "#333" }]}>
+        PR No: {item.PR}
+      </Text>
+
+      <Text style={styles.subTitle}>
+        Kullanım Bilgileri
+      </Text>
+    </View>
+  </View>
+
+
+  <View style={styles.divider} />
+
+
+  <View style={styles.infoRow}>
+    <Text style={styles.label}>
+      Kullanım Sayısı
+    </Text>
+    <Text style={styles.value}>
+      {item.SayimNo}
+    </Text>
+  </View>
+
+
+  <View style={styles.infoRow}>
+    <Text style={styles.label}>
+      Kullanım Tipi
+    </Text>
+    <Text style={styles.value}>
+      {item.UsageComment}
+    </Text>
+  </View>
+
+
+</TouchableOpacity>
+  );
+};
 const SleeveCount = () => {
   const [permission, setPermission] = useState(false);
   const [qrCodeValue, setQrCodeValue] = useState([]);
+  const [modalVisible2,setModalVisible2] = useState(false)
   const [selectedIndexWidth, setSelectedIndexWidth] = useState("");
   const [selectedIndexThickness, setSelectedThickness] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [qrValue, setQrValue] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const device = useCameraDevice("back");
   const [widthData, setWidthData] = useState([]);
   const [thicknessData, setThichknessData] = useState([]);
@@ -45,7 +131,17 @@ const SleeveCount = () => {
   const [usageValue, setUsageValue] = useState(0);
   const [scrapReason, setScrapReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchWeek,setSearchWeek] = useState("")
+  const [searchOrder,setSearchOrder] = useState("")
   const [departmentList, setDepartmentList] = useState([]);
+  const [searchData,setSearchData] = useState([])
+  const [maxValue,setMaxValue] = useState([])
+    const [selectedId, setSelectedId] = useState();
+    const [searchButtonLoading,setSearchButtonLoading] = useState(false)
+  const [searchPRNo,setSearchPRNo] = useState("")
+  const [totalUsage,setTotalUsage] = useState("")
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [isActive2,setIsActive2] = useState(false)
   const isWhichSleeveInvalid = () => {
     if (!whichSleeve) return false;
 
@@ -79,6 +175,54 @@ const SleeveCount = () => {
   };
 
   const [formValues, setFormValues] = useState({});
+
+
+  const onSearch = async()=>{
+    setMaxValue(false)
+    setSearchButtonLoading(true)
+    if(searchOrder && searchWeek){
+      const searchData = {
+        hafta:searchWeek,
+        order:searchOrder,
+        prNo:searchPRNo,
+        sicilNo:employeeID
+      }
+      await axios.get("https://tstapp.poscoassan.com.tr:8443/Production/GetSleeveDetails",{
+        params:searchData,
+       headers: {
+                "auth-token": REACT_APP_SECRET_KEY,
+                       "Content-Type": "application/json",
+              },
+      }).then((res)=>{
+   
+        if(res?.data?.status==="success"){
+     
+          if(res.data?.usageValue===true){
+         setMaxValue(true)
+         setAlertVisible(true)
+         setTotalUsage(res.data?.maxValue)
+
+          }
+   
+        
+          setSearchData(res.data.data)
+        }
+        else{
+           Alert.alert("UYARI",'Kayıt Bulunamadı')
+          setSearchData([])
+        }
+      }).catch((err)=>{
+        setSearchData([])
+      }).finally(()=>{
+     
+         setSearchButtonLoading(false)
+      })
+    }
+    else{
+         Alert.alert("Hata", "Lütfen İlgili Alanları Doldurunuz");
+          setSearchButtonLoading(false)
+    }
+  }
   const onSubmit = () => {
     if (isWhichSleeveInvalid() || isWeekInvalid()) {
       Alert.alert("Hata", "Lütfen aralık dışında bir değer girmeyiniz.");
@@ -133,10 +277,38 @@ const SleeveCount = () => {
       setModalVisible(true);
       setQrValue(codes[0]?.value);
       setIsActive(false);
+      setIsActive2(false)
       if (qrValue) getQrValue();
     },
     requestCameraPermission: true,
   });
+
+   const codeScannnerUsage = useCodeScanner({
+    codeTypes: [
+      "qr",
+      "ean-13",
+      "ean-8",
+      "code-128",
+      "code-39",
+      "code-93",
+      "upc-e",
+      "upc-a",
+      "codabar",
+      "data-matrix",
+      "itf",
+    ],
+    onCodeScanned: (codes) => {
+    
+  
+      setIsActive(false)
+      setIsActive2(false);
+     
+      if (codes[0]?.value) getQrValueUsage(codes[0]?.value);
+    },
+    requestCameraPermission: true,
+  });
+
+ 
 
   const getDepartmentList = async () => {
     try {
@@ -164,7 +336,7 @@ const SleeveCount = () => {
   };
 
   const getQrValue = async () => {
-    setQrCodeValue([]);
+
     setLoading(true);
 
     await axios
@@ -189,6 +361,49 @@ const SleeveCount = () => {
       })
       .catch((err) => {
         setQrCodeValue([]);
+      })
+      .finally(() => setLoading(false));
+  };
+
+
+    const getQrValueUsage = async (prNo) => {
+
+    setLoading(true);
+  
+
+    await axios
+      .get(
+        `https://tstapp.poscoassan.com.tr:8443/Production/GetQrValue?prNo=${prNo}`,
+        {
+          headers: {
+            "auth-token": REACT_APP_SECRET_KEY,
+          },
+        },
+      )
+      .then((res) => {
+      
+        if (res.data?.status === "Success") {
+       
+          setSearchPRNo(prNo);
+          setSearchWeek(res.data?.data[0]?.Week?.toString())
+              setModalVisible2(true);
+        } else {
+       
+          setSearchWeek("")
+          setSearchPRNo("");
+          Alert.alert("Hata",res?.data?.message?res.data?.message:"Kayıt Bulunamadı")
+            //  setIsActive(false);
+            //   setModalVisible2(false);
+        }
+      })
+      .catch((err) => {
+       
+        setSearchPRNo("");
+           setSearchWeek("")
+      
+               Alert.alert("Hata","Kayıt Bulunamadı")
+            //         setIsActive(false)
+            // setModalVisible2(false);
       })
       .finally(() => setLoading(false));
   };
@@ -280,46 +495,74 @@ const SleeveCount = () => {
       () => {
         if (isActive === true) {
           setModalVisible(false);
+          setIsActive(false)
           setWhichSleeve("");
           setWhichWeek("");
           setSelectedThickness("");
           setSelectedIndexWidth("");
+          
           setScrapReason("");
+          setSearchPRNo("")
+          setSearchData([])
+          setSearchOrder("")
+          setSearchWeek("")
+            setMaxValue(false)
+            setTotalUsage("")
+                setAlertVisible(false)
+                    setSearchPRNo("")
           navigation.goBack();
           return true;
         } else {
-          setIsActive(true);
+          setIsActive(false);
           setWhichSleeve("");
           setWhichWeek("");
           setSelectedThickness("");
           setSelectedIndexWidth("");
           setModalVisible(false);
           setScrapReason("");
+                setSearchPRNo("")
+              setSearchData([])
+          setSearchOrder("")
+          setSearchWeek("")
+            setMaxValue(false)
+                setAlertVisible(false)
+            setTotalUsage("")
+                setSearchPRNo("")
 
           return true;
         }
       },
     );
     return () => backHandler.remove();
-  }, [isActive]);
+  }, [isActive,isActive2]);
 
   useFocusEffect(
     useCallback(() => {
       // BURASI: Sayfaya girildiğinde çalışır (Opsiyonel)
       // console.log('Sayfaya girildi');
-      setIsActive(true);
+      setIsActive(false)
+   
       return () => {
         setModalVisible(false);
+        setModalVisible2(false)
         setWhichSleeve("");
         setWhichWeek("");
         setSelectedThickness("");
         setSelectedIndexWidth("");
         setScrapReason("");
+        setSearchPRNo("")
+              setSearchPRNo("")
+            setSearchData([])
+          setSearchOrder("")
+          setSearchWeek("")
+          setMaxValue(false)
+          setTotalUsage("")
+              setAlertVisible(false)
       };
     }, []),
   );
 
-  // if (!device || !permission) {
+  // if (!device || !permission) {Q
   //   return (
   //     <Text onPress={() => Linking.openSettings()}>
   //       Lütfen kameraya izin verin ve cihazın hazır olduğundan emin olun. İzin
@@ -327,17 +570,186 @@ const SleeveCount = () => {
   //     </Text>
   //   );
   // }
+  
+  if(maxValue===true){
+    return <CustomAlert   onClose={() => {
+      setAlertVisible(false)
+      setMaxValue(false)
+    }} visibleMethod={alertVisible} message={`Kullanım yapılması durumunda ${totalUsage} olarak belirlenen sayı aşılacaktır. Sorgulanan sleeve'in kullanılması durumunda hat duruşlarına ve buna bağlı kalite kusurlarına sebebiyet verebilir`}/>
+  }
 
   return (
     <View style={styles.view}>
       <View style={{ flex: 1, width: "100%", height: "100%" }}>
-        <Camera
+      {/* <Button style={{borderRadius:10,width:100}}>Kullanım</Button>
+        <Button>Görüntüle</Button> */}
+        <View style={styles.container}>
+      <TouchableOpacity style={styles.buttonPrimary} onPress={()=>
+        {
+          setIsActive(true)
+        }
+      }>
+        <Text style={styles.textPrimary}>Kullanım</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.buttonSecondary} onPress={()=>setIsActive2(true)}>
+        <Text style={styles.textSecondary}>Kullanım Görüntüle</Text>
+      </TouchableOpacity>
+    </View>
+    {isActive&&  <Camera
           style={StyleSheet.absoluteFill}
           codeScanner={codeScannner}
           device={device}
-          isActive={isActive}
-        />
+        isActive={isActive}
+       />}
+        {isActive2&&  <Camera
+          style={StyleSheet.absoluteFill}
+          codeScanner={codeScannnerUsage}
+          device={device}
+        isActive={isActive2}
+       />}
+      
+     
       </View>
+        {modalVisible2 && (
+        <ScrollView 
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+
+            backgroundColor: "white",
+          }}
+        >
+          {!loading && searchPRNo.length > 0 ? (
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={{ flex: 1, backgroundColor: "#fff", height: "100%" }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                display:"flex",
+                alignItems:"flex-start",
+                justifyContent:"flex-start"
+                }}
+              >
+                <Button
+                  size="small"
+                  appearance="ghost"
+                  status="basic"
+                  onPress={() => {
+                    setIsActive(false);
+                    setModalVisible(false)
+                        setIsActive2(false);
+                    setSearchPRNo("")
+                    setWhichSleeve("");
+                    setWhichWeek("");
+                    setSelectedThickness("");
+                    setSelectedIndexWidth("");
+                    setModalVisible2(false);
+                    setScrapReason("");
+                  }}
+                >
+                  {"< Geri Dön"}
+                </Button>
+                <Text style={[styles.textCenter]}>Sleeve Kağıt</Text>
+               
+              </View>
+     <Text style={{ fontSize: 13, marginBottom: 10 }}>
+                Tanımlı PR:
+                {"  "}
+                {searchPRNo?.replace("-", " ")?.replace("i", "ı")?.toUpperCase()}
+              </Text>
+          
+           
+  <TextInput
+                keyboardType="numeric"
+                style={styles.input}
+                value={searchPRNo}
+       
+                onChangeText={(text) => {
+               
+                  setSearchPRNo(text);
+                }}
+            
+                placeholder="PR No"
+              ></TextInput>
+            
+
+              <TextInput
+                keyboardType="numeric"
+                style={styles.input}
+                value={searchWeek}
+              
+                onChangeText={(text) => {
+                  const onlyInteger = text.replace(/[^0-9]/g, "");
+                  setSearchWeek(onlyInteger);
+                }}
+            
+                placeholder="Kaçıncı Hafta"
+              ></TextInput>
+           
+
+              <TextInput
+                keyboardType="numeric"
+                style={styles.input}
+                value={searchOrder}
+                onChangeText={(text) => setSearchOrder(text)}
+             
+                placeholder="Kaçıncı Sleeve"
+              ></TextInput>
+          
+           
+            
+          
+
+              <Button disabled={searchButtonLoading} style={styles.submitButton} onPress={onSearch}>
+                {" "}
+                Ara
+              </Button>
+              {searchData?.length>0?searchData.map((item,index)=>{
+                return <Item key={index} item={item}/>
+              }):null}
+              {/* <KeyboardAwareFlatList        data={searchData}
+          renderItem={renderItem}
+               contentContainerStyle={{ paddingBottom: 50 }}
+          keyExtractor={item => item.ID}
+          ListHeaderComponent={<>
+          <Text style={{textAlign:"center",fontWeight:"bold"}}>Kullanım Bilgileri</Text>
+          </>}
+              ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 15 }}>
+           Bulunamadı
+          </Text>
+        }
+          extraData={selectedId}>
+
+              </KeyboardAwareFlatList> */}
+            </KeyboardAvoidingView>
+          ) : searchPRNo.length == 0 && !loading ? (
+            <View>
+              <Text
+                onPress={() => {
+                  setIsActive2(true);
+                  setModalVisible2(false);
+                }}
+              >
+                İlgili PR numarası bulunamadı. Tekrar Okutmak için Tıklayınız
+              </Text>
+            </View>
+          ) : (
+            <ActivityIndicator
+              animating={true}
+              size={35}
+              style={{ marginTop: 30 }}
+            />
+          )}
+        </ScrollView>
+      )}
       {modalVisible && (
         <ScrollView
           style={{
@@ -366,12 +778,15 @@ const SleeveCount = () => {
                   appearance="ghost"
                   status="basic"
                   onPress={() => {
-                    setIsActive(true);
+                     setIsActive(false);
+                    setModalVisible(false)
+                        setIsActive2(false);
+                    setSearchPRNo("")
                     setWhichSleeve("");
                     setWhichWeek("");
                     setSelectedThickness("");
                     setSelectedIndexWidth("");
-                    setModalVisible(false);
+                    setModalVisible2(false);
                     setScrapReason("");
                   }}
                 >
@@ -415,30 +830,7 @@ const SleeveCount = () => {
                     Ebat Düşümü
                   </Radio>
                 </RadioGroup>
-                {/* <RadioButton.Group
-                  onValueChange={(newValue) => setUsageValue(newValue)}
-                  value={usageValue}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <RadioButton value="1" />
-                      <Text>Kullanım</Text>
-                    </View>
-
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginLeft: 30,
-                      }}
-                    >
-                      <RadioButton value="2" />
-                      <Text>Hurda ya da Müşteri</Text>
-                    </View>
-                  </View>
-                </RadioButton.Group> */}
+              
               </View>
 
               <Select
@@ -597,6 +989,186 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderRadius: 10,
     paddingVertical: 12,
+  },
+    container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    padding: 10,
+  },
+  buttonPrimary: {
+    flex: 1,
+    backgroundColor: "#2957c5",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 3,
+  },
+  buttonSecondary: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#2957c5",
+  },
+  textPrimary: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  textSecondary: {
+    color: "#2957c5",
+    fontWeight: "bold",
+  },
+    item: {
+    padding: 16,
+    borderRadius: 12,
+    elevation: 3, // Android shadow
+    shadowColor: "#000", // iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  spacing: {
+    marginTop: 20,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+    card: {
+    marginHorizontal: 15,
+    marginVertical: 8,
+    padding: 16,
+    borderRadius: 16,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+
+    elevation: 5,
+  },
+
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+
+  iconBox: {
+    width: 45,
+    height: 45,
+    borderRadius: 12,
+    backgroundColor: "#df1460",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+
+  iconText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+
+
+  headerContent: {
+    flex:1,
+  },
+
+
+  title: {
+    fontSize: 17,
+    fontWeight: "700",
+  },
+
+
+  subTitle: {
+    marginTop:4,
+    color:"#888",
+    fontSize:13,
+  },
+
+
+  divider:{
+    height:1,
+    backgroundColor:"#eee",
+    marginVertical:14,
+  },
+
+
+  infoRow:{
+    flexDirection:"row",
+    justifyContent:"space-between",
+    marginBottom:10,
+  },
+
+
+  label:{
+    color:"#777",
+    fontSize:14,
+    fontWeight:"500",
+  },
+
+
+  value:{
+    color:"#222",
+    fontSize:14,
+    fontWeight:"600",
+    maxWidth:"55%",
+    textAlign:"right",
+  },
+   overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 300,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  image: {
+    width: 140,
+    height: 140,
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  message: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#666',
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 export default SleeveCount;
