@@ -12,6 +12,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   StatusBar,
+  Switch
 } from "react-native";
 
 import TextInput from "../../components/TextInput";
@@ -23,6 +24,7 @@ import {
   Dialog,
   DefaultTheme,
   IconButton,
+  Checkbox
 } from "react-native-paper";
 import { theme } from "../../core/theme";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -36,15 +38,16 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Radio, RadioGroup } from "@ui-kitten/components";
 import i18n from "../../languages/i18n";
 import { REACT_APP_SECRET_KEY } from "@env";
+import { Camera, useCameraDevice, useCodeScanner } from "react-native-vision-camera";
 
 const { height, width } = Dimensions.get("window");
 const SafetyControl = ({ navigation }) => {
   const scrollViewRef = useRef(null);
   const [netInfo, setNetInfo] = useState("");
 
-  const [lineList, setLineList] = useState([]);
+  const [qrArea, setQRArea] = useState([]);
   const url = "https://tstapp.poscoassan.com.tr:8443";
-
+ //const url = "http://10.0.2.2:5504"
   const [employeeId, setEmployeeId] = useState("");
   const [userLine, setUserLine] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,57 +56,73 @@ const SafetyControl = ({ navigation }) => {
   const [defectType, setDefectType] = useState([]);
   const [defectTypeDetails, setDefectTypeDetails] = useState([]);
   const [name, setName] = useState("");
-  const [action, setAction] = useState(0);
+    const [isActive, setIsActive] = useState(true);
+    const [qrValue,setQrValue] = useState("")
+      const device = useCameraDevice("back");
+  // const [action, setAction] = useState(0);
   const [defectValue, setDefectValue] = useState("");
   const [defectDetailsValue, setDefectDetailsValue] = useState("");
+  const [selectedQRArea, setSelectedQRArea] = useState("");
   const [checked, setChecked] = useState(false);
-  const [line, setLine] = useState("");
-
-  const [inspectionType, setInspectionType] = useState(
-    userLine === "IS GUVENLIGI TAKIMI"
-      ? {
-          value: 5,
-          Name: "Safety Patrol",
-        }
-      : { value: 0, Name: "Safety Audit" }
-  );
+  const [probability, setProbability] = useState(null); // Olasılık
+  const [severity, setSeverity] = useState(null);       // Şiddet
+  const [frequency, setFrequency] = useState(null);     // Frekans
   const [area, setArea] = useState("");
   const [content, setContent] = useState("");
   const [filePath, setFilePath] = useState("");
   const [filePath2, setFilePath2] = useState("");
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
   const hideDialog = () => setVisible(false);
-  const [visible2, setVisible2] = React.useState(false);
+  const [visible2, setVisible2] = useState(false);
   const hideDialog2 = () => setVisible2(false);
-  const [visible3, setVisible3] = React.useState(false);
+  const [visible3, setVisible3] = useState(false);
   const hideDialog3 = () => setVisible3(false);
-  const requestCameraPermission = async (config) => {
-    const permission =
-      Platform.OS === "android"
-        ? PERMISSIONS.ANDROID.CAMERA
-        : PERMISSIONS.IOS.CAMERA;
-    return check(permission).then((result) => {
-      switch (result) {
-        case RESULTS.DENIED:
-          return request(permission, {
-            title: "Camera Permission ",
-            message: "TST App Kameranıza ulaşmak istiyor.",
-          }).then((result) => {
-            if (result === RESULTS.GRANTED) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-        case RESULTS.GRANTED:
-          return true;
-        case RESULTS.BLOCKED:
-          return false;
-        default:
-          return false;
-      }
-    });
-  };
+    const [qrCodeValue, setQrCodeValue] = useState([]);
+    const [cameraPermissionGranted, setCameraPermissionGranted] = useState(false);
+    const [isRelatedWorkMe,setIsRelatedWorkMe] = useState(false);
+const requestCameraPermission = async () => {
+  const permission =
+    Platform.OS === "android"
+      ? PERMISSIONS.ANDROID.CAMERA
+      : PERMISSIONS.IOS.CAMERA;
+
+  try {
+    const result = await request(permission);
+
+    console.log("Camera permission:", result);
+
+    if (result === RESULTS.GRANTED) {
+      setCameraPermissionGranted(true);
+      return true;
+    }
+
+    setCameraPermissionGranted(false);
+
+    if (result === RESULTS.BLOCKED) {
+      Alert.alert(
+        "Kamera İzni Gerekli",
+        "Kamera kullanabilmek için Ayarlar'dan kamera izni vermen gerekiyor.",
+        [
+          {
+            text: "İptal",
+            style: "cancel",
+          },
+          {
+            text: "Ayarlar",
+            onPress: openSettings,
+          },
+        ]
+      );
+    }
+
+    return false;
+  } catch (error) {
+    console.log("Camera permission error:", error);
+    setCameraPermissionGranted(false);
+    return false;
+  }
+};
+
   const requestExternalWritePermission = async () => {
     if (Platform.OS === "android") {
       try {
@@ -180,104 +199,30 @@ const SafetyControl = ({ navigation }) => {
       setFilePath(response.assets[0]);
     });
   };
-  const captureImage2 = async (type) => {
-    let options = {
-      mediaType: type,
-      maxWidth: 400,
-      maxHeight: 550,
-      includeBase64: true,
-      quality: 1,
-      videoQuality: "low",
-      durationLimit: 30,
-      saveToPhotos: true,
-    };
-    let isCameraPermitted = await requestCameraPermission();
-    //   let isStoragePermitted = await requestExternalWritePermission();
-    if (isCameraPermitted) {
-      await launchCamera(options, (response) => {
-        if (response.didCancel) {
-          return;
-        } else if (response.errorCode == "camera_unavailable") {
-          alert("Camera not available on device");
-          return;
-        } else if (response.errorCode == "permission") {
-          alert("Permission not satisfied");
-          return;
-        } else if (response.errorCode == "others") {
-          alert(response.errorMessage);
-          return;
-        }
-        setVisible2(false);
-        setFilePath2(response.assets[0]);
-      });
-    }
-  };
-  const chooseFile2 = async (type) => {
-    let options = {
-      mediaType: type,
-      maxWidth: 400,
-      includeBase64: true,
-      maxHeight: 550,
-      quality: 1,
-    };
-    await launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        return;
-      } else if (response.errorCode == "camera_unavailable") {
-        alert("Camera not available on device");
-        return;
-      } else if (response.errorCode == "permission") {
-        alert("Permission not satisfied");
-        return;
-      } else if (response.errorCode == "others") {
-        alert(response.errorMessage);
-        return;
-      }
-      setVisible2(false);
-      setFilePath2(response.assets[0]);
-    });
-  };
+
+
 
   const addForm = async () => {
     setLoading(true);
     let formdata = new FormData();
+   
     if (
-      line &&
-      (areaUniqueList?.length > 0 ? area : true) &&
+      qrValue && 
       content &&
       filePath &&
-      action !== null &&
-      inspectionType &&
-      defectValue &&
-      accidentValue
+      probability !== null &&
+      severity !== null &&
+      frequency !== null 
+    
     ) {
-      if (action === 1 && !opinionImprovement) {
-        Alert.alert(
-          languageData[38]?.Name,
-
-          languageData[37]?.Name,
-          [
-            {
-              text: languageData[39]?.Name,
-            },
-          ],
-          { cancelable: false }
-        );
-        setLoading(false);
-      } else if (
-        (action === 1 && opinionImprovement && filePath2) ||
-        action === 0 ||
-        action === 2
-      ) {
+    
         formdata.append("EmployeeID", employeeId);
-        formdata.append("Line", line.value);
-        {
-          areaUniqueList?.length > 0
-            ? formdata.append("Area", area.value)
-            : null;
-        }
+        formdata.append("QRArea", qrValue);
+     
         formdata.append("DefectContent", content);
-        formdata.append("Status", action === 0 ? 13 : 18);
+        formdata.append("isRelatedWorkMe",isRelatedWorkMe)
+ 
+        formdata.append("Status", 21);
         formdata.append("ISGCheckList", {
           name: filePath.fileName,
           type: filePath.type,
@@ -286,21 +231,18 @@ const SafetyControl = ({ navigation }) => {
               ? filePath.uri
               : filePath.uri.replace("file://", ""),
         });
-        filePath2 &&
-          formdata.append("ISGCheckListAfter", {
-            name: filePath2?.fileName,
-            type: filePath2?.type,
-            uri:
-              Platform.OS === "android"
-                ? filePath2?.uri
-                : filePath2?.uri.replace("file://", ""),
-          });
-        formdata.append("InspectionType", inspectionType.value);
+      
+        formdata.append("InspectionType", 0);
         formdata.append("OpinionOnImprovementMeasurement", opinionImprovement);
-        formdata.append("ClassificationOfActions", action);
-        formdata.append("RiskLevel", defectValue.value);
-        // formdata.append("SubDefectType", defectDetailsValue.value)
-        formdata.append("AccidentPreventionType", accidentValue.value);
+     
+        formdata.append("ClassificationOfActions", 0);
+        formdata.append("RiskLevel", 0);
+        formdata.append("ProbabilityLevel", 6 - probability);
+        formdata.append("SeverityLevel", 6 - severity);
+        formdata.append("FrequencyLevel", 6 - frequency);
+      
+   
+        formdata.append("AccidentPreventionType", 0);
 
         await axios
           .post(`${url}/ISG/ISGInspectionCheckListData`, formdata, {
@@ -311,6 +253,7 @@ const SafetyControl = ({ navigation }) => {
             },
           })
           .then((res) => {
+         
             if (res.data?.status === "Success") {
               Alert.alert(
                 languageData[40]?.Name,
@@ -322,10 +265,14 @@ const SafetyControl = ({ navigation }) => {
                 ],
                 { cancelable: false }
               );
-              setArea("");
-              setLine("");
+        
+              setQRArea("");
               setContent("");
               setFilePath("");
+              setFilePath2("");
+              setProbability(null);
+              setSeverity(null);
+              setFrequency(null);
               setChecked(false);
               setLoading(false);
               navigation.navigate("SafetyMainScreen");
@@ -343,9 +290,8 @@ const SafetyControl = ({ navigation }) => {
               setLoading(false);
             }
           })
-          .catch((err) => console.warn(err))
+          .catch((err) => console.log(err))
           .finally(() => setLoading(false));
-      }
     } else {
       Alert.alert(
         languageData[38]?.Name,
@@ -360,6 +306,64 @@ const SafetyControl = ({ navigation }) => {
       setLoading(false);
     }
   };
+  const getQrValue = async () => {
+
+    setLoading(true);
+  
+    await axios
+      .get(
+        `${url}/Common/ListISGQrData/${
+          qrValue
+        }`,
+        {
+     
+         
+           headers: {
+          "Content-type": "application/json",
+          "auth-token": REACT_APP_SECRET_KEY,
+        },
+        },
+      )
+      .then((res) => {
+       
+        if (res.data?.status === "success") {
+          setQrCodeValue(res.data.data);
+      
+        } else {
+          setIsActive(false);
+
+          setQrCodeValue([]);
+        }
+      })
+      .catch((err) => {
+             console.log(err)
+        setQrCodeValue([]);
+      })
+      .finally(() => setLoading(false));
+  };
+   const codeScannner = useCodeScanner({
+      codeTypes: [
+        "qr",
+        "ean-13",
+        "ean-8",
+        "code-128",
+        "code-39",
+        "code-93",
+        "upc-e",
+        "upc-a",
+        "codabar",
+        "data-matrix",
+        "itf",
+      ],
+      onCodeScanned: (codes) => {
+        console.log(codes)
+        setQrValue(codes[0]?.value);
+        setIsActive(false);
+      
+        if (qrValue) getQrValue();
+      },
+      requestCameraPermission: true,
+    });
   const getAccidentData = async () => {
     await axios
       .get(`${url}/Common/ListISGControlsData`, {
@@ -386,34 +390,8 @@ const SafetyControl = ({ navigation }) => {
       })
       .catch((err) => console.warn(err));
   };
-  const getDefectData = async () => {
-    await axios
-      .get(`${url}/Common/ListISGDefectData`, {
-        headers: {
-          "Content-type": "application/json",
-          "auth-token": REACT_APP_SECRET_KEY,
-        },
-      })
-      .then(async (res) => {
-        setDefectType(
-          res.data.map(
-            (item) =>
-              [
-                {
-                  value: item.ID,
-                  Name: i18n.language === "tr" ? item.NameTR : item.Name,
-                },
-              ][0]
-          )
-        );
-      })
-      .catch((err) => console.warn(err));
-  };
-  const riskLevel = [
-    { id: 1, value: 1, Name: "Düşük-Low" },
-    { id: 2, value: 2, Name: "Orta-Medium" },
-    { id: 3, value: 3, Name: "Yüksek-High" },
-  ];
+ 
+
   const getDefectDetailsData = async () => {
     await axios
       .get(`${url}/Common/ListISGDefectDetailData`, {
@@ -438,108 +416,85 @@ const SafetyControl = ({ navigation }) => {
       })
       .catch((err) => console.warn(err));
   };
-  const getHttps2 = async () => {
-    await axios
-      .get(`${url}/Common/ListTeamData`, {
-        headers: {
-          "Content-type": "application/json",
-          "auth-token": REACT_APP_SECRET_KEY,
-        },
-        params: {
-          ApplicationName: "ISGCheckList",
-        },
-      })
-      .then(async (res) => {
-        setLineList(
-          res.data?.map(
-            (item) =>
-              [
-                {
-                  value: item.ID,
-                  Name:
-                    i18n.language === "tr"
-                      ? item.NameForISG
-                      : item.NameForISGEn,
-                  Value1: item["ListSubTeams.ID"],
-                  TeamID: item["ListSubTeams.TeamID"],
-                  ForISG: item["ListSubTeams.ForISG"],
-                  NameTr:
-                    item[
-                      i18n.language === "tr"
-                        ? "ListSubTeams.NameTr"
-                        : "ListSubTeams.Name"
-                    ],
-                },
-              ][0]
-          )
-        );
-      })
-      .catch((err) => console.warn(err));
-  };
-  const accidentList = useMemo(() => {
-    const arrayUniqueByKey = accidentType.filter(
-      (item) => item.Type === 1 && item.Active === 1
-    );
-    return arrayUniqueByKey;
-  }, [accidentType]);
+  // const getHttps2 = async () => {
+  //   await axios
+  //     .get(`${url}/Common/ListISGQrData`, {
+  //       headers: {
+  //         "Content-type": "application/json",
+  //         "auth-token": REACT_APP_SECRET_KEY,
+  //       },
+  //       params: {
+  //         ApplicationName: "ISGCheckList",
+  //       },
+  //     })
+  //     .then(async (res) => {
+  //       setQRArea(
+  //         res.data?.map(
+  //           (item) =>
+  //             [
+  //               {
+  //                 value: item.ID,
+  //                 Name:item.Name
+               
+               
+                 
+  //               },
+  //             ][0]
+  //         )
+  //       );
+  //     })
+  //     .catch((err) => console.warn(err));
+  // };
+
   const languageData = useMemo(() => {
     const arrayUniqueByKey = accidentType.filter((item) => item.Type === 4);
     return arrayUniqueByKey;
   }, [accidentType]);
 
-  const lineUniqueList = useMemo(() => {
-    const arrayUniqueByKey = lineList.filter(
-      (a, i) => lineList.findIndex((s) => a.Name === s.Name) === i
-    );
-    return arrayUniqueByKey;
-  }, [lineList]);
+ 
 
-  const defectDetailsList = useMemo(() => {
-    const arrayUniqueByKey = defectTypeDetails.filter(
-      (item) => item.Type === defectValue?.value
-    );
-    return arrayUniqueByKey;
-  }, [defectValue]);
+const renderRiskSection = (
+  title,
+  description,
+  options,
+  selectedIndex,
+  onChange,
+) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>
+      {title} <Text style={styles.required}>*</Text>
+    </Text>
 
-  const inspectionList = useMemo(() => {
-    const arrayUniqueByKey = accidentType
-      .filter((item) => item.Type === 2 && item.Active === 1)
-      .filter((item) =>
-        userLine !== "IS GUVENLIGI TAKIMI" ? item.ForISG === 0 : item.ForISG < 2
-      );
-    return arrayUniqueByKey;
-  }, [accidentType, userLine]);
-  const selectedItem =
-    userLine === "İş Güvenliği Takımı"
-      ? {
-          value: 18,
-          Name: languageData[34]?.Name,
-        }
-      : { value: 15, Name: languageData[35]?.Name };
-  const [accidentValue, setAccidentValue] = useState({
-    value: 23,
-    Name: languageData[28]?.Name,
-  });
-  const selectedItemAccident = { value: 23, Name: languageData[28]?.Name };
+    <Text style={styles.sectionDescription}>{description}</Text>
 
-  const areaUniqueList = useMemo(() => {
-    const arrayUniqueByKey = lineList
-      ?.filter((item) => item.TeamID === line.value && item.ForISG === 1)
-      ?.map(
-        (item) =>
-          [
-            {
-              value: item.Value1,
-              Name: item.NameTr,
-            },
-          ][0]
-      );
-    if (typeof arrayUniqueByKey !== "undefined") {
-      return arrayUniqueByKey;
-    } else {
-      return [];
-    }
-  }, [lineUniqueList, line]);
+    <RadioGroup
+      selectedIndex={selectedIndex ?? undefined}
+      onChange={onChange}
+    >
+      {options.map((option, index) => (
+        <Radio
+          key={index}
+          style={[
+            styles.radioOption,
+            selectedIndex === index && styles.radioOptionSelected,
+          ]}
+        >
+          {() => (
+            <Text
+              style={[
+                styles.radioText,
+                selectedIndex === index && styles.radioTextSelected,
+              ]}
+            >
+              {option}
+            </Text>
+          )}
+        </Radio>
+      ))}
+    </RadioGroup>
+  </View>
+);
+
 
   const getUser = async () => {
     await sendUserInfoName((sendResponse) => {
@@ -548,22 +503,20 @@ const SafetyControl = ({ navigation }) => {
       setUserLine(sendResponse.line);
     });
   };
-
+useEffect(() => {
+  if (isActive) {
+    requestCameraPermission();
+  }
+}, [isActive]);
   useEffect(() => {
     getUser();
   }, []);
   useEffect(() => {
     getAccidentData();
   }, [netInfo]);
-  useEffect(() => {
-    getDefectData();
-  }, [netInfo]);
-  useEffect(() => {
-    getDefectDetailsData();
-  }, [netInfo]);
-  useEffect(() => {
-    getHttps2();
-  }, [netInfo]);
+
+
+
 
   useEffect(() => {
     // Subscribe to network state updates
@@ -578,437 +531,592 @@ const SafetyControl = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <ScrollView keyboardShouldPersistTaps={"always"}>
-        <Provider>
-          <View style={styles.container}>
-            <Text
-              style={{
-                backgroundColor: "white",
-                width: "100%",
-                textAlign: "center",
-                fontSize: 16,
-                color: "#000",
-                fontWeight: "600",
-              }}
-            >
-              {" "}
-              {languageData[36]?.Name}
-            </Text>
-            <View style={styles.form}>
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <TextInput
-                  theme={DefaultTheme}
-                  disabled={true}
-                  label={languageData[12]?.Name}
-                  value={name}
-                  returnKeyType="next"
-                  autoCapitalize="none"
-                />
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Text style={{ color: "red" }}> *</Text>
-                    <Text> {languageData[13]?.Name}</Text>
-                  </View>
-                  {lineUniqueList ? (
-                    <PickerModal
-                      style={{ width: "100%", color: "black" }}
-                      Autocomplete={false}
-                      items={lineUniqueList}
-                      sortingLanguage={"tr"}
-                      showToTopButton={true}
-                      showAlphabeticalIndex={true}
-                      autoGenerateAlphabeticalIndex={true}
-                      selectPlaceholderText={
-                        <Text>{languageData[27]?.Name}</Text>
-                      }
-                      searchPlaceholderText={languageData[29]?.Name}
-                      requireSelection={false}
-                      autoSort={true}
-                      onSelected={(item) => {
-                        setLine(item);
-                        setArea("");
-                      }}
-                    />
-                  ) : null}
-                </View>
-              </TouchableWithoutFeedback>
-              {areaUniqueList?.length > 0 ? (
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                  <View>
-                    <Text style={{ color: "red" }}> *</Text>
-                    <Text> {languageData[14]?.Name}</Text>
-                    {areaUniqueList ? (
-                      <PickerModal
-                        style={{ width: "100%", backgroundColor: "black" }}
-                        Autocomplete={false}
-                        items={areaUniqueList}
-                        sortingLanguage={"tr"}
-                        showToTopButton={true}
-                        showAlphabeticalIndex={true}
-                        autoGenerateAlphabeticalIndex={true}
-                        selectPlaceholderText={
-                          <Text>{languageData[27]?.Name}</Text>
-                        }
-                        searchPlaceholderText={languageData[29]?.Name}
-                        requireSelection={false}
-                        autoSort={true}
-                        onSelected={(item) => setArea(item)}
-                      />
-                    ) : null}
-                  </View>
-                </TouchableWithoutFeedback>
-              ) : null}
-
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Text style={{ color: "red" }}> *</Text>
-                    <Text> {languageData[15]?.Name}</Text>
-                  </View>
-                  {inspectionList ? (
-                    <PickerModal
-                      style={{ width: "100%", backgroundColor: "black" }}
-                      Autocomplete={false}
-                      items={inspectionList}
-                      sortingLanguage={"tr"}
-                      showToTopButton={true}
-                      showAlphabeticalIndex={true}
-                      autoGenerateAlphabeticalIndex={true}
-                      selectPlaceholderText={
-                        <Text>
-                          <Text style={{ color: "red" }}> *</Text>
-                          {languageData[27]?.Name}
-                        </Text>
-                      }
-                      searchPlaceholderText={languageData[29]?.Name}
-                      requireSelection={false}
-                      autoSort={true}
-                      onSelected={(item) => setInspectionType(item)}
-                    />
-                  ) : null}
-                </View>
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Text style={{ color: "red" }}> *</Text>
-                    <Text> {languageData[16]?.Name}</Text>
-                  </View>
-                  {accidentList ? (
-                    <PickerModal
-                      style={{ width: "100%", backgroundColor: "black" }}
-                      Autocomplete={false}
-                      items={accidentList}
-                      sortingLanguage={"tr"}
-                      showToTopButton={true}
-                      showAlphabeticalIndex={true}
-                      autoGenerateAlphabeticalIndex={true}
-                      selectPlaceholderText={
-                        <Text>
-                          <Text style={{ color: "red" }}> *</Text>
-                          <Text> {languageData[27]?.Name}</Text>
-                        </Text>
-                      }
-                      searchPlaceholderText={languageData[29]?.Name}
-                      requireSelection={false}
-                      autoSort={true}
-                      onSelected={(item) => setAccidentValue(item)}
-                    />
-                  ) : null}
-                </View>
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Text style={{ color: "red" }}> *</Text>
-                    <Text> {languageData[17]?.Name}</Text>
-                  </View>
-
-                  <PickerModal
-                    style={{ width: "100%", backgroundColor: "black" }}
-                    Autocomplete={false}
-                    items={riskLevel}
-                    sortingLanguage={"tr"}
-                    showToTopButton={true}
-                    showAlphabeticalIndex={true}
-                    autoGenerateAlphabeticalIndex={true}
-                    selectPlaceholderText={
-                      <Text>
-                        <Text style={{ color: "red" }}> *</Text>
-                        <Text> {languageData[27]?.Name}</Text>
-                      </Text>
-                    }
-                    searchPlaceholderText={languageData[29]?.Name}
-                    requireSelection={false}
-                    autoSort={true}
-                    onSelected={(item) => setDefectValue(item)}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-
-              <View style={{ height: 60 }}>
-                <Text>{languageData[19]?.Name}</Text>
-                <RadioGroup
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    flexWrap: "wrap",
-                  }}
-                  selectedIndex={action}
-                  onChange={(index) => setAction(index)}
-                >
-                  <Radio>{languageData[20]?.Name}</Radio>
-                  <Radio>{languageData[21]?.Name}</Radio>
-                  <Radio>{languageData[44]?.Name}</Radio>
-                </RadioGroup>
-              </View>
-              <KeyboardAvoidingView
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  marginTop: Platform.OS === "ios" ? 20 : 0,
-                }}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-              >
-                <TextInput
-                  theme={DefaultTheme}
-                  onChangeText={(text) => setContent(text)}
-                  value={content}
-                  label={
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      {languageData[22]?.Name}
-                    </Text>
-                  }
-                  returnKeyType="next"
-                  autoCapitalize="none"
-                />
-              </KeyboardAvoidingView>
-              <TextInput
-                theme={DefaultTheme}
-                onChangeText={(text) => setOpinionImprovement(text)}
-                value={opinionImprovement}
-                returnKeyType="next"
-                label={
-                  <Text>
-                    {action === 1 ? (
-                      <Text style={{ color: "red" }}> *</Text>
-                    ) : null}
-                    <Text> {languageData[23]?.Name}</Text>
-                  </Text>
-                }
-                autoCapitalize="none"
+  <Provider>
+    <View style={styles.screen}>
+      {isActive ? (
+        <View style={styles.cameraContainer}>
+          {cameraPermissionGranted && device ? (
+            <>
+              <Camera
+                style={StyleSheet.absoluteFill}
+                codeScanner={codeScannner}
+                device={device}
+                isActive={isActive}
               />
 
-              {filePath?.uri || filePath2?.uri ? (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                    flexDirection: "row",
-                  }}
-                >
-                  <View style={{ width: action === 0 ? "100%" : "50%" }}>
+              <View
+                pointerEvents="none"
+                style={styles.cameraMessage}
+              >
+                <Text style={styles.cameraTitle}>QR kodu okutun</Text>
+                <Text style={styles.cameraDescription}>
+                  Kamerayı ilgili alanın QR koduna doğrultun.
+                </Text>
+              </View>
+            </>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>
+                {cameraPermissionGranted
+                  ? "Kamera kullanılamıyor"
+                  : "Kamera izni gerekli"}
+              </Text>
+
+              <Text style={styles.emptyDescription}>
+                {cameraPermissionGranted
+                  ? "Kamera bağlantısını kontrol edip tekrar deneyin."
+                  : "QR kodu okutmak için uygulamaya kamera izni verin."}
+              </Text>
+            </View>
+          )}
+        </View>
+      ) : qrCodeValue?.length > 0 ? (
+        <KeyboardAvoidingView
+          style={styles.keyboardContainer}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <View style={styles.headerAccent} />
+                <Text style={styles.pageTitle}>Risk Değerlendirmesi</Text>
+                <Text style={styles.pageDescription}>
+                  Gözleminizi ve risk düzeyini aşağıdaki alanlardan belirtin.
+                </Text>
+              </View>
+
+              <View style={styles.section}>
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>
+                    {languageData[12]?.Name}
+                  </Text>
+                  <Text style={styles.infoValue}>{name || "—"}</Text>
+                </View>
+
+                <View style={styles.infoDivider} />
+
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>
+                    {languageData[13]?.Name}
+                  </Text>
+                  <Text style={styles.infoValue}>{qrValue || "—"}</Text>
+                </View>
+              </View>
+
+              {renderRiskSection(
+                "Olasılık",
+                "Gerçekleşme ihtimalini seçin.",
+                [
+                  "Kesin",
+                  "Yüksek",
+                  "Olası",
+                  "Mümkün",
+                  "Beklenmez fakat mümkün",
+                  "Beklenmez",
+                ],
+                probability,
+                setProbability,
+              )}
+
+              {renderRiskSection(
+                "Şiddet",
+                "Olası sonucun etkisini seçin.",
+                [
+                  "Çok Ölümlü Kaza",
+                  "Öldürücü Kaza",
+                  "Kalıcı Hasar",
+                  "Önemli Hasar",
+                  "Küçük hasar",
+                  "Ucuz atlatma",
+                ],
+                severity,
+                setSeverity,
+              )}
+
+              {renderRiskSection(
+                "Frekans",
+                "Maruz kalma sıklığını seçin.",
+                [
+                  "Hemen Hemen",
+                  "Sık sık",
+                  "Arasıra",
+                  "Sık Değil",
+                  "Seyrek",
+                  "Çok Seyrek",
+                ],
+                frequency,
+                setFrequency,
+              )}
+
+              <View style={styles.section}>
+                <View style={styles.relatedWorkRow}>
+                  <Text style={styles.relatedWorkText}>
+                    İşi ben mi yapacağım?
+                  </Text>
+
+                  {Platform.OS === "android" ? (
+                    <Checkbox
+                      status={isRelatedWorkMe ? "checked" : "unchecked"}
+                      color="#0B337C"
+                      onPress={() =>
+                        setIsRelatedWorkMe((previous) => !previous)
+                      }
+                    />
+                  ) : (
+                    <Switch
+                      value={isRelatedWorkMe}
+                      trackColor={{
+                        true: "#0B337C",
+                        false: "#CBD5E1",
+                      }}
+                      onValueChange={setIsRelatedWorkMe}
+                    />
+                  )}
+                </View>
+
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>
+                    {languageData[22]?.Name}
+                    <Text style={styles.required}> *</Text>
+                  </Text>
+
+                  <TextInput
+                    theme={DefaultTheme}
+                    value={content}
+                    onChangeText={setContent}
+                    multiline
+                    autoCapitalize="sentences"
+                    style={styles.textArea}
+                  />
+                </View>
+
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>
+                    {languageData[23]?.Name}
+                  </Text>
+
+                  <TextInput
+                    theme={DefaultTheme}
+                    value={opinionImprovement}
+                    onChangeText={setOpinionImprovement}
+                    multiline
+                    autoCapitalize="sentences"
+                    style={styles.textArea}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>
+                  {languageData[25]?.Name}
+                </Text>
+
+                {!!filePath?.uri && (
+                  <View style={styles.photoContainer}>
                     <Animated.Image
                       source={{ uri: filePath.uri }}
-                      style={{ height: 150, resizeMode: "stretch" }}
+                      resizeMode="contain"
+                      style={styles.photo}
                     />
                   </View>
-                  {action === 1 ? (
-                    <View style={{ width: "50%", marginHorizontal: 5 }}>
-                      <Animated.Image
-                        source={{ uri: filePath2.uri }}
-                        style={{ height: 150, resizeMode: "stretch" }}
-                      />
-                    </View>
-                  ) : null}
-                </View>
-              ) : null}
-              <View
-                style={{
-                  flex: 1,
-                  width: "100%",
-                  justifyContent: "space-around",
-                  alignItems: "flex-start",
-                  maxHeight: 100,
-                  flexDirection: "row",
-                  marginVertical: 5,
-                }}
-              >
-                <Icon.Button
-                  name="image"
-                  backgroundColor={"#69b5fa"}
-                  onPress={() => setVisible(true)}
-                >
-                  <Text style={styles.textStyle}>{languageData[25]?.Name}</Text>
-                </Icon.Button>
-                {action === 1 ? (
-                  <Icon.Button
-                    name="image"
-                    backgroundColor={"#69b5fa"}
-                    onPress={() => setVisible2(true)}
-                  >
-                    <Text style={styles.textStyle}>
-                      {languageData[26]?.Name}
-                    </Text>
-                  </Icon.Button>
-                ) : null}
-
-                <Portal>
-                  <Dialog visible={visible} onDismiss={hideDialog}>
-                    <Dialog.Content>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => chooseFile("photo")}
-                      >
-                        <Icon name={"image"} />
-                        {languageData[33]?.Name}
-                      </Button>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => captureImage("photo")}
-                      >
-                        <Icon name={"camera"} />
-                        {languageData[32]?.Name}
-                      </Button>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                      <Button onPress={hideDialog}>
-                        {languageData[31]?.Name}
-                      </Button>
-                    </Dialog.Actions>
-                  </Dialog>
-                </Portal>
-                <Portal>
-                  <Dialog visible={visible2} onDismiss={hideDialog2}>
-                    <Dialog.Content>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => chooseFile2("photo")}
-                      >
-                        <Icon name={"image"} />
-                        {languageData[33]?.Name}
-                      </Button>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => captureImage2("photo")}
-                      >
-                        <Icon name={"camera"} />
-                        {languageData[32]?.Name}
-                      </Button>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                      <Button onPress={hideDialog2}>
-                        {languageData[31]?.Name}
-                      </Button>
-                    </Dialog.Actions>
-                  </Dialog>
-                </Portal>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  marginVertical: 10,
-                }}
-              >
-                {loading ? (
-                  <ActivityIndicator
-                    animating={true}
-                    color={theme.colors.primary}
-                  />
-                ) : (
-                  <Button
-                    style={styles.button}
-                    disabled={loading}
-                    onPress={addForm}
-                    mode="contained"
-                  >
-                    {languageData[24]?.Name}
-                  </Button>
                 )}
+
+                <Button
+                  mode="outlined"
+                  textColor="#0B337C"
+                  style={styles.photoButton}
+                  contentStyle={styles.buttonContent}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setVisible(true);
+                  }}
+                >
+                  {languageData[25]?.Name}
+                </Button>
               </View>
+
+              <Button
+                mode="contained"
+                buttonColor="#0B337C"
+                textColor="#FFFFFF"
+                style={styles.submitButton}
+                contentStyle={styles.buttonContent}
+                labelStyle={styles.submitLabel}
+                loading={loading}
+                disabled={loading}
+                onPress={addForm}
+              >
+                {languageData[24]?.Name}
+              </Button>
             </View>
-          </View>
-        </Provider>
-      </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      ) : (
+        <View style={styles.emptyState}>
+          <View style={styles.emptyAccent} />
+
+          <Text style={styles.emptyTitle}>
+            QR bilgisi bulunamadı
+          </Text>
+
+          <Text style={styles.emptyDescription}>
+            İlgili alanın QR kodunu yeniden okutun.
+          </Text>
+
+          <Button
+            mode="contained"
+            buttonColor="#0B337C"
+            textColor="#FFFFFF"
+            style={styles.retryButton}
+            contentStyle={styles.buttonContent}
+            onPress={() => {
+              setQrCodeValue([]);
+              setIsActive(true);
+            }}
+          >
+            Tekrar Okut
+          </Button>
+        </View>
+      )}
+
+      <Portal>
+        <Dialog
+          visible={visible}
+          onDismiss={hideDialog}
+          style={styles.dialog}
+        >
+          <Dialog.Title style={styles.dialogTitle}>
+            {languageData[25]?.Name}
+          </Dialog.Title>
+
+          <Dialog.Content>
+            <Button
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.dialogOption}
+              contentStyle={styles.buttonContent}
+              onPress={() => {
+                hideDialog();
+                chooseFile("photo");
+              }}
+            >
+              {languageData[33]?.Name}
+            </Button>
+
+            <Button
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.dialogOption}
+              contentStyle={styles.buttonContent}
+              onPress={() => {
+                hideDialog();
+                captureImage("photo");
+              }}
+            >
+              {languageData[32]?.Name}
+            </Button>
+          </Dialog.Content>
+
+          <Dialog.Actions>
+            <Button textColor="#64748B" onPress={hideDialog}>
+              {languageData[31]?.Name}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
-  );
-};
+  </Provider>
+);
+}
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: "#e3e7e8",
-    width: "100%",
-    alignItems: "flex-start",
-    marginBottom: 40,
-
-    justifyContent: "flex-start",
-
-    paddingTop: Platform.OS === "android" ? 0 : 0,
+    backgroundColor: "#F3F6FC",
   },
-  select: {
-    margin: 5,
-    height: 60,
-    width: width - 10,
+
+  keyboardContainer: {
+    flex: 1,
   },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: 22,
+    paddingBottom: 40,
+  },
+
   form: {
-    backgroundColor: "white",
-    width: width,
-    padding: 10,
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+  },
 
+  header: {
+    paddingHorizontal: 4,
+    marginBottom: 24,
+  },
+
+  headerAccent: {
+    width: 32,
+    height: 4,
     borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 16,
   },
-  buttonStyle: {
-    alignItems: "center",
-    backgroundColor: "#69b5fa",
-    borderRadius: 10,
-    padding: 5,
-    color: "white",
-    marginVertical: 10,
+
+  pageTitle: {
+    color: "#172B4D",
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 33,
+    marginBottom: 8,
   },
-  textStyle: {
-    padding: 10,
-    color: "white",
-    textAlign: "center",
+
+  pageDescription: {
+    color: "#64748B",
+    fontSize: 14,
+    lineHeight: 22,
   },
-  button: {
-    alignItems: "center",
-    backgroundColor: theme.colors.primary,
-    borderRadius: 10,
-    width: "60%",
-    padding: 5,
-    color: "white",
+
+  section: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
+    marginBottom: 16,
   },
-  buttonText: {
-    textAlign: "center",
+
+  sectionTitle: {
+    color: "#172B4D",
+    fontSize: 17,
+    fontWeight: "700",
+    lineHeight: 25,
+  },
+
+  sectionDescription: {
+    color: "#73829B",
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 4,
+    marginBottom: 14,
+  },
+
+  required: {
+    color: "#DC2626",
+  },
+
+  infoRow: {
+    paddingVertical: 3,
+  },
+
+  infoLabel: {
+    color: "#73829B",
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 5,
+  },
+
+  infoValue: {
+    color: "#172B4D",
     fontSize: 15,
-    color: "#fff",
+    fontWeight: "600",
+    lineHeight: 23,
+  },
+
+  infoDivider: {
+    height: 1,
+    backgroundColor: "#EDF1F7",
+    marginVertical: 14,
+  },
+
+  radioOption: {
+    minHeight: 48,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginVertical: 4,
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#E8EDF5",
+    borderRadius: 10,
+  },
+
+  radioOptionSelected: {
+    backgroundColor: "#EAF0FA",
+    borderColor: "#0B337C",
+  },
+
+  radioText: {
+    flexShrink: 1,
+    color: "#475569",
+    fontSize: 14,
+    lineHeight: 22,
+    marginLeft: 10,
+  },
+
+  radioTextSelected: {
+    color: "#0B337C",
+    fontWeight: "600",
+  },
+
+  relatedWorkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingBottom: 16,
+    marginBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDF1F7",
+  },
+
+  relatedWorkText: {
+    flex: 1,
+    color: "#172B4D",
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 22,
+    marginRight: 12,
+  },
+
+  field: {
+    marginTop: 16,
+  },
+
+  fieldLabel: {
+    color: "#475569",
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+
+  textArea: {
+    minHeight: 100,
+    backgroundColor: "#F8FAFD",
+    textAlignVertical: "top",
+  },
+
+  photoContainer: {
+    marginTop: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#F0F4FA",
+  },
+
+  photo: {
+    width: "100%",
+    height: 220,
+  },
+
+  photoButton: {
+    borderRadius: 12,
+    borderColor: "#CBD8EE",
+    marginTop: 16,
+  },
+
+  buttonContent: {
+    minHeight: 52,
+    paddingVertical: 4,
+  },
+
+  submitButton: {
+    borderRadius: 12,
+    marginTop: 4,
+  },
+
+  submitLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0,
+  },
+
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: "#F3F6FC",
+  },
+
+  cameraMessage: {
+    position: "absolute",
+    left: 24,
+    right: 24,
+    bottom: 48,
+    padding: 20,
+    borderRadius: 16,
+    backgroundColor: "rgba(11, 51, 124, 0.92)",
+  },
+
+  cameraTitle: {
+    color: "#FFFFFF",
+    fontSize: 19,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+
+  cameraDescription: {
+    color: "#D4E2F8",
+    fontSize: 14,
+    lineHeight: 22,
+    textAlign: "center",
+  },
+
+  emptyState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    paddingVertical: 24,
+  },
+
+  emptyAccent: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 22,
+  },
+
+  emptyTitle: {
+    color: "#172B4D",
+    fontSize: 21,
+    lineHeight: 29,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+
+  emptyDescription: {
+    color: "#64748B",
+    fontSize: 14,
+    lineHeight: 23,
+    textAlign: "center",
+  },
+
+  retryButton: {
+    borderRadius: 12,
+    marginTop: 24,
+    minWidth: 180,
+  },
+
+  dialog: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+  },
+
+  dialogTitle: {
+    color: "#172B4D",
+    fontSize: 19,
+    fontWeight: "700",
+  },
+
+  dialogOption: {
+    borderRadius: 10,
+    borderColor: "#DCE5F3",
+    marginTop: 12,
   },
 });
 export default SafetyControl;

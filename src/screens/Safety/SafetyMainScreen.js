@@ -2,9 +2,10 @@ import React, { memo, useEffect, useMemo, useState } from "react";
 import {
   StyleSheet,
   View,
-  ImageBackground,
+  ScrollView,
   Dimensions,
   Text,
+  Image
 } from "react-native";
 import Toast from "../../components/Toast";
 import Background_Green from "../../components/Background";
@@ -149,146 +150,331 @@ const SafetyMainScreen = ({ route: { params }, navigation }) => {
   }, [checked]);
 
   return (
-    <Background_Green>
-      <Provider>
-        <View style={styles.container}>
-          <Card style={[styles.cardStyle, { backgroundColor: "white" }]}>
-            <Card.Content>
-              <Text variant="titleLarge" style={{ color: "#000" }}>
-                {" "}
-                {t("safetyMainScreen.message1")}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: "#000" }}>
-                {" "}
-                {t("safetyMainScreen.message2")}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: "#000" }}>
-                {" "}
-                {t("safetyMainScreen.ranking")}: {seqId + 1} / {liste.length} |{" "}
-                {t("safetyMainScreen.monthlyPoint")}: {isTotalPoint}
-              </Text>
-              <Text variant="bodyMedium" style={{ color: "#000" }}>
-                {" "}
-                {t("safetyMainScreen.totalPoint")}: {isTotalPoint2}
-              </Text>
-            </Card.Content>
-          </Card>
+  <Provider>
+    <View style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerAccent} />
 
-          <View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginBottom: 10,
-                marginHorizontal: 5,
-                flexWrap: "wrap",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                textColor="#fff"
-                style={styles.buttonRight}
-                mode="outlined"
-                onPress={() =>
-                  checked || checkedFatih
-                    ? null
-                    : navigation.replace("SafetyDetailScreen")
-                }
-              >
-                {checked || checkedFatih
-                  ? t("safetyMainScreen.completed")
-                  : t("safetyMainScreen.answerQuestion")}
-              </Button>
+          <Text style={styles.title}>
+            {t("safetyMainScreen.message1")}
+          </Text>
 
-              <Button
-                textColor="#fff"
-                mode="outlined"
-                style={styles.buttonRight}
-                onPress={() => navigation.navigate("SafetyRules")}
-              >
-                {t("safetyMainScreen.safetyRules")}
-              </Button>
+          <Text style={styles.subtitle}>
+            {t("safetyMainScreen.message2")}
+          </Text>
+        </View>
 
-              <Button
-                textColor="#fff"
-                style={styles.buttonRight}
-                mode="outlined"
-                onPress={() => navigation.navigate("SafetyControl")}
-              >
-                {languageData.length > 0
-                  ? languageData[43]?.Name
-                  : t("safetyMainScreen.safetyInspection")}
-              </Button>
+        <View style={styles.content}>
+          <View style={styles.statsCard}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>
+                {liste.length > 0 && seqId >= 0 ? seqId + 1 : "—"}
+                <Text style={styles.statTotal}> / {liste.length}</Text>
+              </Text>
+
+              <Text style={styles.statLabel}>
+                {t("safetyMainScreen.ranking")}
+              </Text>
             </View>
 
-            <ImageBackground
-              resizeMode="contain"
-              source={require("../../assets/safety1st.png")}
-              style={styles.backgroundImage}
-            />
+            <View style={styles.statDivider} />
 
-            <Toast
-              type={toast.type}
-              message={toast.value}
-              onDismiss={() => setToast({ value: "", type: "" })}
-            />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>
+                {isTotalPoint ?? 0}
+              </Text>
+
+              <Text style={styles.statLabel}>
+                {t("safetyMainScreen.monthlyPoint")}
+              </Text>
+            </View>
+
+            <View style={styles.statDivider} />
+
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>
+                {isTotalPoint2 ?? 0}
+              </Text>
+
+              <Text style={styles.statLabel}>
+                {t("safetyMainScreen.totalPoint")}
+              </Text>
+            </View>
           </View>
 
-          <Portal>
-            {isOpen && (
-              <Dialog
-                style={dialogContent?.DialogStyle}
-                visible={isOpen}
-                onDismiss={hideDialog}
-              >
-                <Dialog.Content>
-                  <Text style={dialogContent?.TextStyle}>
-                    {dialogContent?.Text}
-                  </Text>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button
-                    style={dialogContent?.ButtonStyle}
-                    color={dialogContent?.ButtonColor}
-                    onPress={hideDialog}
-                  >
-                    {t("general.close")}
-                  </Button>
-                </Dialog.Actions>
-              </Dialog>
-            )}
-          </Portal>
+          <View style={styles.actionsCard}>
+            <Button
+              mode="contained"
+              buttonColor={
+                checked || checkedFatih ? "#E8F5ED" : "#0B337C"
+              }
+              textColor={
+                checked || checkedFatih ? "#237247" : "#FFFFFF"
+              }
+              accessibilityState={{
+                disabled: !!(checked || checkedFatih),
+              }}
+              style={styles.primaryButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              onPress={() => {
+                if (!checked && !checkedFatih) {
+                  navigation.replace("SafetyDetailScreen");
+                }
+              }}
+            >
+              {checked || checkedFatih
+                ? t("safetyMainScreen.completed")
+                : t("safetyMainScreen.answerQuestion")}
+            </Button>
+
+            <View style={styles.actionDivider} />
+
+            <Button
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.secondaryButton}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              onPress={() => navigation.navigate("SafetyRules")}
+            >
+              {t("safetyMainScreen.safetyRules")}
+            </Button>
+
+            <Button
+              mode="outlined"
+              textColor="#0B337C"
+              style={[styles.secondaryButton, styles.lastButton]}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+              onPress={() => navigation.navigate("SafetyControl")}
+            >
+              {languageData?.[43]?.Name ||
+                t("safetyMainScreen.safetyInspection")}
+            </Button>
+          </View>
+
+          <View style={styles.imageCard}>
+            <Image
+              source={require("../../assets/safety1st.png")}
+              resizeMode="contain"
+              style={styles.safetyImage}
+              accessible={false}
+            />
+          </View>
         </View>
-      </Provider>
-    </Background_Green>
-  );
-};
+      </ScrollView>
+
+      <Toast
+        type={toast.type}
+        message={toast.value}
+        onDismiss={() => setToast({ value: "", type: "" })}
+      />
+
+      <Portal>
+        {isOpen && (
+          <Dialog
+            style={[styles.dialog, dialogContent?.DialogStyle]}
+            visible={isOpen}
+            onDismiss={hideDialog}
+          >
+            <Dialog.Content>
+              <Text
+                style={[styles.dialogText, dialogContent?.TextStyle]}
+              >
+                {dialogContent?.Text}
+              </Text>
+            </Dialog.Content>
+
+            <Dialog.Actions>
+              <Button
+                style={dialogContent?.ButtonStyle}
+                textColor={dialogContent?.ButtonColor || "#0B337C"}
+                onPress={hideDialog}
+              >
+                {t("general.close")}
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        )}
+      </Portal>
+    </View>
+  </Provider>
+);
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
+    backgroundColor: "#F3F6FC",
   },
-  backgroundImage: {
-    flex: 1,
-    height: 300,
-    width: undefined,
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 28,
   },
-  buttonRight: {
-    textAlign: "center",
-    justifyContent: "center",
-    backgroundColor: "#5435e8",
-    borderRadius: 10,
-    fontSize: 3,
-    height: 55,
+
+  header: {
+    backgroundColor: "#0B337C",
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 54,
+  },
+
+  headerAccent: {
+    width: 34,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#93C5FD",
+    marginBottom: 18,
+  },
+
+  title: {
+    color: "#FFFFFF",
+    fontSize: 25,
+    fontWeight: "700",
+    lineHeight: 34,
+    marginBottom: 10,
+  },
+
+  subtitle: {
+    color: "#D4E2F8",
+    fontSize: 14,
+    lineHeight: 23,
+  },
+
+  content: {
+    width: "100%",
+    maxWidth: 600,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+    marginTop: -26,
+  },
+
+  statsCard: {
     flexDirection: "row",
-    alignItems: "center",
-    margin: 10,
+    alignItems: "stretch",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    paddingVertical: 22,
+    paddingHorizontal: 8,
+    marginBottom: 18,
+    shadowColor: "#0B337C",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  cardStyle: {
-    backgroundColor: "red",
-    marginTop: 10,
-    width: width - 30,
+
+  statItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+
+  statValue: {
+    color: "#0B337C",
+    fontSize: 22,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: 7,
+  },
+
+  statTotal: {
+    color: "#8492A8",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+
+  statLabel: {
+    color: "#64748B",
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: "center",
+    fontWeight: "500",
+  },
+
+  statDivider: {
+    width: 1,
+    backgroundColor: "#E8EDF5",
+    marginVertical: 4,
+  },
+
+  actionsCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E8EDF5",
+    padding: 18,
+    marginBottom: 18,
+  },
+
+  primaryButton: {
+    borderRadius: 12,
+  },
+
+  buttonContent: {
+    minHeight: 54,
+    paddingVertical: 5,
+  },
+
+  buttonLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    letterSpacing: 0,
+    marginHorizontal: 10,
+  },
+
+  actionDivider: {
+    height: 1,
+    backgroundColor: "#EDF1F7",
+    marginVertical: 18,
+  },
+
+  secondaryButton: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    backgroundColor: "#F8FAFE",
+    marginBottom: 12,
+  },
+
+  lastButton: {
+    marginBottom: 0,
+  },
+
+  imageCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E8EDF5",
+    padding: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  safetyImage: {
+    width: "100%",
+    height: 180,
+  },
+
+  dialog: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+  },
+
+  dialogText: {
+    color: "#334155",
+    fontSize: 15,
+    lineHeight: 24,
   },
 });
 

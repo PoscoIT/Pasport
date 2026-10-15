@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, Dimensions } from "react-native";
+import { View, StyleSheet, Text, ScrollView,TouchableOpacity } from "react-native";
 
 import { useState } from "react";
 
@@ -18,68 +18,105 @@ const CareSystemMainScreen = () => {
 
   const navigation = useNavigation();
 
-  return (
-<View style={styles.container}>
-  <View style={styles.card}>
-    <Button
-      appearance="outline"
-      style={styles.button}
-      onPress={() => navigation.navigate("CareSystemPeriodicControl")}
+return (
+  <View style={styles.container}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
     >
-      <Icon name="briefcase" size={16}  />
-      <Text style={styles.buttonText} style={{paddingLeft:30}}>
-     
-   {t("careSystem.periodicControl")}
-      </Text>
-    </Button>
+      <View style={styles.content}>
+        <TouchableOpacity
+          style={styles.actionCard}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          onPress={() => navigation.navigate("CareSystemPeriodicControl")}
+        >
+          <View style={styles.iconContainer}>
+            <Icon name="briefcase" size={22} color="#0B337C" />
+          </View>
 
-    <Button
-      appearance="outline"
-      status="danger"
-      style={styles.button}
-      onPress={() => navigation.navigate("CareSystemChecklistRoute")}
-    >
-      <Icon name="location-arrow" size={16} style={{paddingLeft:10}} />
-      <Text style={styles.buttonText}>
-   {t("careSystem.createRoute")}
-      </Text>
-    </Button>
+          <Text style={styles.actionTitle}>
+            {t("careSystem.periodicControl")}
+          </Text>
+
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionCard}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          onPress={() => navigation.navigate("CareSystemChecklistRoute")}
+        >
+          <View style={styles.iconContainer}>
+            <Icon name="location-arrow" size={23} color="#0B337C" />
+          </View>
+
+          <Text style={styles.actionTitle}>
+            {t("careSystem.createRoute")}
+          </Text>
+
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   </View>
-</View>
-  );
+);
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#F3F6FC",
   },
 
-  card: {
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 24,
+    paddingBottom: 36,
+  },
+
+  content: {
     width: "100%",
-    backgroundColor: "white",
+    maxWidth: 600,
+    alignSelf: "center",
+    paddingHorizontal: 20,
+  },
+
+  actionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 100,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
     borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-
-    elevation: 4,
+    paddingHorizontal: 18,
+    paddingVertical: 22,
+    marginBottom: 16,
   },
 
-  button: {
-    marginVertical: 10,
-    borderRadius: 10,
- 
-    marginHorizontal:15
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: "#EAF0FA",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
   },
 
-  buttonText: {
+  actionTitle: {
+    flex: 1,
+    color: "#172B4D",
     fontSize: 16,
     fontWeight: "600",
+    lineHeight: 24,
+  },
+
+  chevron: {
+    color: "#94A3B8",
+    fontSize: 28,
+    marginLeft: 12,
   },
 });
 

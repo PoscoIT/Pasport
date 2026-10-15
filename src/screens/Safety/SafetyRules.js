@@ -68,155 +68,276 @@ const SafetyRules = ({ navigation }) => {
     getAccidentDate();
   }, []);
 
-  const renderButton = (image, appHead, labelText) => (
-    <View style={styles.containerInside3}>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("SafetyRuleDetail", { appHead, appDate: today })
-        }
-      >
-        <Image style={styles.images} source={image} />
-      </TouchableOpacity>
-      <View style={{ flexDirection: "row" }}>
-        <Text style={styles.mehmetFatih}>{labelText}</Text>
+ const renderButton = (image, appHead, labelText) => (
+  <View style={styles.categoryWrapper}>
+    <TouchableOpacity
+      style={styles.categoryCard}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={labelText}
+      onPress={() =>
+        navigation.navigate("SafetyRuleDetail", {
+          appHead,
+          appDate: today,
+        })
+      }
+    >
+      <View style={styles.imageContainer}>
+        <Image style={styles.categoryImage} source={image} />
       </View>
+
+      <Text style={styles.categoryLabel}>{labelText}</Text>
+    </TouchableOpacity>
+  </View>
+);
+
+const accidentDate = isUserPoscoAssanUser
+  ? poscoAssanAccidentDate
+  : poscoTnpcAccidentDate;
+
+const formattedAccidentDate = accidentDate
+  ? accidentDate.split("-").reverse().join(".")
+  : "—";
+
+return (
+  <View style={styles.screen}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <View style={styles.container}>
+       <View style={styles.summaryCard}>
+  <View style={styles.dateRow}>
+    <Text style={styles.dateLabel}>
+      {t("general.today")}
+    </Text>
+    <Text style={styles.dateValue}>{date}</Text>
+  </View>
+
+  <View style={styles.dateRow}>
+    <Text style={styles.dateLabel}>
+      {t("general.lastAccidentDate")}
+    </Text>
+    <Text style={styles.dateValue}>
+      {formattedAccidentDate}
+    </Text>
+  </View>
+
+  <View style={styles.counterPanel}>
+    <View style={styles.counterAccent} />
+
+    <View style={styles.counterContent}>
+      <Text style={styles.counterLabel}>
+        {t("general.passingTime")}
+      </Text>
+
+      <Text style={styles.counterValue}>
+        {lastInDate ?? "—"}
+      </Text>
     </View>
-  );
+  </View>
+</View>
 
-  return (
-    <Background_Green>
-      <ScrollView>
-        <View style={styles.container}>
-          <Card style={[styles.cardStyle, { backgroundColor: "BLUE" }]}>
-            <Card.Content>
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ width: width / 2 }}>
-                  <Text style={styles.paragraphTitle}>
-                    {t("general.today")}:
-                  </Text>
-                  <Text style={styles.paragraphTitle}>
-                    {t("general.lastAccidentDate")}:
-                  </Text>
-                  <Text style={styles.paragraphTitle}>
-                    {t("general.passingTime")}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    width: width / 2 - 40,
-                    alignItems: "flex-end",
-                    alignContent: "flex-end",
-                    left: 0,
-                  }}
-                >
-                  <Text style={styles.paragraphTitle}>{date}</Text>
-                  <Text style={styles.paragraphTitle}>
-                    {isUserPoscoAssanUser
-                      ? poscoAssanAccidentDate.split("-").reverse().join(".")
-                      : poscoTnpcAccidentDate.split("-").reverse().join(".")}
-                  </Text>
-                  <View style={{ flexDirection: "row" }}>
-                    {lastInDate
-                      ?.toString()
-                      ?.split("")
-                      ?.map((item, index) => (
-                        <View style={{ width: width / 8 }} key={index}>
-                          <Text style={styles.paragCounter}>{item}</Text>
-                        </View>
-                      ))}
-                  </View>
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
-
-          <View style={styles.containerInside}>
-            <View style={styles.containerInside2}>
-              {renderButton(Image1, "1", "TBM")}
-              {renderButton(Image2, "2", t("safetyRules.workPermit"))}
-              {renderButton(Image3, "3", `10 ${t("safetyRules.safetyRules")}`)}
-            </View>
-            <View style={styles.containerInside2}>
-              {renderButton(Image5, "4", t("safetyRules.fireStudies"))}
-              {renderButton(Image6, "5", t("safetyRules.height"))}
-              {renderButton(Image7, "6", t("safetyRules.indoorStudies"))}
-            </View>
-            <View style={styles.containerInside2}>
-              {renderButton(Image8, "7", t("safetyRules.heavyLifting"))}
-              {renderButton(Image4, "8", t("safetyRules.onePoint"))}
-              {renderButton(Image9, "9", t("safetyRules.safetyVideo"))}
-            </View>
-          </View>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionAccent} />
+          <Text style={styles.sectionTitle}>
+            {t("safetyRules.safetyRules")}
+          </Text>
         </View>
-      </ScrollView>
-    </Background_Green>
-  );
-};
 
+        <View style={styles.categoryGrid}>
+          {renderButton(Image1, "1", "TBM")}
+          {renderButton(Image2, "2", t("safetyRules.workPermit"))}
+          {renderButton(
+            Image3,
+            "3",
+            `10 ${t("safetyRules.safetyRules")}`,
+          )}
+          {renderButton(Image5, "4", t("safetyRules.fireStudies"))}
+          {renderButton(Image6, "5", t("safetyRules.height"))}
+          {renderButton(Image7, "6", t("safetyRules.indoorStudies"))}
+          {renderButton(Image8, "7", t("safetyRules.heavyLifting"))}
+          {renderButton(Image4, "8", t("safetyRules.onePoint"))}
+          {renderButton(Image9, "9", t("safetyRules.safetyVideo"))}
+        </View>
+      </View>
+    </ScrollView>
+  </View>
+);
+}
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F3F6FC",
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: 20,
+  },
+
   container: {
+    width: "100%",
+    maxWidth: 600,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+  },
+
+  summaryCard: {
+  backgroundColor: "#FFFFFF",
+  borderRadius: 16,
+  borderWidth: 1,
+  borderColor: "#E3EAF4",
+  padding: 20,
+  marginBottom: 24,
+},
+
+dateRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 12,
+},
+
+dateLabel: {
+  flex: 1,
+  color: "#64748B",
+  fontSize: 13,
+  lineHeight: 20,
+  paddingRight: 12,
+},
+
+dateValue: {
+  flex: 1,
+  color: "#172B4D",
+  fontSize: 14,
+  lineHeight: 21,
+  fontWeight: "600",
+  textAlign: "right",
+},
+
+counterPanel: {
+  flexDirection: "row",
+  alignItems: "stretch",
+  backgroundColor: "#F0F4FB",
+  borderRadius: 12,
+  marginTop: 8,
+  overflow: "hidden",
+},
+
+counterAccent: {
+  width: 4,
+  backgroundColor: "#0B337C",
+},
+
+counterContent: {
+  flex: 1,
+  paddingHorizontal: 18,
+  paddingVertical: 16,
+},
+
+counterLabel: {
+  color: "#526581",
+  fontSize: 13,
+  lineHeight: 20,
+  marginBottom: 4,
+},
+
+counterValue: {
+  color: "#0B337C",
+  fontSize: 38,
+  fontWeight: "800",
+  fontVariant: ["tabular-nums"],
+},
+  counterDigit: {
+    minWidth: 42,
+    minHeight: 54,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    marginHorizontal: 3,
+    marginBottom: 6,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  counterText: {
+    color: "#0B337C",
+    fontSize: 28,
+    fontWeight: "800",
+    fontVariant: ["tabular-nums"],
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+
+  sectionAccent: {
+    width: 4,
+    height: 22,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginRight: 10,
+  },
+
+  sectionTitle: {
+    flex: 1,
+    color: "#172B4D",
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 25,
+  },
+
+  categoryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginHorizontal: -5,
+  },
+
+  categoryWrapper: {
+    width: "33.333333%",
+    paddingHorizontal: 5,
+    marginBottom: 12,
+  },
+
+  categoryCard: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    paddingHorizontal: 7,
+    paddingTop: 16,
+    paddingBottom: 14,
+    minHeight: 152,
+  },
 
-    height: Platform.OS === "ios" ? height - 210 : height + 100,
-  },
-  containerInside: {
-    backgroundColor: "transparent",
-    width: width,
-    margin: 10,
-    alignItems: "center",
-  },
-  containerInside2: {
-    flexDirection: "row",
-  },
-  containerInside3: {
-    alignItems: "center",
-    margin: 10,
-  },
-  cardStyle: {
-    height: 130,
-    width: width,
-  },
-  paragraphTitle: {
-    color: "#333",
-    fontWeight: "600",
-    fontSize: width / 22,
-    padding: 5,
-  },
-  button: {
-    padding: 5,
-    marginBottom: 10,
-    shadowColor: "#303838",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.85,
-    height: 110,
-    width: 110,
-    elevation: 5,
-  },
-  images: {
-    height: 100,
+  imageContainer: {
+    width: "100%",
+    maxWidth: 76,
     aspectRatio: 1,
-    width: 100,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+
+  categoryImage: {
+    width: "100%",
+    height: "100%",
     resizeMode: "contain",
   },
-  mehmetFatih: {
-    flex: 1,
-    flexWrap: "wrap",
-    textAlign: "center",
-    color: "#333",
-    fontWeight: "bold",
-  },
-  paragCounter: {
-    color: "#333",
+
+  categoryLabel: {
+    color: "#334155",
+    fontSize: 12,
+    lineHeight: 18,
     fontWeight: "600",
-    borderStyle: "solid",
-    borderWidth: 2,
-    margin: 2,
-    backgroundColor: "#ee5",
-    padding: 5,
     textAlign: "center",
-    fontSize: width / 22,
   },
 });
 

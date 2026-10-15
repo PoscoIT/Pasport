@@ -35,7 +35,7 @@
       "defectDetails": "Kusur Detayı",
       "potantialMeasure": "Potansiyel Önlem",
       "create": "Oluştur",
-      "before": "Öncesi",
+
       "after": "Sonrası",
       "pleaseSelect": "Lütfen Seçiniz",
       "noAccident": "Kazasız",
@@ -124,7 +124,9 @@
     "bodyShowerChecklist": "Göz ve Boy Duşları Sistemi",
     "hr": "İK",
     "forgotPassword": "Şifremi Unuttum",
+    "forgotPasswordTitle": "Hesabınıza bağlı e-posta adresini girin. Şifrenizi yenilemeniz için size bir bağlantı gönderelim",
     "goBack": "Geriye Dön",
+    "forgotPasswordButton": "Sıfırlama bağlantısı gönder",
     "noDetails": "Detay Bulunamadı",
     "forgotPasswordMessage": "Şifre sıfırlama linki mail adresinize gönderilmiştir.",
     "unknownUser": "Kullanıcı Bulunamadı.",
@@ -199,7 +201,40 @@
       "addImage": "Görsel Ekle",
       "value": "Değer",
       "dailyChecklist": "Günlük Checklist",
-      "pleaseRoute": "Lütfen Checklist Rotası Oluşturunuz"
+      "pleaseRoute": "Lütfen Checklist Rotası Oluşturunuz",
+      "isDescriptionRequired": "Açıklama Gerekli mi?",
+      "addingImageNotMandatory": "GÖRSEL EKLEMEK ZORUNLU DEĞİLDİR"
+    },
+    "emergencyAreaChecklist": {
+      "entryTitle": "Giriş Kaydı",
+      "emergencyChecklistTitle": "Acil Durum Kaydı",
+      "endGathering": "Toplanmayı bitir",
+      "searchPerson": "Kişi ara",
+      "unRegisteredPerson": "Kaydı Olmayan Kişiler",
+      "completeChecklistPerson": "Checklist Dolduran Kişiler",
+      "here": "Burada",
+      "notHere": "Burada Değil",
+      "close": "Kapat",
+      "notRecord": "Kayıt bulunamadı",
+      "noPersonMatching": "Arama kriterinize uygun kişi bulunamadı"
+    },
+    "careSystemChecklistDetails": {
+      "controlDetail": "Kontrol Detayları",
+      "changeMeasurement": "Ölçüm sonuçlarının zaman içindeki değişimi",
+      "historicalRecord": "Geçmiş kontrol kayıtları ve yanıtları",
+      "measurementHistory": "Ölçüm Geçmişi",
+      "measurementValuetoControlDate": "Kontrol tarihine göre ölçüm değerleri",
+      "measurement": "Ölçüm",
+      "measurementValue": "Ölçüm değeri",
+      "record": "Kayıt",
+      "controlHistory": "Kontrol Geçmişi",
+      "controlPoint": "Kontrol Noktası",
+      "controlRecord": "Kontrol Kaydı",
+      "answer": "Yanıt",
+      "controlDate": "Kontrol Tarihi",
+      "description": "Açıklama",
+      "noRecord": "Bu kontrol için henüz görüntülenecek bir kayıt bulunmuyor",
+      "otherMetrics": "  Diğer ölçümleri görmek için grafiği yatay kaydırabilirsiniz"
     }
   }
 }

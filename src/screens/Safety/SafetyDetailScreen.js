@@ -276,154 +276,396 @@ const SafetyDetailScreen = ({ navigation }) => {
     };
   }, []);
 
-  if (liste.length > 0 && listeMulti.length > 0)
-    return (
-      <Background_Green style={styles.background_Green}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Card style={styles.cardStyle}>
-            <Card.Content>
-              <Text variant="titleLarge">
-                {t("safetyDetailsScreen.message1")},
-              </Text>
-              <Text variant="bodyMedium">
-                {t("safetyDetailsScreen.message2")}
-              </Text>
-            </Card.Content>
-          </Card>
-          <Separator />
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={[styles.container3, { marginLeft: 20, marginTop: 5 }]}>
-              <Text variant="bodyMedium" style={styles.leftParag}>
-                {liste[rand].question}
-              </Text>
+if (liste.length > 0 && listeMulti.length > 0) {
+  return (
+    <View style={styles.screen}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.headerAccent} />
+
+            <Text style={styles.title}>
+              {t("safetyDetailsScreen.message1")}
+            </Text>
+
+            <Text style={styles.subtitle}>
+              {t("safetyDetailsScreen.message2")}
+            </Text>
+          </View>
+
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0B337C" />
             </View>
-          )}
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={[styles.container3, { marginLeft: 20 }]}>
-              <RadioGroup
-                selectedIndex={quest1Answer}
-                onChange={(index) => {
-                  setquest1Answer(index);
-                  setText("abc");
-                }}
-              >
-                <Radio>{t("safetyDetailsScreen.true")}</Radio>
-                <Radio>{t("safetyDetailsScreen.false")}</Radio>
-              </RadioGroup>
-            </View>
-          )}
-          <Separator />
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={[styles.container3, { marginHorizontal: 20 }]}>
-              <Text variant="bodyMedium" style={styles.leftParag}>
-                {liste[rand2].question}
-              </Text>
-            </View>
-          )}
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={[styles.container3, { marginLeft: 20 }]}>
-              <RadioGroup
-                selectedIndex={quest2Answer}
-                onChange={(index) => setquest2Answer(index)}
-              >
-                <Radio>{t("safetyDetailsScreen.true")}</Radio>
-                <Radio>{t("safetyDetailsScreen.false")}</Radio>
-              </RadioGroup>
-            </View>
-          )}
-          <Separator />
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={[styles.container3, { marginLeft: 20 }]}>
-              <Text variant="bodyMedium" style={styles.leftParag}>
-                {listeMulti[rand3].question}
-              </Text>
-            </View>
-          )}
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={[styles.container3, { marginLeft: 20 }]}>
-              <RadioGroup
-                selectedIndex={type2Answer}
-                onChange={(index) => settype2Answer(index)}
-              >
-                <Radio>{listeMulti[rand3].ans1}</Radio>
-                <Radio>{listeMulti[rand3].ans2}</Radio>
-                <Radio>{listeMulti[rand3].ans3}</Radio>
-              </RadioGroup>
-              <Separator />
-            </View>
-          )}
-          {loading && <ActivityIndicator color={"#444"} />}
-          {!loading && (
-            <View style={styles.viewCont}>
-              <Text></Text>
-              <Button
-                buttonColor="#4e7291ff"
-                mode="contained"
-                onPress={insertRec2}
-                disabled={disabled}
-              >
-                Cevapları Gönder - SEND
-              </Button>
-              <Text></Text>
-              <CountdownCircleTimer
-                isPlaying={isPlaying}
-                duration={40}
-                colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
-                size={80}
-                strokeWidth={5}
-                colorsTime={[30, 20, 10, 0]}
-                onComplete={insertRec2}
-              >
-                {({ remainingTime }) => (
-                  <Text style={{ fontSize: 11 }}>
-                    {t("safetyDetailsScreen.remaining")}:{remainingTime}
+          ) : (
+            <>
+              <View style={styles.questionCard}>
+                <View style={styles.questionHeader}>
+                  <View style={styles.numberBadge}>
+                    <Text style={styles.numberText}>1</Text>
+                  </View>
+
+                  <Text style={styles.questionText}>
+                    {liste[rand].question}
                   </Text>
-                )}
-              </CountdownCircleTimer>
-              <Toast
-                type={toast.type}
-                message={toast.value}
-                onDismiss={() => setToast({ value: "", type: "" })}
-              />
-            </View>
+                </View>
+
+                <RadioGroup
+                  selectedIndex={quest1Answer}
+                  onChange={(index) => {
+                    setquest1Answer(index);
+                    setText("abc");
+                  }}
+                >
+                  <Radio
+                    style={[
+                      styles.option,
+                      quest1Answer === 0 && styles.optionSelected,
+                    ]}
+                  >
+                    {() => (
+                      <Text style={styles.optionText}>
+                        {t("safetyDetailsScreen.true")}
+                      </Text>
+                    )}
+                  </Radio>
+
+                  <Radio
+                    style={[
+                      styles.option,
+                      quest1Answer === 1 && styles.optionSelected,
+                    ]}
+                  >
+                    {() => (
+                      <Text style={styles.optionText}>
+                        {t("safetyDetailsScreen.false")}
+                      </Text>
+                    )}
+                  </Radio>
+                </RadioGroup>
+              </View>
+
+              <View style={styles.questionCard}>
+                <View style={styles.questionHeader}>
+                  <View style={styles.numberBadge}>
+                    <Text style={styles.numberText}>2</Text>
+                  </View>
+
+                  <Text style={styles.questionText}>
+                    {liste[rand2].question}
+                  </Text>
+                </View>
+
+                <RadioGroup
+                  selectedIndex={quest2Answer}
+                  onChange={(index) => setquest2Answer(index)}
+                >
+                  <Radio
+                    style={[
+                      styles.option,
+                      quest2Answer === 0 && styles.optionSelected,
+                    ]}
+                  >
+                    {() => (
+                      <Text style={styles.optionText}>
+                        {t("safetyDetailsScreen.true")}
+                      </Text>
+                    )}
+                  </Radio>
+
+                  <Radio
+                    style={[
+                      styles.option,
+                      quest2Answer === 1 && styles.optionSelected,
+                    ]}
+                  >
+                    {() => (
+                      <Text style={styles.optionText}>
+                        {t("safetyDetailsScreen.false")}
+                      </Text>
+                    )}
+                  </Radio>
+                </RadioGroup>
+              </View>
+
+              <View style={styles.questionCard}>
+                <View style={styles.questionHeader}>
+                  <View style={styles.numberBadge}>
+                    <Text style={styles.numberText}>3</Text>
+                  </View>
+
+                  <Text style={styles.questionText}>
+                    {listeMulti[rand3].question}
+                  </Text>
+                </View>
+
+                <RadioGroup
+                  selectedIndex={type2Answer}
+                  onChange={(index) => settype2Answer(index)}
+                >
+                  {[
+                    listeMulti[rand3].ans1,
+                    listeMulti[rand3].ans2,
+                    listeMulti[rand3].ans3,
+                  ].map((answer, index) => (
+                    <Radio
+                      key={index}
+                      style={[
+                        styles.option,
+                        type2Answer === index && styles.optionSelected,
+                      ]}
+                    >
+                      {() => (
+                        <Text style={styles.optionText}>{answer}</Text>
+                      )}
+                    </Radio>
+                  ))}
+                </RadioGroup>
+              </View>
+
+              <View style={styles.submitPanel}>
+                <View style={styles.timerContainer}>
+                  <CountdownCircleTimer
+                    isPlaying={isPlaying}
+                    duration={40}
+                    colors={["#0B337C", "#D99A16", "#DC2626", "#DC2626"]}
+                    colorsTime={[40, 20, 10, 0]}
+                    size={76}
+                    strokeWidth={5}
+                    onComplete={insertRec2}
+                  >
+                    {({ remainingTime }) => (
+                      <Text
+                        style={[
+                          styles.timerValue,
+                          remainingTime <= 10 && styles.timerUrgent,
+                        ]}
+                      >
+                        {remainingTime}
+                      </Text>
+                    )}
+                  </CountdownCircleTimer>
+
+                  <Text style={styles.timerLabel}>
+                    {t("safetyDetailsScreen.remaining")}
+                  </Text>
+                </View>
+
+                <View style={styles.submitButtonWrapper}>
+                  <Button
+                    mode="contained"
+                    buttonColor="#0B337C"
+                    textColor="#FFFFFF"
+                    style={styles.submitButton}
+                    contentStyle={styles.submitButtonContent}
+                    labelStyle={styles.submitButtonLabel}
+                    onPress={insertRec2}
+                    disabled={disabled}
+                  >
+                    {t("submitSafetyAnswers", {
+                      defaultValue: "Cevapları Gönder",
+                    })}
+                  </Button>
+                </View>
+              </View>
+            </>
           )}
-        </ScrollView>
-      </Background_Green>
-    );
-};
+        </View>
+      </ScrollView>
+
+      <Toast
+        type={toast.type}
+        message={toast.value}
+        onDismiss={() => setToast({ value: "", type: "" })}
+      />
+    </View>
+  );
+}
+}
+
+
 
 const styles = StyleSheet.create({
-  separator: {
-    borderBottomColor: "#fff",
-    borderWidth: 1,
-    width: "100%",
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  screen: {
+    flex: 1,
+    backgroundColor: "#F3F6FC",
   },
-  cardStyle: {
-    backgroundColor: "#d6e9f7ff",
-    width: "100%",
-    borderRadius: 10,
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 22,
+    paddingBottom: 36,
   },
-  leftParag: {
+
+  container: {
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+  },
+
+  header: {
+    paddingHorizontal: 4,
+    marginBottom: 24,
+  },
+
+  headerAccent: {
+    width: 32,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 16,
+  },
+
+  title: {
+    color: "#172B4D",
+    fontSize: 23,
+    lineHeight: 32,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+
+  subtitle: {
+    color: "#64748B",
     fontSize: 14,
-    justifyContent: "center",
+    lineHeight: 23,
   },
-  viewCont: {
-    justifyContent: "center",
+
+  loadingContainer: {
+    paddingVertical: 60,
     alignItems: "center",
+    justifyContent: "center",
   },
-  container3: {
-    width: width - 10,
+
+  questionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 16,
+    marginBottom: 16,
   },
-  background_Green: {
-    height: height + 70,
-    width: "90%",
+
+  questionHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
+
+  numberBadge: {
+    minWidth: 30,
+    minHeight: 30,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 9,
+    backgroundColor: "#EAF0FA",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  numberText: {
+    color: "#0B337C",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
+  questionText: {
+    flex: 1,
+    color: "#253858",
+    fontSize: 15,
+    lineHeight: 24,
+    fontWeight: "600",
+    paddingTop: 2,
+  },
+
+  option: {
+    minHeight: 50,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E8EDF5",
+    backgroundColor: "#F8FAFD",
+    marginVertical: 4,
+  },
+
+  optionSelected: {
+    borderColor: "#0B337C",
+    backgroundColor: "#EAF0FA",
+  },
+
+  optionText: {
+    flexShrink: 1,
+    color: "#334155",
+    fontSize: 14,
+    lineHeight: 22,
+    marginLeft: 10,
+  },
+
+  submitPanel: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 4,
+  },
+
+  timerContainer: {
+    width: 96,
+    alignItems: "center",
+    marginVertical: 6,
+  },
+
+  timerValue: {
+    color: "#0B337C",
+    fontSize: 25,
+    fontWeight: "800",
+    fontVariant: ["tabular-nums"],
+  },
+
+  timerUrgent: {
+    color: "#DC2626",
+  },
+
+  timerLabel: {
+    color: "#64748B",
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: "center",
+    marginTop: 8,
+  },
+
+  submitButtonWrapper: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 170,
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+  },
+
+  submitButton: {
+    borderRadius: 12,
+  },
+
+  submitButtonContent: {
+    minHeight: 54,
+    paddingVertical: 5,
+  },
+
+  submitButtonLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0,
+    marginHorizontal: 10,
   },
 });
 

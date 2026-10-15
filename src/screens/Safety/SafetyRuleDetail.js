@@ -466,6 +466,23 @@ const SafetyRuleDetail = ({ route: { params }, navigation }) => {
       return loading;
     });
   };
+  const accidentDate = isUserPoscoAssanUser
+  ? poscoAssanAccidentDate
+  : poscoTnpcAccidentDate;
+
+const formattedAccidentDate = accidentDate
+  ? accidentDate.split("-").reverse().join(".")
+  : "—";
+
+const isVideoPage = String(params.appHead) === "9";
+const isImagePage = String(params.appHead) === "8";
+const isChecklistPage = !isVideoPage && !isImagePage;
+
+const contentEntries = (firebaseData ?? []).filter(([key]) =>
+  key.includes("Content"),
+);
+
+const checklistEntries = contentEntries.filter((item) => item[1] !== "");
 
   useEffect(() => {
     getQuestions().then(async () => {
@@ -479,392 +496,399 @@ const SafetyRuleDetail = ({ route: { params }, navigation }) => {
   }, []);
 
   return (
-    <Background_Green>
-      <ScrollView nestedScrollEnabled={true}>
-        <View style={styles.container}>
-          <Card style={[styles.cardStyle, { backgroundColor: "BLUE" }]}>
-            <Card.Content>
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ width: width / 2 }}>
-                  <View>
-                    <Text
-                      style={{
-                        color: "#333",
-                        fontWeight: "600",
-                        fontSize: width / 22,
-                        padding: 5,
-                      }}
-                    >
-                      {t("general.today")}:
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        color: "#333",
-                        fontWeight: "600",
-                        fontSize: width / 22,
-                        padding: 5,
-                      }}
-                    >
-                      {t("general.lastAccidentDate")}:
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        color: "#333",
-                        fontWeight: "600",
-                        fontSize: width / 22,
-                        padding: 5,
-                      }}
-                    >
-                      {t("general.passingTime")}:
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    width: width / 2 - 40,
-                    alignItems: "flex-end",
-                    alignContent: "flex-end",
-                    left: 0,
-                  }}
-                >
-                  <View>
-                    <Text
-                      style={{
-                        color: "#333",
-                        fontWeight: "600",
-                        fontSize: width / 22,
-                        textAlign: "right",
-                        padding: 5,
-                      }}
-                    >
-                      {date}
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        color: "#333",
-                        fontWeight: "600",
-                        fontSize: width / 22,
-                        textAlign: "right",
-                        padding: 5,
-                      }}
-                    >
-                      {isUserPoscoAssanUser
-                        ? poscoAssanAccidentDate.split("-").reverse().join(".")
-                        : poscoTnpcAccidentDate.split("-").reverse().join(".")}
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: "row" }}>
-                    {lastInDate
-                      ? lastInDate
-                          ?.toString()
-                          ?.split("")
-                          ?.map((item, index) => (
-                            <View style={{ width: width / 8 }} key={index}>
-                              <Text style={styles.paragCounter}>{item}</Text>
-                            </View>
-                          ))
-                      : null}
-                  </View>
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
+  <View style={styles.screen}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <View style={styles.container}>
+        <View style={styles.summary}>
+          <View style={styles.dateRow}>
+            <Text style={styles.dateLabel}>
+              {t("general.today")}
+            </Text>
+            <Text style={styles.dateValue}>{date}</Text>
+          </View>
 
-          <View style={styles.containerInside}>
-            <View style={styles.containerInside2}>
-              <Text style={styles.mehmetFatih}>{listeMulti.Name}</Text>
-              <Separator />
+          <View style={styles.dateRow}>
+            <Text style={styles.dateLabel}>
+              {t("general.lastAccidentDate")}
+            </Text>
+            <Text style={styles.dateValue}>
+              {formattedAccidentDate}
+            </Text>
+          </View>
 
-              {params.appHead == 9 && (
-                <View>
-                  {firebaseData
-                    .filter(([key, value]) => key.includes("Content"))
-                    .filter((item) => item[1] !== "")
-                    .map((item, index) =>
-                      firebaseData
-                        .filter(([keys, value]) =>
-                          keys.includes("Title" + index)
-                        )
-                        .filter((items) => items[1] !== "")
-                        .map((items, indexs) => (
-                          <List.Item
-                            key={indexs}
-                            style={[styles.card, styles.elevation]}
-                            title={listeMulti.Name}
-                            description={items[1]}
-                            onPress={() => {
-                              navigation.navigate("SafetyVideo", {
-                                data: item[1],
-                                title: items[1],
-                                itemId: items,
-                              });
-                            }}
-                          />
-                        ))
-                    )}
-                </View>
-              )}
-
-              {params.appHead == 8 && (
-                <View>
-                  <ScrollView showsVerticalScrollIndicator={false}>
-                    {firebaseData
-                      .filter(([key, value]) => key.includes("Content"))
-                      .sort(
-                        (a, b) =>
-                          Date.parse(b[1].insertDate) -
-                          Date.parse(a[1].insertDate)
-                      )
-                      .map((item, index) => {
-                        return (
-                          <View key={index} style={styles.photoContainer}>
-                            {item
-                              .filter((item) => item.uriList)
-
-                              .map((cat, indexed) => {
-                                return (
-                                  <List.Item
-                                    key={indexed}
-                                    style={[styles.card, styles.elevation]}
-                                    title={cat.summary}
-                                    description={new Date(
-                                      cat?.insertDate
-                                    )?.toLocaleDateString("tr")}
-                                    onPress={() => {
-                                      navigation.navigate("SafetyImage", {
-                                        data: cat,
-                                        itemId: index,
-                                      });
-                                    }}
-                                  />
-                                );
-                              })}
-                          </View>
-                        );
-                      })}
-                  </ScrollView>
-                </View>
-              )}
-
-              {/* <ScrollView showsVerticalScrollIndicator={false}>
-                  {firebaseData
-                    .filter(([key, value]) => key.includes('Content'))
-
-                    .map((item, index) => (
-                      <View key={index} style={styles.photoContainer}>
-                        <Text>{item.source?.uri}</Text>
-                        {item
-                          .filter(item2 => item2.source?.uri)
-                          .sort((a, b) => {
-                            if (a.insertDate < b.insertDate) { return -1; }
-                            if (a.insertDate > b.insertDate) { return 1; }
-                            return 0;
-                          })
-                          .map((cat, indexed) => (
-                            <List.Item
-                              key={indexed}
-                              style={[styles.card, styles.elevation]}
-                              title={cat.summary}
-                              description={new Date(
-                                cat?.insertDate,
-                              )?.toLocaleDateString('tr')}
-                              onPress={() => {
-                                setVisible(true);
-                                setInitial(index);
-                              }}
-                              left={props => (
-                                <List.Icon {...props} icon="image" />
-                              )}
-                            />
-                          ))}
-                      </View>
-                    ))}
-                </ScrollView>*/}
-
-              {params.appHead != 9 && params.appHead != 8 && (
-                <View>
-                  {firebaseData
-                    .filter(([key, value]) => key.includes("Content"))
-                    .filter((item) => item[1] !== "")
-                    .map((item, index) => (
-                      <View style={styles.containerCheck} key={index}>
-                        <View style={styles.ViewContainerLeft}>
-                          <Text style={styles.mehmetFatih2}>⬤ {item[1]} </Text>
-                        </View>
-                        <View style={styles.ViewContainerRight}>
-                          <Toggle
-                            checked={
-                              ListeSemihMulti == null
-                                ? false
-                                : ListeSemihMulti[`ch${index}`]
-                            }
-                            status={
-                              (
-                                ListeSemihMulti == null
-                                  ? false
-                                  : ListeSemihMulti[`ch${index}`]
-                              )
-                                ? "success"
-                                : "danger"
-                            }
-                            onChange={(isChecked) => {
-                              setListeSemihMulti({
-                                ...ListeSemihMulti,
-                                [`ch${index}`]: isChecked,
-                              });
-                            }}
-                          />
-                        </View>
-                      </View>
-                    ))}
-                </View>
-              )}
-            </View>
-            <Separator />
-            {params.appHead != 9 && params.appHead != 8 && (
-              <View style={{ height: 120 }}>
-                <Text />
-                <Text />
-                {!loading && (
-                  <Button mode="contained" onPress={insertSafetyRule}>
-                    {" "}
-                    Sonucları Kaydet
-                  </Button>
-                )}
-              </View>
-            )}
+          <View style={styles.counterRow}>
+            <Text style={styles.counterLabel}>
+              {t("general.passingTime")}
+            </Text>
+            <Text style={styles.counterValue}>
+              {lastInDate ?? "—"}
+            </Text>
           </View>
         </View>
-      </ScrollView>
-    </Background_Green>
-  );
-};
+
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionAccent} />
+
+          <Text style={styles.sectionTitle}>
+            {listeMulti?.Name}
+          </Text>
+        </View>
+
+        {isVideoPage && (
+          <View>
+            {checklistEntries.map((item, index) =>
+              (firebaseData ?? [])
+                .filter(([key]) => key.includes("Title" + index))
+                .filter((entry) => entry[1] !== "")
+                .map((titleEntry) => (
+                  <List.Item
+                    key={`${item[0]}-${titleEntry[0]}`}
+                    style={styles.listItem}
+                    title={titleEntry[1]}
+                    description={listeMulti?.Name}
+                    titleStyle={styles.listTitle}
+                    descriptionStyle={styles.listDescription}
+                    titleNumberOfLines={3}
+                    descriptionNumberOfLines={2}
+                    onPress={() =>
+                      navigation.navigate("SafetyVideo", {
+                        data: item[1],
+                        title: titleEntry[1],
+                        itemId: titleEntry,
+                      })
+                    }
+                  />
+                )),
+            )}
+          </View>
+        )}
+
+        {isImagePage && (
+          <View>
+            {contentEntries
+              .slice()
+              .sort(
+                (a, b) =>
+                  (Date.parse(b[1]?.insertDate) || 0) -
+                  (Date.parse(a[1]?.insertDate) || 0),
+              )
+              .map((item, index) => {
+                const cat = item[1];
+
+                if (!cat?.uriList) {
+                  return null;
+                }
+
+                const insertDate = new Date(cat.insertDate);
+                const dateLabel = Number.isNaN(insertDate.getTime())
+                  ? ""
+                  : insertDate.toLocaleDateString("tr-TR");
+
+                return (
+                  <List.Item
+                    key={item[0]}
+                    style={styles.listItem}
+                    title={cat.summary}
+                    description={dateLabel}
+                    titleStyle={styles.listTitle}
+                    descriptionStyle={styles.listDescription}
+                    titleNumberOfLines={3}
+                    onPress={() =>
+                      navigation.navigate("SafetyImage", {
+                        data: cat,
+                        itemId: index,
+                      })
+                    }
+                  />
+                );
+              })}
+          </View>
+        )}
+
+        {isChecklistPage && (
+          <View style={styles.checklist}>
+            {checklistEntries.map((item, index) => {
+              const isChecked = !!ListeSemihMulti?.[`ch${index}`];
+
+              return (
+                <View
+                  key={item[0]}
+                  style={[
+                    styles.checkRow,
+                    index === checklistEntries.length - 1 &&
+                      styles.lastCheckRow,
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.numberBadge,
+                      isChecked && styles.numberBadgeChecked,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.numberText,
+                        isChecked && styles.numberTextChecked,
+                      ]}
+                    >
+                      {index + 1}
+                    </Text>
+                  </View>
+
+                  <Text style={styles.checkText}>{item[1]}</Text>
+
+                  <View style={styles.toggleContainer}>
+                    <Toggle
+                      checked={isChecked}
+                      status={isChecked ? "success" : "basic"}
+                      accessibilityLabel={String(item[1])}
+                      onChange={(isChecked) => {
+                        setListeSemihMulti((previous) => ({
+                          ...previous,
+                          [`ch${index}`]: isChecked,
+                        }));
+                      }}
+                    />
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {isChecklistPage && (
+          <View style={styles.saveContainer}>
+            <Button
+              mode="contained"
+              buttonColor="#0B337C"
+              textColor="#FFFFFF"
+              style={styles.saveButton}
+              contentStyle={styles.saveButtonContent}
+              labelStyle={styles.saveButtonLabel}
+              loading={loading}
+              disabled={loading}
+              onPress={insertSafetyRule}
+            >
+              {t("saveSafetyResults", {
+                defaultValue: "Sonuçları Kaydet",
+              })}
+            </Button>
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  </View>
+);
+}
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    alignItems: "center",
-    minHeight: Platform.OS === "ios" ? height - 210 : height + 100,
-    marginBottom: 40,
+    backgroundColor: "#F3F6FC",
   },
-  containerInside: {
-    backgroundColor: "transparent",
-    width: width,
-    alignItems: "center",
-    flex: 1,
-  },
-  cardStyle: {
-    height: 130,
-    width: width,
-  },
-  button: {
-    borderRadius: 15,
-    padding: 5,
-    marginBottom: 10,
-    shadowColor: "#303838",
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 5,
-    shadowOpacity: 0.85,
-    height: 110,
 
-    width: 110,
-    elevation: 5,
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 16,
+    paddingBottom: 36,
   },
-  containerInside2: {
-    flex: 1,
-    width: width,
-  },
-  card: {
-    backgroundColor: "rgba(216,228,232,0.85)",
-    borderRadius: 2,
-    paddingHorizontal: 25,
+
+  container: {
     width: "100%",
-    paddingVertical: 10,
-    borderBottomWidth: 0.2,
+    maxWidth: 680,
+    alignSelf: "center",
+    paddingHorizontal: 16,
   },
-  elevation: {
-    elevation: 15,
-    borderWidth: 0.1,
-    shadowColor: "transparent",
-  },
-  mehmetFatih: {
-    flexWrap: "wrap",
-    textAlign: "center",
-    color: "#333",
-    fontWeight: "bold",
-    fontSize: width / 20,
-    padding: 10,
-  },
-  mehmetFatih2: {
-    flexWrap: "wrap",
-    textAlign: "left",
-    color: "#333",
-    fontWeight: "bold",
-    fontSize: width / 28,
-    padding: 10,
-  },
-  heading: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  mehmetFatih3: {
-    flexWrap: "wrap",
-    textAlign: "center",
-    color: "#333",
-    fontWeight: "bold",
-    fontSize: width / 20,
-    padding: 10,
-    width: width,
-  },
-  paragCounter: {
-    color: "#333",
-    fontWeight: "600",
-    borderStyle: "solid",
-    borderWidth: 2,
-    margin: 2,
-    backgroundColor: "#ee5",
-    padding: 5,
-    textAlign: "center",
-    fontSize: width / 22,
-  },
-  containerCheck: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  containerCheck3: {
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  ViewContainerLeft: {
-    flex: 18,
-    width: "100%",
-  },
-  ViewContainerRight: {
-    flex: 3,
-    width: "100%",
-    alignItems: "center",
-  },
-  separator: {
-    borderBottomColor: "#fff",
+
+  summary: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
     borderWidth: 1,
-    width: "100%",
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "#E3EAF4",
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    marginBottom: 26,
   },
-  photoContainer: {
-    flex: 1,
+
+  dateRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
-  h1: {
-    padding: 40,
-    textAlign: "center",
-    fontSize: 24,
+
+  dateLabel: {
+    flex: 1,
+    color: "#64748B",
+    fontSize: 13,
+    lineHeight: 20,
+    paddingRight: 12,
+  },
+
+  dateValue: {
+    flex: 1,
+    color: "#172B4D",
+    fontSize: 14,
+    lineHeight: 21,
+    fontWeight: "600",
+    textAlign: "right",
+  },
+
+  counterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderTopColor: "#EDF1F7",
+    marginTop: 4,
+    paddingVertical: 14,
+  },
+
+  counterLabel: {
+    flex: 1,
+    color: "#526581",
+    fontSize: 13,
+    lineHeight: 20,
+    paddingRight: 12,
+  },
+
+  counterValue: {
+    flexShrink: 1,
+    color: "#0B337C",
+    fontSize: 30,
+    fontWeight: "800",
+    textAlign: "right",
+    fontVariant: ["tabular-nums"],
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingHorizontal: 2,
+  },
+
+  sectionAccent: {
+    width: 4,
+    height: 24,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginRight: 10,
+  },
+
+  sectionTitle: {
+    flex: 1,
+    color: "#172B4D",
+    fontSize: 19,
+    fontWeight: "700",
+    lineHeight: 27,
+  },
+
+  listItem: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 10,
+  },
+
+  listTitle: {
+    color: "#172B4D",
+    fontSize: 15,
+    fontWeight: "600",
+    lineHeight: 23,
+  },
+
+  listDescription: {
+    color: "#73829B",
+    fontSize: 12,
+    lineHeight: 19,
+    marginTop: 5,
+  },
+
+  checklist: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    paddingHorizontal: 14,
+  },
+
+  checkRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDF1F7",
+  },
+
+  lastCheckRow: {
+    borderBottomWidth: 0,
+  },
+
+  numberBadge: {
+    minWidth: 28,
+    minHeight: 28,
+    paddingHorizontal: 5,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: "#EFF3FA",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+    marginTop: 2,
+  },
+
+  numberBadgeChecked: {
+    backgroundColor: "#E8F5ED",
+  },
+
+  numberText: {
+    color: "#0B337C",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  numberTextChecked: {
+    color: "#237247",
+  },
+
+  checkText: {
+    flex: 1,
+    color: "#334155",
+    fontSize: 14,
+    lineHeight: 23,
+    paddingTop: 3,
+  },
+
+  toggleContainer: {
+    flexShrink: 0,
+    alignSelf: "center",
+    marginLeft: 10,
+  },
+
+  saveContainer: {
+    marginTop: 22,
+  },
+
+  saveButton: {
+    borderRadius: 12,
+  },
+
+  saveButtonContent: {
+    minHeight: 54,
+    paddingVertical: 5,
+  },
+
+  saveButtonLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0,
   },
 });
 

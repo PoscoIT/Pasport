@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
+  ScrollView
 } from "react-native";
 import { Button } from "react-native-paper";
 
@@ -62,110 +63,99 @@ const LoginScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.safeAreaStyle}>
-      {!loading && (
-        <View style={{ borderTopWidth: 1, borderTopColor: "#dcdcdc" }}>
-          <Card style={[styles.cardStyle]}>
-            <Card.Content>
-              <Text variant="titleLarge">{t("loginScreen.message1")}</Text>
-              <Text variant="bodyMedium">{t("loginScreen.message2")}</Text>
-            </Card.Content>
-          </Card>
-          <View>
-            <View
-              style={{
-                flexDirection: "column",
-                flexGrow: 1,
-                marginHorizontal: 10,
-                borderRadius: 30,
-              }}
-            >
-              <TextInput
-                label={t("loginScreen.email")}
-                returnKeyType="next"
-                value={email.value}
-                onChangeText={(text) => setEmail({ value: text, error: "" })}
-                error={!!email.error}
-                errorText={email.error}
-                autoCapitalize="none"
-                autoComplete="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-              />
-            </View>
-            <View
-              style={{
-                flexDirection: "column",
-                flexGrow: 1,
-                marginHorizontal: 10,
-                borderRadius: 30,
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <TextInput
-                  label={t("loginScreen.password")}
-                  returnKeyType="done"
-                  value={password.value}
-                  onChangeText={(text) =>
-                    setPassword({ value: text, error: "" })
-                  }
-                  error={!!password.error}
-                  errorText={password.error}
-                  secureTextEntry={true}
-                  autoCapitalize="none"
-                  eyeIcon={true}
-                />
-              </View>
+  <View style={[styles.safeAreaStyle, loginStyles.screen]}>
+  {!loading && (
+    <ScrollView
+      contentContainerStyle={loginStyles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={loginStyles.header}>
+        <View style={loginStyles.accent} />
 
-              <TouchableOpacity
-                onPress={() => navigation.navigate("ForgotPasswordScreen")}
-              >
-                <Text
-                  style={{
-                    color: "black",
-                    margin: 10,
-                    textAlign: "right",
-                    textDecorationLine: "underline",
-                  }}
-                >
-                  {t("forgotPassword")}
-                </Text>
-              </TouchableOpacity>
+        <Text style={loginStyles.title}>
+          {t("loginScreen.message1")}
+        </Text>
 
-              {error ? (
-                <Text style={{ color: "red", margin: 10 }}>{error}</Text>
-              ) : null}
-            </View>
-            <View
-              style={{
-                flexDirection: "column",
-                flexGrow: 1,
-                marginHorizontal: 60,
-              }}
-            >
-              <Button
-                mode="contained"
-                style={styles.button}
-                onPress={_onLoginPressed}
-              >
-                {t("loginScreen.login")}
-              </Button>
-            </View>
-            <View
-              style={{
-                flexDirection: "column",
-                flexGrow: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                marginVertical: 50,
-              }}
-            >
-              <Text>{t("loginScreen.version")} 56</Text>
-            </View>
-          </View>
+        <Text style={loginStyles.subtitle}>
+          {t("loginScreen.message2")}
+        </Text>
+
+        <View style={loginStyles.decorationLarge} />
+        <View style={loginStyles.decorationSmall} />
+      </View>
+
+      <View style={loginStyles.form}>
+        <View style={loginStyles.inputWrapper}>
+          <TextInput
+            label={t("loginScreen.email")}
+            returnKeyType="next"
+            value={email.value}
+            onChangeText={(text) => setEmail({ value: text, error: "" })}
+            error={!!email.error}
+            errorText={email.error}
+            autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            keyboardType="email-address"
+          />
         </View>
-      )}
-    </View>
+
+        <View style={loginStyles.inputWrapper}>
+          <TextInput
+            label={t("loginScreen.password")}
+            returnKeyType="done"
+            value={password.value}
+            onChangeText={(text) =>
+              setPassword({ value: text, error: "" })
+            }
+            error={!!password.error}
+            errorText={password.error}
+            secureTextEntry
+            autoCapitalize="none"
+            eyeIcon
+          />
+        </View>
+
+        <TouchableOpacity
+          style={loginStyles.forgotPassword}
+          onPress={() => navigation.navigate("ForgotPasswordScreen")}
+          accessibilityRole="button"
+        >
+          <Text style={loginStyles.forgotPasswordText}>
+            {t("forgotPassword")}
+          </Text>
+        </TouchableOpacity>
+
+        {!!error && (
+          <View style={loginStyles.errorBox}>
+            <Text style={loginStyles.errorText}>{error}</Text>
+          </View>
+        )}
+
+        <Button
+          mode="contained"
+          onPress={_onLoginPressed}
+          buttonColor="#0F766E"
+          textColor="#FFFFFF"
+          style={loginStyles.loginButton}
+          contentStyle={loginStyles.loginButtonContent}
+          labelStyle={loginStyles.loginButtonLabel}
+        >
+          {t("loginScreen.login")}
+        </Button>
+      </View>
+
+      <View style={loginStyles.footer}>
+        <View style={loginStyles.footerLine} />
+        <Text style={loginStyles.versionText}>
+          {t("loginScreen.version")} 59
+        </Text>
+        <View style={loginStyles.footerLine} />
+      </View>
+    </ScrollView>
+  )}
+</View>
   );
 };
 
@@ -205,6 +195,142 @@ const styles = StyleSheet.create({
     backgroundColor: "#196795",
     borderRadius: 10,
     marginTop: 20,
+  },
+});
+
+const loginStyles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F3F6FC",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 32,
+  },
+  header: {
+    backgroundColor: "#0B337C",
+    paddingHorizontal: 30,
+    paddingTop: 48,
+    paddingBottom: 70,
+    overflow: "hidden",
+  },
+  accent: {
+    width: 38,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "#93C5FD",
+    marginBottom: 24,
+    zIndex: 1,
+  },
+  title: {
+    color: "#FFFFFF",
+    fontSize: 30,
+    fontWeight: "700",
+    lineHeight: 39,
+    marginBottom: 12,
+    zIndex: 1,
+  },
+  subtitle: {
+    color: "#D4E2F8",
+    fontSize: 15,
+    lineHeight: 24,
+    maxWidth: 320,
+    zIndex: 1,
+  },
+  decorationLarge: {
+    position: "absolute",
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.16)",
+    right: -100,
+    top: -65,
+  },
+  decorationSmall: {
+    position: "absolute",
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    right: -70,
+    bottom: -40,
+  },
+  form: {
+    width: "90%",
+    maxWidth: 440,
+    alignSelf: "center",
+    marginTop: -30,
+    padding: 24,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    shadowColor: "#0B337C",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 4,
+  },
+  inputWrapper: {
+    width: "100%",
+    marginBottom: 10,
+  },
+  forgotPassword: {
+    alignSelf: "flex-end",
+    paddingVertical: 12,
+    paddingLeft: 12,
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    color: "#0B337C",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  errorBox: {
+    backgroundColor: "#FFF1F2",
+    borderLeftWidth: 3,
+    borderLeftColor: "#E11D48",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 18,
+  },
+  errorText: {
+    color: "#BE123C",
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  loginButton: {
+    backgroundColor: "#0B337C",
+    borderRadius: 12,
+  },
+  loginButtonContent: {
+    minHeight: 54,
+  },
+  loginButtonLabel: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 0.2,
+  },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 36,
+    paddingHorizontal: 60,
+  },
+  footerLine: {
+    flex: 1,
+    maxWidth: 55,
+    height: 1,
+    backgroundColor: "#D5DEED",
+  },
+  versionText: {
+    color: "#73829B",
+    fontSize: 12,
+    marginHorizontal: 14,
   },
 });
 

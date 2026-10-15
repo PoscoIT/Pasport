@@ -4,12 +4,17 @@ import {
   StyleSheet,
   Text,
   Modal,
-  TextInput,
   FlatList,
   Alert,
   Dimensions,
   Linking,
   KeyboardAvoidingView,
+ 
+  TextInput as NativeTextInput,
+  ScrollView,
+
+  Platform,
+ 
 } from "react-native";
 
 import {  useEffect,  useState } from "react";
@@ -30,7 +35,7 @@ import {
 import { Toast } from "toastify-react-native";
 
 
-const PaperTrackingSecond = () => {
+const PaperTrackingSecond = ({navigation}) => {
   const [count, setCount] = useState(0);
   const [netInfo, setNetInfo] = useState("");
   const [ScanResult, setScanResult] = useState(false);
@@ -81,9 +86,13 @@ const PaperTrackingSecond = () => {
 
   let scanAgain = (a = false) => {
     getPermission(a);
+    
   };
   let scanAgain2 = () => {
     getPermission(false);
+  
+
+  
   };
 
 
@@ -254,18 +263,18 @@ const PaperTrackingSecond = () => {
         <Text title="Barkod Numarası:" subtitle={item.Barcode} />
 
         <Card.Content>
-          <Text style={styles.title}>Barkod Numarası: {item.Barcode}</Text>
+          <Text style={stockStyles.title}>Barkod Numarası: {item.Barcode}</Text>
      
             <View>
-              <Text style={styles.title}>
+              <Text style={stockStyles.title}>
                 Kağıt Tipi:{" "}
                 İkinci El
               </Text>
-              <Text style={styles.title}>Renk :{item.PaperType2}</Text>
-              <Text style={styles.title}>Sarım Kodu :{item.StockCode}</Text>
-              <Text style={styles.title}>Gram: {item.Gram}</Text>
-              <Text style={styles.title}>Boyut: {item.Size}</Text>
-              <Text style={styles.title}>Ağırlık: {item.Weight}</Text>
+              <Text style={stockStyles.title}>Renk :{item.PaperType2}</Text>
+              <Text style={stockStyles.title}>Sarım Kodu :{item.StockCode}</Text>
+              <Text style={stockStyles.title}>Gram: {item.Gram}</Text>
+              <Text style={stockStyles.title}>Boyut: {item.Size}</Text>
+              <Text style={stockStyles.title}>Ağırlık: {item.Weight}</Text>
             </View>
    
         </Card.Content>
@@ -376,395 +385,486 @@ if(res.data){
   }, []);
 
 
+const closeStockModal = () => {
+  setModalVisible(false);
+  setData([]);
+  setQrValue("");
+  setScan(false);
+  setCount((previous) => previous + 1);
+};
 
+const closeManualStockModal = (isStockOut) => {
+  if (isStockOut) {
+    setModalVisible2(false);
+  } else {
+    setModalVisible1(false);
+  }
 
-  return (
+  setData([]);
+  setQrValue("");
+  setQrValueManual("");
+  setCount((previous) => previous + 1);
+};
+
+const openManualStockModal = (isStockOut) => {
+  setData([]);
+  setQrValue("");
+  setQrValueManual("");
+  setModalVisible(false);
+  setModalVisible1(!isStockOut);
+  setModalVisible2(isStockOut);
+  setCountMethod(isStockOut);
+};
+
+const renderStockAction = (title, description, icon, onPress) => (
+  <TouchableOpacity
+    style={stockStyles.actionCard}
+    activeOpacity={0.7}
+    accessibilityRole="button"
+    onPress={onPress}
+  >
+    <View style={stockStyles.iconBox}>
+      <FontAwesome name={icon} size={22} color="#0B337C" />
+    </View>
+
+    <View style={stockStyles.actionContent}>
+      <Text style={stockStyles.actionTitle}>{title}</Text>
+      <Text style={stockStyles.actionDescription}>{description}</Text>
+    </View>
+
+    <Text style={stockStyles.chevron}>›</Text>
+  </TouchableOpacity>
+);
+
+const renderStockModal = (visible, title, onClose, manual = false) => (
+  <Modal
+    animationType="fade"
+    transparent
+    visible={visible}
+    onRequestClose={onClose}
+  >
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
+      style={stockStyles.modalBackdrop}
     >
-      {!scan && (
-        <View
-          style={{ flex: 1, flexDirection: "column", alignItems: "center" }}
-        >
-          <Button
-            appearance={"outline"}
-            style={styles.button3}
-            onPress={() => scanAgain(false)}
-          >
-            <Text style={styles.buttonTextStyle}>Stoğa Al</Text>
-          </Button>
-          <Button
-            appearance={"outline"}
-            status={"danger"}
-            style={styles.button3}
-            onPress={() => {
-             
-               setModalVisible(false)
-              setModalVisible1(true);
-          
-              setCountMethod(false);
-            }}
-          >
-            <Text style={styles.buttonTextStyle}>Manuel Stoğa Al</Text>
-          </Button>
-          <Button
-            appearance={"outline"}
-            status={"success"}
-            style={styles.button4}
-            onPress={() => scanAgain(true)}
-          >
-            <Text style={styles.buttonTextStyle}>Stoktan Düş</Text>
-          </Button>
-          <Button
-            appearance={"outline"}
-            status={"warning"}
-            style={styles.button4}
-            onPress={() => {
-              setModalVisible2(true);
-              setModalVisible(false)
-              setCountMethod(true);
-            }}
-          >
-            <Text style={styles.buttonTextStyle}>Manuel Stoktan Düş</Text>
-          </Button>
-        
-        </View>
-      )}
+      <View style={stockStyles.modalPanel}>
+        <View style={stockStyles.modalHeader}>
+          <Text style={stockStyles.modalTitle}>{title}</Text>
 
-      <View style={{ flex: 1, width: "100%", height: "100%" }}>
-        {scan && (
-          <View
-            style={{
-              width: 100,
-              alignItems: "center",
-              justifyContent: "flex-start",
-            }}
+          <TouchableOpacity
+            style={stockStyles.closeButton}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Kapat"
           >
-            <Button
-              appearance={"ghost"}
-              onPress={scanAgain2}
-              // accessoryLeft={(props) => (
-              //   <Icon {...props} name={"arrow-back-outline"} />
-              // )}
-            >
-              <Text>Geri</Text>
-            </Button>
+            <FontAwesome name="close" size={20} color="#64748B" />
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          style={stockStyles.resultList}
+          contentContainerStyle={stockStyles.resultContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => String(item.Id)}
+          data={!manual || qrValue.length > 0 ? data : []}
+          renderItem={renderItem}
+          ListHeaderComponent={
+            manual ? (
+              <View style={stockStyles.searchSection}>
+                <Text style={stockStyles.inputLabel}>
+                  Barkod Numarası
+                </Text>
+
+                <NativeTextInput
+                  style={stockStyles.input}
+                  value={qrValueManual}
+                  onChangeText={setQrValueManual}
+                  placeholder="Barkod numarası giriniz"
+                  placeholderTextColor="#94A3B8"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  accessibilityLabel="Barkod Numarası"
+                />
+
+                <TouchableOpacity
+                  style={stockStyles.searchButton}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  onPress={() => {
+                    setQrValue(qrValueManual);
+                    fetchPaperData(qrValueManual);
+                  }}
+                >
+                  <Text style={stockStyles.searchButtonText}>
+                    Sorgula
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            <View style={stockStyles.emptyState}>
+              {manual && !qrValue.length ? (
+                <Text style={stockStyles.emptyDescription}>
+                  Kağıt bilgilerini görüntülemek için barkod
+                  numarasını girip sorgulayın.
+                </Text>
+              ) : (
+                <>
+                  <Text style={stockStyles.emptyTitle}>
+                    Kağıt bilgisi bulunamadı
+                  </Text>
+                  <Text style={stockStyles.emptyDescription}>
+                    Barkod bilgisini kontrol ederek tekrar deneyin.
+                  </Text>
+                </>
+              )}
+            </View>
+          }
+        />
+      </View>
+    </KeyboardAvoidingView>
+  </Modal>
+);
+
+  return (
+  <View style={stockStyles.screen}>
+    {!scan ? (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={stockStyles.scrollContent}
+      >
+        <View style={stockStyles.content}>
+          <View style={stockStyles.header}>
+            <View style={stockStyles.headerAccent} />
+
+            <Text style={stockStyles.title}>Stok İşlemleri</Text>
+            <Text style={stockStyles.subtitle}>
+              Stoğa giriş veya stoktan çıkış işlemini seçin.
+            </Text>
           </View>
-        )}
-        {scan && (
+
+          <Text style={stockStyles.groupLabel}>STOĞA GİRİŞ</Text>
+
+          {renderStockAction(
+            "Stoğa Al",
+            "Kamera ile barkod okutarak ilerleyin.",
+            "sign-in",
+            () => scanAgain(false),
+          )}
+
+          {renderStockAction(
+            "Manuel Stoğa Al",
+            "Barkod numarasını elle girin.",
+            "keyboard-o",
+            () => openManualStockModal(false),
+          )}
+
+          <Text style={stockStyles.groupLabel}>STOKTAN ÇIKIŞ</Text>
+
+          {renderStockAction(
+            "Stoktan Düş",
+            "Kamera ile barkod okutarak ilerleyin.",
+            "sign-out",
+            () => scanAgain(true),
+          )}
+
+          {renderStockAction(
+            "Manuel Stoktan Düş",
+            "Barkod numarasını elle girin.",
+            "keyboard-o",
+            () => openManualStockModal(true),
+          )}
+        </View>
+      </ScrollView>
+    ) : (
+      <View style={stockStyles.cameraContainer}>
+        {device  ? (
           <Camera
             style={StyleSheet.absoluteFill}
             codeScanner={codeScannner}
             device={device}
-            isActive={scan}
+            isActive={
+              scan &&
+              !modalVisible &&
+              !modalVisible1 &&
+              !modalVisible2
+            }
           />
+        ) : (
+          <View style={stockStyles.cameraEmpty}>
+            <Text style={stockStyles.cameraText}>
+              Kamera kullanılamıyor.
+            </Text>
+          </View>
         )}
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(false);
-              setData([]);
-                    setQrValue("");
-                    setScan(false);
-                    setCount(count + 1);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View
-                style={{
-                  width: "100%",
-                  justifyContent: "flex-end",
-                  alignItems: "flex-end",
-                  marginRight: 30,
-                  marginTop: 5,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setModalVisible(!modalVisible);
-                    setData([]);
-                    setQrValue("");
-                    setScan(false);
-                    setCount(count + 1);
-                  }}
-                >
-                  <FontAwesome name={"close"} color="#000000" size={32} />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.modalText}>Kağıt Bilgileri</Text>
+       
 
-              <FlatList
-                removeClippedSubviews={true}
-                keyboardShouldPersistTaps="handled"
-                keyExtractor={(item) => item.Id}
-                data={data}
-                renderItem={renderItem}
-                ListEmptyComponent={
-                  <View>
-                    <Text>İlgili Kağıt Bilgisi bulunamadı.</Text>
-                  </View>
-                }
-              />
-            </View>
+        {device && (
+          <View pointerEvents="none" style={stockStyles.cameraHint}>
+            <Text style={stockStyles.cameraText}>
+              Kamerayı kağıt üzerindeki barkoda doğrultun.
+            </Text>
           </View>
-        </Modal>
-
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible1}
-          onRequestClose={() => {
-            setModalVisible1(false);
-          
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View
-                style={{
-                  width: "100%",
-                  justifyContent: "flex-end",
-                  alignItems: "flex-end",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setData([]);
-                    setQrValue("");
-                    setQrValueManual("");
-                    setModalVisible1(!modalVisible1);
-                    setCount(count + 1);
-                  }}
-                >
-                  <FontAwesome name={"close"} color="#000000" size={32} />
-                </TouchableOpacity>
-              </View>
-              <View style={{ flex: 1, flexDirection: "row" }}>
-                <View style={{ flex: 1, alignItems: "center" }}>
-                  <TextInput
-                    style={styles.input}
-                    value={qrValueManual}
-                    onChangeText={(text) => setQrValueManual(text)}
-                    placeholder="Barkod Numarası Giriniz"
-                  />
-                  <Button
-                    style={styles.button3}
-                    onPress={() => {
-                      setQrValue(qrValueManual);
-                      fetchPaperData(qrValueManual);
-                    }}
-                  >
-                    <Text style={styles.buttonTextStyle}>Sorgula</Text>
-                  </Button>
-                </View>
-              </View>
-              {qrValue.length > 0 ? (
-                <FlatList
-                  keyExtractor={(item) => item.Id}
-                  data={data}
-                  renderItem={renderItem}
-                  ListEmptyComponent={
-                    <View>
-                      <Text>İlgili Kağıt Bilgisi bulunamadı.</Text>
-                    </View>
-                  }
-                />
-              ) : null}
-            </View>
-          </View>
-        </Modal>
-
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible2}
-          onRequestClose={() => {
-            setModalVisible2(!modalVisible2);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View
-                style={{
-                  width: "100%",
-                  justifyContent: "flex-end",
-                  alignItems: "flex-end",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    setData([]);
-                    setQrValue("");
-                    setQrValueManual("");
-                    setModalVisible2(!modalVisible2);
-                    setCount(count + 1);
-                  }}
-                >
-                  <FontAwesome name={"close"} color="#000000" size={32} />
-                </TouchableOpacity>
-              </View>
-              <View style={{ flex: 1, flexDirection: "row" }}>
-                <View style={{ flex: 1, alignItems: "center" }}>
-                  <TextInput
-                    style={styles.input}
-                    value={qrValueManual}
-                    onChangeText={(text) => setQrValueManual(text)}
-                    placeholder="Barkod Numarası Giriniz"
-                  />
-                  <Button
-                    style={styles.button3}
-                    onPress={() => {
-                      setQrValue(qrValueManual);
-                      fetchPaperData(qrValueManual);
-                    }}
-                  >
-                    <Text style={styles.buttonTextStyle}>Sorgula</Text>
-                  </Button>
-                </View>
-              </View>
-              {qrValue.length > 0 ? (
-                <FlatList
-                  keyExtractor={(item) => item.Id}
-                  data={data}
-                  renderItem={renderItem}
-                  ListEmptyComponent={
-                    <View>
-                      <Text>İlgili Kağıt Bilgisi bulunamadı.</Text>
-                    </View>
-                  }
-                />
-              ) : null}
-            </View>
-          </View>
-        </Modal>
+        )}
       </View>
-    </KeyboardAvoidingView>
-  );
+    )}
+
+    {renderStockModal(
+      modalVisible,
+      "Kağıt Bilgileri",
+      closeStockModal,
+    )}
+
+    {renderStockModal(
+      modalVisible1,
+      "Manuel Stoğa Al",
+      () => closeManualStockModal(false),
+      true,
+    )}
+
+    {renderStockModal(
+      modalVisible2,
+      "Manuel Stoktan Düş",
+      () => closeManualStockModal(true),
+      true,
+    )}
+  </View>
+);
 };
-const styles = StyleSheet.create({
-  centeredView: {
+const stockStyles = StyleSheet.create({
+  screen: {
     flex: 1,
-    alignItems: "center",
+    backgroundColor: "#F3F6FC",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 24,
+    paddingBottom: 36,
+  },
+  content: {
     width: "100%",
-    justifyContent: "center",
+    maxWidth: 600,
+    alignSelf: "center",
+    paddingHorizontal: 18,
   },
-  input1: {
-    height: 40,
-    margin: 30,
-    marginLeft: 0,
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: "white",
-    width: "100%",
-    padding: 10,
+  header: {
+    marginBottom: 24,
+    paddingHorizontal: 2,
   },
-  input: {
-    height: 40,
-    margin: 30,
-    borderWidth: 1,
-    borderRadius: 10,
-    width: "100%",
-    padding: 10,
-  },
-  input2: {
-    height: 45,
-    margin: 30,
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 0,
-    marginRight: 0,
-    borderWidth: 1,
-    borderRadius: 5,
-    fontSize: 10,
-  },
-  centeredViewManual: {
-    flex: 1,
-
-    width: "100%",
-  },
-  button3: {
-    width: "70%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  button4: {
-    width: "70%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 10,
-    color: "#fff",
-  },
-  button5: {
-    width: "70%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 10,
-    color: "#fff",
-  },
-  linearGradient: {
-    flex: 1,
-  },
-  modalText: {
-    textAlign: "center",
-  },
-  modalView: {
-    flex: 1,
-    backgroundColor: "#fff",
-
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+  headerAccent: {
+    width: 32,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 16,
   },
   title: {
+    color: "#172B4D",
     fontSize: 16,
+    fontWeight: "700",
+    lineHeight: 24,
+    marginBottom: 8,
   },
-  centerText: {
+  subtitle: {
+    color: "#64748B",
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  groupLabel: {
+    color: "#73829B",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+    marginTop: 12,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  actionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 94,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 12,
+  },
+  iconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: "#EAF0FA",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+  actionContent: {
     flex: 1,
-    fontSize: 18,
-    padding: 32,
-    color: "#777",
   },
-  cameraStyle: {
-    height: "100%",
-    marginTop: 40,
+  actionTitle: {
+    color: "#172B4D",
+    fontSize: 15,
+    fontWeight: "700",
+    lineHeight: 23,
+  },
+  actionDescription: {
+    color: "#73829B",
+    fontSize: 12,
+    lineHeight: 19,
+    marginTop: 4,
+  },
+  chevron: {
+    color: "#94A3B8",
+    fontSize: 26,
+    marginLeft: 10,
+  },
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: "#172B4D",
+  },
+  cameraEmpty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  cameraBack: {
+    position: "absolute",
+    top: 20,
+    left: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 44,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: "rgba(11, 51, 124, 0.9)",
+  },
+  cameraBackText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+    marginLeft: 10,
+  },
+  cameraHint: {
+    position: "absolute",
+    left: 24,
+    right: 24,
+    bottom: 48,
+    borderRadius: 14,
+    padding: 18,
+    backgroundColor: "rgba(11, 51, 124, 0.9)",
+  },
+  cameraText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    lineHeight: 22,
+    textAlign: "center",
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 32,
+  },
+  modalPanel: {
     width: "100%",
+    maxWidth: 640,
+    height: "90%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDF1F7",
+  },
+  modalTitle: {
     flex: 1,
-    alignSelf: "center",
+    color: "#172B4D",
+    fontSize: 19,
+    fontWeight: "700",
+    lineHeight: 27,
+    marginRight: 10,
+  },
+  closeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "#F3F6FC",
+    alignItems: "center",
     justifyContent: "center",
   },
-  textBold: {
-    fontWeight: "500",
-    color: "#000",
+  resultList: {
+    flex: 1,
   },
-  buttonText: {
-    fontSize: 21,
-    color: "rgb(0,122,255)",
-  },
-  buttonTouchable: {
+  resultContent: {
+    flexGrow: 1,
     padding: 16,
   },
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    height: 192,
+  searchSection: {
+    paddingBottom: 18,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDF1F7",
   },
-  select: {
-    flex: 1,
-    margin: 2,
+  inputLabel: {
+    color: "#475569",
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  input: {
+    minHeight: 50,
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    borderRadius: 10,
+    backgroundColor: "#F8FAFD",
+    color: "#334155",
+    fontSize: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  searchButton: {
+    minHeight: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0B337C",
+    borderRadius: 10,
+    marginTop: 12,
+    padding: 12,
+  },
+  searchButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  emptyState: {
+    paddingHorizontal: 12,
+    paddingVertical: 36,
+    alignItems: "center",
+  },
+  emptyTitle: {
+    color: "#334155",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emptyDescription: {
+    color: "#73829B",
+    fontSize: 13,
+    lineHeight: 22,
+    textAlign: "center",
   },
 });
 

@@ -35,7 +35,7 @@
       "defectDetails": "Defect Details",
       "potantialMeasure": "Potential Measure",
       "create": "Create",
-      "before": "Before",
+
       "after": "After",
       "pleaseSelect": "Please Select",
       "noAccident": "No Accident",
@@ -127,7 +127,9 @@
     "forgotPassword": "Forgot Password",
     "goBack": "Go Back",
     "noDetails": "No Details Found",
+    "forgotPasswordTitle": "Enter the email address connected to your account. Let's send you a link to renew your password",
     "forgotPasswordMessage": "Password reset link has been sent to your e-mail address.",
+    "forgotPasswordButton": "Send a reset link",
     "unknownUser": "User not Found.",
     "employeeID": "Employee ID",
     "riskLevel": {
@@ -199,7 +201,40 @@
       "addImage": "Add Image",
       "value": "Value",
       "dailyChecklist": "Daily Checklist",
-      "pleaseRoute": "Please Create Checklist Route"
+      "pleaseRoute": "Please Create Checklist Route",
+      "isDescriptionRequired": "Is an Explanation Necessary?",
+      "addingImageNotMandatory": "ADDING AN IMAGE IS NOT MANDATORY"
+    },
+    "emergencyAreaChecklist": {
+      "entryTitle": "Entry Record",
+      "emergencyChecklistTitle": "Emergency Record",
+      "endGathering": "End the gathering",
+      "searchPerson": "Search Person",
+      "unRegisteredPerson": "Unregistered Person",
+      "completeChecklistPerson": "Complete the Controlling Person",
+      "here": "Here",
+      "notHere": "Not here",
+      "close": "Close",
+      "notRecord": "Not Record",
+      "noPersonMatching": "No person matching your search criteria was found."
+    },
+    "careSystemChecklistDetails": {
+      "controlDetail": "Control Details",
+      "changeMeasurement": "The change in measurement results over time",
+      "historicalRecord": "Historical check records and responses",
+      "measurementHistory": "Measurement History",
+      "measurementValuetoControlDate": "Measurement values ​​according to the control date",
+      "measurement": "Measurement",
+      "measurementValue": "Measurement value",
+      "record": "Record",
+      "controlHistory": "Control History",
+      "controlPoint": "Control Point",
+      "controlRecord": "Control Record",
+      "answer": "Answer",
+      "controlDate": "Control Date",
+      "description": "Description",
+      "noRecord": "There are no records to display for this check yet",
+      "otherMetrics": "You can scroll the chart horizontally to see other metrics"
     }
   }
 }

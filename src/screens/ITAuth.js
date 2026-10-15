@@ -1,15 +1,16 @@
 import {
   View,
-  Alert,
-  StyleSheet,
-  Dimensions,
-  TouchableWithoutFeedback,
+  Text,
+  TextInput as NativeTextInput,
+  ScrollView,
   KeyboardAvoidingView,
   Keyboard,
-  Button,
-  Text,
   Platform,
+  StyleSheet,
+  Dimensions
 } from "react-native";
+
+import { Button as PaperButton } from "react-native-paper";
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { sendUserInfoName } from "../api/auth-api";
@@ -205,139 +206,278 @@ const ITAuth = () => {
     getHttps2();
   }, []);
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
+ return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={styles.container}
+  >
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View>
-          <View>
-            <Text>
-              <Text style={{ color: "red" }}> *</Text>
+      <View style={styles.formContainer}>
+        <View style={styles.header}>
+          <View style={styles.headerAccent} />
+
+          <Text style={styles.title}>
+            {t("itAuth.createRequest")}
+          </Text>
+        </View>
+
+        <View style={styles.formCard}>
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
               {t("itAuth.area")}
+              <Text style={styles.required}> *</Text>
             </Text>
+
+            <View style={styles.pickerContainer}>
+              <PickerModal
+                style={styles.picker}
+                Autocomplete={false}
+                items={areaList}
+                sortingLanguage="tr"
+                showToTopButton
+                showAlphabeticalIndex
+                autoGenerateAlphabeticalIndex
+                searchPlaceholderText={t("itAuth.area")}
+                requireSelection={false}
+                autoSort
+                onSelected={(item) => {
+                  Keyboard.dismiss();
+                  setArea(item);
+                }}
+              />
+            </View>
           </View>
 
-          <PickerModal
-            style={{ width: "100%", color: "black" }}
-            Autocomplete={false}
-            items={areaList}
-            sortingLanguage={"tr"}
-            showToTopButton={true}
-            showAlphabeticalIndex={true}
-            autoGenerateAlphabeticalIndex={true}
-            searchPlaceholderText={"Alan"}
-            requireSelection={false}
-            autoSort={true}
-            onSelected={(item) => {
-              setArea(item);
-            }}
-          />
-        </View>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View>
-          <View>
-            <Text>
-              <Text style={{ color: "red" }}> *</Text>
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
               {t("itAuth.category")}
+              <Text style={styles.required}> *</Text>
             </Text>
+
+            {categoryUniqueList ? (
+              <View style={styles.pickerContainer}>
+                <PickerModal
+                  style={styles.picker}
+                  Autocomplete={false}
+                  items={categoryUniqueList}
+                  sortingLanguage="tr"
+                  showToTopButton
+                  searchPlaceholderText={t("itAuth.category")}
+                  requireSelection={false}
+                  onSelected={(item) => {
+                    Keyboard.dismiss();
+                    setCategory(item);
+                  }}
+                />
+              </View>
+            ) : null}
           </View>
-          {categoryUniqueList ? (
-            <PickerModal
-              style={{ width: "100%", color: "black" }}
-              Autocomplete={false}
-              items={categoryUniqueList}
-              sortingLanguage={"tr"}
-              showToTopButton={true}
-              searchPlaceholderText={"Kategori"}
-              requireSelection={false}
-              onSelected={(item) => {
-                setCategory(item);
-                /* setLine(item)
-                            setArea("")*/
-              }}
-            />
-          ) : null}
-        </View>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View>
-          <View>
-            <Text>
-              <Text style={{ color: "red" }}> *</Text>
+
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
               {t("itAuth.reason")}
+              <Text style={styles.required}> *</Text>
             </Text>
+
+            {reasonList ? (
+              <View style={styles.pickerContainer}>
+                <PickerModal
+                  style={styles.picker}
+                  Autocomplete={false}
+                  items={reasonList}
+                  sortingLanguage="tr"
+                  showToTopButton
+                  searchPlaceholderText={t("itAuth.reason")}
+                  requireSelection={false}
+                  onSelected={(item) => {
+                    Keyboard.dismiss();
+                    setReason(item);
+                  }}
+                />
+              </View>
+            ) : null}
           </View>
 
-          {reasonList ? (
-            <PickerModal
-              style={{ width: "100%", color: "black" }}
-              Autocomplete={false}
-              items={reasonList}
-              sortingLanguage={"tr"}
-              showToTopButton={true}
-              searchPlaceholderText={"Neden"}
-              requireSelection={false}
-              onSelected={(item) => {
-                setReason(item);
-                /* setLine(item)
-                             setArea("")*/
-              }}
-            />
-          ) : null}
-        </View>
-      </TouchableWithoutFeedback>
-      <View>
-        <Text>
-          <Text style={{ color: "red" }}> *</Text>
-          {t("itAuth.duration")}
-        </Text>
-      </View>
-      <TextInput
-        value={duration}
-        onChangeText={(text) => setDuration(text)}
-      ></TextInput>
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
+              {t("itAuth.duration")}
+              <Text style={styles.required}> *</Text>
+            </Text>
 
-      <View style={{ flex: 1 }}>
-        <TextInput
-          multiline={true}
-          numberOfLines={4}
-          style={{ textAlignVertical: "top", height: 100 }}
-          value={text}
-          onChangeText={(text) => setText(text)}
-          name="decription"
-          label={t("itAuth.duration")}
-        />
-        <Button
-          color={theme.colors.primary}
+            <NativeTextInput
+              value={String(duration ?? "")}
+              onChangeText={setDuration}
+              style={styles.input}
+              placeholder={t("itAuth.duration")}
+              placeholderTextColor="#94A3B8"
+              accessibilityLabel={t("itAuth.duration")}
+            />
+          </View>
+
+          <View style={styles.divider} />
+
+          <View>
+            <Text style={styles.fieldLabel}>
+              {t("itAuth.description", {
+                defaultValue: "Açıklama",
+              })}
+            </Text>
+
+            <NativeTextInput
+              multiline
+              numberOfLines={5}
+              style={[styles.input, styles.textArea]}
+              value={text}
+              onChangeText={setText}
+              placeholder={t("itAuth.descriptionPlaceholder", {
+                defaultValue: "Talebinizle ilgili ayrıntıları yazın.",
+              })}
+              placeholderTextColor="#94A3B8"
+              accessibilityLabel={t("itAuth.description", {
+                defaultValue: "Açıklama",
+              })}
+              autoCapitalize="sentences"
+            />
+          </View>
+        </View>
+
+        <PaperButton
+          mode="contained"
+          buttonColor="#0B337C"
+          textColor="#FFFFFF"
           style={styles.button}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.buttonLabel}
           onPress={onSubmit}
-          title={t("itAuth.createRequest")}
-        ></Button>
+        >
+          {t("itAuth.createRequest")}
+        </PaperButton>
       </View>
-    </KeyboardAvoidingView>
-  );
-};
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#181e34",
+    backgroundColor: "#F3F6FC",
   },
-  textIntput: {
-    height: 300,
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 26,
+    paddingBottom: 36,
   },
+
   formContainer: {
-    padding: 8,
-    flex: 1,
+    width: "100%",
+    maxWidth: 600,
+    alignSelf: "center",
+    paddingHorizontal: 20,
   },
+
+  header: {
+    paddingHorizontal: 2,
+    marginBottom: 24,
+  },
+
+  headerAccent: {
+    width: 32,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 18,
+  },
+
+  title: {
+    color: "#172B4D",
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 33,
+  },
+
+  formCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
+    marginBottom: 22,
+  },
+
+  field: {
+    marginBottom: 20,
+  },
+
+  fieldLabel: {
+    color: "#334155",
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 21,
+    marginBottom: 9,
+  },
+
+  required: {
+    color: "#DC2626",
+  },
+
+  pickerContainer: {
+    minHeight: 52,
+    justifyContent: "center",
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+
+  picker: {
+    width: "100%",
+    color: "#334155",
+  },
+
+  input: {
+    minHeight: 52,
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: "#334155",
+    fontSize: 15,
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#EDF1F7",
+    marginBottom: 20,
+  },
+
+  textArea: {
+    minHeight: 140,
+    textAlignVertical: "top",
+    lineHeight: 23,
+  },
+
   button: {
-    margin: 10,
-    width: width - 30,
-    height: 40,
+    borderRadius: 12,
+  },
+
+  buttonContent: {
+    minHeight: 54,
+    paddingVertical: 5,
+  },
+
+  buttonLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0,
   },
 });
 export default ITAuth;

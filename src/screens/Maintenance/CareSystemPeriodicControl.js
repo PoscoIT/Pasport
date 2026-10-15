@@ -21,7 +21,7 @@ const CareSystemPeriodicControl = () => {
 
    const url = "https://tstapp.poscoassan.com.tr:8443";
   //const url = "http://localhost:5509"
- // const url = "http://10.0.2.2:5509";
+  //const url = "http://10.0.2.2:5509";
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const { t } = useTranslation();
@@ -194,6 +194,8 @@ const CareSystemPeriodicControl = () => {
           headers: { "auth-token": REACT_APP_SECRET_KEY },
         }
       );
+
+     
 
       if (res.data?.status === "Success") {
         const newData = res.data.data[0] || [];

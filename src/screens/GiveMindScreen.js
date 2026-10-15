@@ -1,5 +1,15 @@
-import React, { memo, useState, useEffect } from "react";
-import { StyleSheet, Dimensions, View, LogBox, Alert } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Dimensions,
+  LogBox,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView
+} from "react-native";
+
+
 import { database } from "../database/firebaseDB";
 import Toast from "../components/Toast";
 import {
@@ -9,12 +19,15 @@ import {
   sendMailForGonulden,
   sendMailForGonuldenLocalMail,
 } from "../api/auth-api";
-import { Card, Text, TextInput } from "react-native-paper";
-import Background_Green from "../components/Background_Green";
+import {
+  Button as PaperButton,
+  TextInput as PaperTextInput,
+} from "react-native-paper";
+
 import PickerModal from "react-native-picker-modal-view";
-import Button from "../components/Button";
+import {memo,useState,useEffect} from 'react'
 import { t } from "i18next";
-import { ScrollView } from "react-native-gesture-handler";
+
 
 let height = Dimensions.get("window").height; //full width
 let width = Dimensions.get("window").width; //full width
@@ -215,198 +228,367 @@ const GiveMindScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <Background_Green>
-      <ScrollView>
-        <Card style={styles.cardStyle}>
-          <Card.Content>
-            <Text variant="titleLarge">{t("loginScreen.message1")},</Text>
-            <Text variant="bodyMedium">{t("loginScreen.message2")}</Text>
-            <Text variant="bodyMedium">
-              Kalan Teşekkür Miktarı (Remaining Thanks) : {creditPoint}
-            </Text>
-          </Card.Content>
-        </Card>
-        <View>
-          <View style={styles.container}>
-            <PickerModal
-              onSelected={(item) => {
-                setAdSoyad({ value: item.Name });
-                setsicilNo({ value: item.value });
-                setlineInfo({ value: item.lineValue });
-                setMailInfo({ value: item.MailAdd });
-                setSelectedItem(item);
-              }}
-              Autocomplete={false}
-              items={liste}
-              sortingLanguage={"tr"}
-              showToTopButton={true}
-              selected={selectedItem}
-              showAlphabeticalIndex={true}
-              autoGenerateAlphabeticalIndex={true}
-              selectPlaceholderText={"Ad Soyad (Name Surname)"}
-              searchPlaceholderText={"Search..."}
-              requireSelection={false}
-              autoSort={true}
-            />
-          </View>
-          <View style={styles.container}>
-            <PickerModal
-              onSelected={(item) => {
-                setDeger({ value: item.value });
-                setSelectedItem2(item);
-              }}
-              Autocomplete={false}
-              items={dataCore}
-              sortingLanguage={"tr"}
-              showToTopButton={true}
-              selected={selectedItem2}
-              selectPlaceholderText={"İlgili Değer (Related Core Value)"}
-              searchPlaceholderText={"Search..."}
-              requireSelection={false}
-              autoSort={true}
-            />
-          </View>
-          <View style={styles.containerAciklama}>
-            <TextInput
-              mode="fixed"
-              placeholder="Açıklama (Explanation)"
-              style={styles.input2}
-              value={commente.value}
-              onChangeText={(text) => setCommente({ value: text })}
-              multiline={true}
-              Autocomplete={false}
-              maxLength={160}
-              right={<TextInput.Affix text={commente.value.length + "/160"} />}
-              underlineColorAndroid="transparent"
-            />
-          </View>
-          <View style={styles.container}>
-            {!loading && (
-              <Button
-                mode="contained"
-                style={styles.button}
-                onPress={insertRec}
-              >
-                {" "}
-                Teşekkür Gönder (Send)
-              </Button>
-            )}
-          </View>
-          <View style={styles.listItemViewer}>
-            <View style={styles.ViewContainerRightBottom}>
-              <Card>
-                <Card.Content>
-                  <Text variant="titleLarge">{t("gonuldenScreen.safety")}</Text>
-                  <Text variant="bodyMedium">
-                    {t("gonuldenScreen.safetyMessage")}
-                  </Text>
-                </Card.Content>
-              </Card>
-            </View>
-            <View style={styles.ViewContainerRightBottom}>
-              <Card>
-                <Card.Content>
-                  <Text variant="titleLarge">{t("gonuldenScreen.ethics")}</Text>
-                  <Text variant="bodyMedium">
-                    {t("gonuldenScreen.ethicsMessage")}
-                  </Text>
-                </Card.Content>
-              </Card>
-            </View>
-            <View style={styles.ViewContainerRightBottom}>
-              <Card>
-                <Card.Content>
-                  <Text variant="titleLarge">
-                    {t("gonuldenScreen.fundamental")}
-                  </Text>
-                  <Text variant="bodyMedium">
-                    {t("gonuldenScreen.fundamentalMessage")}
-                  </Text>
-                </Card.Content>
-              </Card>
-            </View>
-            <View style={styles.ViewContainerRightBottom}>
-              <Card>
-                <Card.Content>
-                  <Text variant="titleLarge">{t("gonuldenScreen.winWin")}</Text>
-                  <Text variant="bodyMedium">
-                    {t("gonuldenScreen.winWinMessage")}
-                  </Text>
-                </Card.Content>
-              </Card>
-            </View>
-            <View style={styles.ViewContainerRightBottom}>
-              <Card>
-                <Card.Content>
-                  <Text variant="titleLarge">
-                    {t("gonuldenScreen.creativity")}
-                  </Text>
-                  <Text variant="bodyMedium">
-                    {t("gonuldenScreen.creativityMessage")}
-                  </Text>
-                </Card.Content>
-              </Card>
-            </View>
-          </View>
-          <Toast
-            type={toast.type}
-            message={toast.value}
-            onDismiss={() => setToast({ value: "", type: "" })}
-          />
+  <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={styles.screen}
+  >
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <View style={styles.headerAccent} />
+
+          <Text style={styles.title}>
+            {t("loginScreen.message1")}
+          </Text>
+
+          <Text style={styles.subtitle}>
+            {t("loginScreen.message2")}
+          </Text>
         </View>
-      </ScrollView>
-    </Background_Green>
-  );
+
+        <View style={styles.creditPanel}>
+          <View style={styles.creditInfo}>
+            <Text style={styles.creditTitle}>
+              Kalan Teşekkür Miktarı
+            </Text>
+            <Text style={styles.creditSubtitle}>Remaining Thanks</Text>
+          </View>
+
+          <Text style={styles.creditValue}>{creditPoint ?? 0}</Text>
+        </View>
+
+        <View style={styles.formCard}>
+          <View style={styles.field}>
+            <Text style={styles.label}>Ad Soyad / Name Surname</Text>
+
+            <View style={styles.pickerContainer}>
+              <PickerModal
+                onSelected={(item) => {
+                  setAdSoyad({ value: item.Name });
+                  setsicilNo({ value: item.value });
+                  setlineInfo({ value: item.lineValue });
+                  setMailInfo({ value: item.MailAdd });
+                  setSelectedItem(item);
+                }}
+                Autocomplete={false}
+                items={liste}
+                sortingLanguage="tr"
+                showToTopButton
+                selected={selectedItem}
+                showAlphabeticalIndex
+                autoGenerateAlphabeticalIndex
+                selectPlaceholderText="Ad Soyad (Name Surname)"
+                searchPlaceholderText="Search..."
+                requireSelection={false}
+                autoSort
+              />
+            </View>
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>
+              İlgili Değer / Related Core Value
+            </Text>
+
+            <View style={styles.pickerContainer}>
+              <PickerModal
+                onSelected={(item) => {
+                  setDeger({ value: item.value });
+                  setSelectedItem2(item);
+                }}
+                Autocomplete={false}
+                items={dataCore}
+                sortingLanguage="tr"
+                showToTopButton
+                selected={selectedItem2}
+                selectPlaceholderText="İlgili Değer (Related Core Value)"
+                searchPlaceholderText="Search..."
+                requireSelection={false}
+                autoSort
+              />
+            </View>
+          </View>
+
+          <View>
+            <Text style={styles.label}>Açıklama / Explanation</Text>
+
+            <PaperTextInput
+              mode="outlined"
+              placeholder="Açıklama (Explanation)"
+              placeholderTextColor="#94A3B8"
+              style={styles.textInput}
+              outlineStyle={styles.inputOutline}
+              outlineColor="#DCE5F3"
+              activeOutlineColor="#0B337C"
+              textColor="#334155"
+              value={commente.value ?? ""}
+              onChangeText={(text) => setCommente({ value: text })}
+              multiline
+              maxLength={160}
+              editable={!loading}
+              accessibilityLabel="Açıklama / Explanation"
+            />
+
+            <Text style={styles.characterCount}>
+              {(commente.value ?? "").length}/160
+            </Text>
+          </View>
+
+          <PaperButton
+            mode="contained"
+            buttonColor="#0B337C"
+            textColor="#FFFFFF"
+            style={styles.submitButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            loading={loading}
+            disabled={loading}
+            onPress={insertRec}
+          >
+            Teşekkür Gönder / Send
+          </PaperButton>
+        </View>
+
+        <View style={styles.valuesPanel}>
+          {[
+            ["safety", "safetyMessage"],
+            ["ethics", "ethicsMessage"],
+            ["fundamental", "fundamentalMessage"],
+            ["winWin", "winWinMessage"],
+            ["creativity", "creativityMessage"],
+          ].map(([titleKey, messageKey], index) => (
+            <View
+              key={titleKey}
+              style={[
+                styles.valueRow,
+                index === 4 && styles.lastValueRow,
+              ]}
+            >
+              <View style={styles.valueMarker} />
+
+              <View style={styles.valueContent}>
+                <Text style={styles.valueTitle}>
+                  {t(`gonuldenScreen.${titleKey}`)}
+                </Text>
+
+                <Text style={styles.valueDescription}>
+                  {t(`gonuldenScreen.${messageKey}`)}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+
+    <Toast
+      type={toast.type}
+      message={toast.value}
+      onDismiss={() => setToast({ value: "", type: "" })}
+    />
+  </KeyboardAvoidingView>
+);
 };
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 5,
-    height: 60,
-    width: width - 10,
-  },
-  containerAciklama: {
-    margin: 5,
-    height: 90,
-    width: width - 10,
-  },
-  itemStyle: {
-    fontSize: 15,
-    height: 75,
-    color: "black",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  ViewContainerRightBottom: {
-    width: width - 10,
-    margin: 5,
-  },
-  inputContainer: {
-    fontSize: 12,
-    width: width - 10,
-  },
-  leftParag: {
-    fontSize: 12,
-    marginLeft: 5,
-    justifyContent: "center",
-  },
-  input2: {
-    marginBottom: 10,
-    backgroundColor: "transparent",
-    width: width - 10,
-  },
-  cardStyle: {
-    backgroundColor: "white",
-    margin: 5,
-    width: width - 10,
-  },
-  safeAreaStyle: {
+  screen: {
     flex: 1,
-    justifyContent: "center",
-    marginTop: 240,
+    backgroundColor: "#F3F6FC",
   },
-  listItemViewer: {
-    paddingBottom: 100,
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 24,
+    paddingBottom: 40,
+  },
+
+  content: {
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+  },
+
+  header: {
+    paddingHorizontal: 4,
+    marginBottom: 22,
+  },
+
+  headerAccent: {
+    width: 32,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 16,
+  },
+
+  title: {
+    color: "#172B4D",
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 33,
+    marginBottom: 8,
+  },
+
+  subtitle: {
+    color: "#64748B",
+    fontSize: 14,
+    lineHeight: 23,
+  },
+
+  creditPanel: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EAF0FA",
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    marginBottom: 18,
+  },
+
+  creditInfo: {
+    flex: 1,
+    paddingRight: 16,
+  },
+
+  creditTitle: {
+    color: "#0B337C",
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 22,
+  },
+
+  creditSubtitle: {
+    color: "#64748B",
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 3,
+  },
+
+  creditValue: {
+    flexShrink: 1,
+    color: "#0B337C",
+    fontSize: 32,
+    fontWeight: "800",
+    textAlign: "right",
+    fontVariant: ["tabular-nums"],
+  },
+
+  formCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
+    marginBottom: 24,
+  },
+
+  field: {
+    marginBottom: 20,
+  },
+
+  label: {
+    color: "#334155",
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 21,
+    marginBottom: 8,
+  },
+
+  pickerContainer: {
+    minHeight: 52,
+    justifyContent: "center",
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+
+  textInput: {
+    minHeight: 140,
+    backgroundColor: "#F8FAFD",
+    fontSize: 14,
+    textAlignVertical: "top",
+  },
+
+  inputOutline: {
+    borderRadius: 10,
+  },
+
+  characterCount: {
+    color: "#8492A8",
+    fontSize: 12,
+    textAlign: "right",
+    marginTop: 7,
+  },
+
+  submitButton: {
+    borderRadius: 12,
+    marginTop: 20,
+  },
+
+  buttonContent: {
+    minHeight: 54,
+    paddingVertical: 5,
+  },
+
+  buttonLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0,
+  },
+
+  valuesPanel: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    paddingHorizontal: 18,
+  },
+
+  valueRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDF1F7",
+  },
+
+  lastValueRow: {
+    borderBottomWidth: 0,
+  },
+
+  valueMarker: {
+    width: 5,
+    height: 20,
+    borderRadius: 3,
+    backgroundColor: "#0B337C",
+    marginTop: 2,
+    marginRight: 12,
+  },
+
+  valueContent: {
+    flex: 1,
+  },
+
+  valueTitle: {
+    color: "#172B4D",
+    fontSize: 15,
+    fontWeight: "700",
+    lineHeight: 23,
+    marginBottom: 6,
+  },
+
+  valueDescription: {
+    color: "#64748B",
+    fontSize: 13,
+    lineHeight: 22,
   },
 });
 

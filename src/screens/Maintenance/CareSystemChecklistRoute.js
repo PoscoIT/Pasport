@@ -4,7 +4,7 @@ import {
   FlatList,
   Platform,
   StyleSheet,
-
+ ActivityIndicator,
   Text,
   TouchableOpacity,
   View,
@@ -16,7 +16,7 @@ import axios from "axios";
 import { Button } from "@ui-kitten/components";
 import { sendUserInfoName } from "../../api/auth-api";
 import {
-  ActivityIndicator,
+ 
   Card,
   Checkbox,
   MD2Colors,

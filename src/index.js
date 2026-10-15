@@ -9,9 +9,9 @@ import {
   Alert,
   Dimensions,
   Platform,
-  StatusBar,
+  Image,
 } from "react-native";
-import { TransitionPresets } from "@react-navigation/stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LoginStack from "./navigation/LoginStack";
 
 import { Layout, Avatar } from "@ui-kitten/components";
@@ -22,7 +22,7 @@ import LineStack from "./navigation/LineStack";
 import CareSystemStack from "./navigation/CareSystemStack";
 // import auth from "@react-native-firebase/auth";
 import { auth } from "./database/firebaseDB";
-import { getVersionNo } from "./api/auth-api";
+import { getVersionNo,sendUserInfoName } from "./api/auth-api";
 import MyMac from "./navigation/MyMac";
 import {
   createDrawerNavigator,
@@ -44,6 +44,7 @@ import CraneChecklist from "./screens/Production/CraneChecklist";
 import SleeveCount from "./screens/Production/SleeveCount";
 import CoilCarChecklist from "./screens/Production/CoilCarChecklist";
 import PaperTrackingSecond from "./screens/Production/PaperTrackingSecond";
+import EmergencyAreaChecklist from "./screens/Safety/EmergencyAreaChecklist";
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -63,44 +64,94 @@ const Index = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [versionStatus, setVersionStatus] = useState(false);
   const { width } = Dimensions.get("screen");
+  const [name, setName] = useState("");
+  
+
 
   const CustomDrawerContent = (props) => {
-    return (
-      <DrawerContentScrollView {...props}>
-        <View
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            top: 0,
-          }}
-        >
-          <Avatar style={styles.logo} source={require("./assets/logo.png")} />
-        </View>
-        <DrawerItemList {...props} />
+  const insets = useSafeAreaInsets();
 
+  return (
+    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <View style={{ flex: 1 }}>
+        <DrawerContentScrollView
+          {...props}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.drawerHeader}>
+            <Image
+              source={require("./assets/logo.png")}
+              style={styles.logo}
+              resizeMode="cover"
+            />
+             {/* <Text>{user??name}</Text>  */}
+
+        
+          </View>
+
+          <View style={{ paddingHorizontal: 10 }}>
+            <DrawerItemList {...props} />
+          </View>
+        </DrawerContentScrollView>
+      </View>
+
+      <View
+        style={{
+          flexGrow: 0,
+          flexShrink: 0,
+          paddingHorizontal: 16,
+          paddingTop: 10,
+          paddingBottom: Math.max(insets.bottom, 12),
+          borderTopWidth: 1,
+          borderTopColor: "#E8EDF5",
+          backgroundColor: "#FFFFFF",
+        }}
+      >
         <DrawerItem
           label={t("general.logOut")}
+          inactiveTintColor="#B42318"
+          inactiveBackgroundColor="#FFF1F0"
+          style={{ marginHorizontal: 0, borderRadius: 10 }}
           onPress={() =>
-            Alert.alert(t("general.logOut"), t("general.logoutMessage"), [
-              {
-                text: t("general.no"),
-                onPress: () => console.log("Cancel Pressed"),
-                style: "cancel",
-              },
-              { text: t("general.yes"), onPress: () => logoutUser("TST") },
-            ])
+            Alert.alert(
+              t("general.logOut"),
+              t("general.logoutMessage"),
+              [
+                {
+                  text: t("general.no"),
+                  style: "cancel",
+                },
+                {
+                  text: t("general.yes"),
+                  style: "destructive",
+                  onPress: () => logoutUser("TST"),
+                },
+              ],
+            )
           }
         />
-        <DrawerItem label={t("loginScreen.version") + "   56"} />
-      </DrawerContentScrollView>
-    );
-  };
+
+        <Text
+          style={{
+            color: "#64748B",
+            fontSize: 12,
+            textAlign: "center",
+            marginTop: 10,
+          }}
+        >
+          {t("loginScreen.version")} 59
+        </Text>
+      </View>
+    </View>
+  );
+};
 
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 56) {
+        if (responsee.version > 59) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
@@ -120,6 +171,8 @@ const Index = ({ navigation }) => {
     checkUser();
   }, [user]);
 
+
+
   if (loading || isLoading) {
     return (
       <View style={styles.preloader}>
@@ -137,28 +190,57 @@ const Index = ({ navigation }) => {
     );
   } else {
     return user ? (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "#FDFAF6",
-          paddingTop: Platform.OS === "android" ? 0 : 44,
-        }}
-      >
-        <Layout style={{ flex: 1 }}>
-          <Drawer.Navigator
-            screenOptions={({ route, navigation }) => ({
-              headerTitle: "",
-              gestureEnabled: true,
-              drawerType:"slide",
-              ...TransitionPresets.ModalPresentationIOS,
-            })}
-            initialRouteName="SafetyMainScreen"
-            drawerContent={(props) => <CustomDrawerContent {...props} />}
-          >
-            <Drawer.Screen name="SafetyMainScreen" component={MentorStack} />
+      <View style={styles.appContainer}>
+  <Layout style={styles.appLayout}>
+         <Drawer.Navigator
+          initialRouteName="SafetyMainScreen"
+  drawerContent={(props) => <CustomDrawerContent {...props} />}
+  screenOptions={{
+    headerTitle: "",
+    headerStyle: {
+      backgroundColor: "#FFFFFF",
+    },
+    headerTintColor: "#0B337C",
+    headerShadowVisible: false,
+
+    drawerType: "front",
+    swipeEnabled: true,
+    overlayColor: "rgba(15, 23, 42, 0.3)",
+
+    drawerStyle: {
+      width: Math.min(width * 0.88, 350),
+      backgroundColor: "#FFFFFF",
+    },
+
+    drawerActiveTintColor: "#0B337C",
+    drawerActiveBackgroundColor: "#EAF0FA",
+    drawerInactiveTintColor: "#475569",
+    drawerInactiveBackgroundColor: "transparent",
+
+    drawerItemStyle: {
+      borderRadius: 10,
+      marginHorizontal: 0,
+      marginVertical: 2,
+    },
+
+    drawerLabelStyle: {
+      fontSize: 13,
+      fontWeight: "600",
+    },
+  }}
+>
+
+         <Drawer.Screen
+  name="SafetyMainScreen"
+  component={MentorStack}
+  options={{
+    drawerLabel: "Safety First",
+  }}
+/>
 
             {/* <Drawer.Screen name="Checklist" component={Checklist} /> */}
             <Drawer.Screen name="Care System Checklist" component={CareSystemStack} />
+            <Drawer.Screen name="Emergency Area Checklist" component={EmergencyAreaChecklist} />
             <Drawer.Screen name={t("iTSR")} component={ITIncidentStack} />
             <Drawer.Screen name={t("iTAuth")} component={ITAuthStack} />
             <Drawer.Screen name={t("myMachine")} component={MyMac} />
@@ -177,8 +259,8 @@ const Index = ({ navigation }) => {
                 unmountOnBlur: true,
               }}
             />
-            <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
-             <Drawer.Screen name="Canlı Kağıt Stok Durumu" component={PaperTrackingSecond} />
+            <Drawer.Screen name="Canlı Beyaz Kağıt" component={PaperTracking} />
+             <Drawer.Screen name="ZRM Kağıt Stok Durumu" component={PaperTrackingSecond} />
 
             {/*<Drawer.Screen options={{*/}
 
@@ -283,25 +365,105 @@ const Index = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  TopNavigation: {
-    backgroundColor: "#FDFAF6",
-    bottom: 0,
-    zIndex: 1,
-    position: "absolute",
+  appContainer: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingTop: Platform.OS === "android" ? 0 : 44,
   },
-  preloader: {
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    position: "absolute",
-    alignItems: "center",
-    justifyContent: "center",
+
+  appLayout: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
   },
+
+  drawerScroll: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+
+  drawerContent: {
+    flexGrow: 1,
+  },
+
+  drawerHeader: {
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    paddingBottom: 22,
+    marginHorizontal: 8,
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEF1F5",
+  },
+
   logo: {
     width: "100%",
+    height: 44,
+    marginBottom: 16,
+  },
 
-    aspectRatio: 5,
+  profileName: {
+    color: "#172B4D",
+    fontSize: 16,
+    fontWeight: "700",
+    lineHeight: 23,
+    marginBottom: 4,
+  },
+
+  profileEmail: {
+    color: "#64748B",
+    fontSize: 12,
+    lineHeight: 19,
+  },
+
+  menuContainer: {
+    paddingHorizontal: 10,
+    paddingBottom: 18,
+  },
+
+  drawerFooter: {
+    flexGrow: 1,
+    justifyContent: "flex-end",
+    paddingHorizontal: 12,
+    paddingBottom: 16,
+  },
+
+  logoutButton: {
+    borderTopWidth: 1,
+    borderTopColor: "#EEF1F5",
+    borderRadius: 0,
+    marginHorizontal: 0,
+    marginVertical: 0,
+    paddingTop: 8,
+  },
+
+  logoutLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  versionText: {
+    color: "#94A3B8",
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: 12,
+    marginBottom: 4,
+  },
+
+  preloader: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 28,
+  },
+
+  labelDate: {
+    color: "#0B337C",
+    fontSize: 17,
+    fontWeight: "600",
+    lineHeight: 26,
+    textAlign: "center",
+    marginBottom: 20,
   },
 });
 export default Index;

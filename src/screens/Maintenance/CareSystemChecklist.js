@@ -6,10 +6,12 @@ import {
   Platform,
   Image,
   ActivityIndicator,
-  Alert, // Alert importu eksikti, eklendi
+  Alert,
+  Switch,
+  Keyboard, // Alert importu eksikti, eklendi
 } from "react-native";
 import {  TextInput } from "react-native-paper";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Radio, RadioGroup } from "@ui-kitten/components";
 import axios from "axios";
 import { sendUserInfoName } from "../../api/auth-api";
@@ -22,6 +24,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 // 🔥 ScrollView yerine FlatList versiyonunu içe aktarıyoruz
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
+import { FlatList } from "react-native-gesture-handler";
 
 const CareSystemChecklist = ({ route }) => {
   const { uID,CheckTime } = route.params;
@@ -33,18 +36,20 @@ const CareSystemChecklist = ({ route }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true); 
   const [loadingMore, setLoadingMore] = useState(false); 
-
+const flatListRef = useRef(null);
   const [employeeID, setEmployeeId] = useState("");
   const [employeeName, setEmployeeName] = useState("");
   const [loading, setLoading] = useState(true);
   const [activeItem, setActiveItem] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [formValues, setFormValues] = useState({});
+  const scrollOffset = useRef(0);
+  const [descriptionRequired, setDescriptionRequired] = useState({});
 
   const navigation = useNavigation();
   const { t } = useTranslation();
 //const url = "http://10.0.2.2:5509"
-//const url = "http://localhost:5509"
+// const url = "http://localhost:5509"
   const url = "https://tstapp.poscoassan.com.tr:8443";
   const answers = [
     { label: "OK", value: "OK" },
@@ -167,30 +172,26 @@ const onSubmit = async () => {
 
 
 
-  const hasMissingDescription = flatList.some((item) => {
-   
+const hasMissingDescription = Object.entries(descriptionRequired).some(
+  ([uID, selections]) =>
+    Object.entries(selections).some(([index, required]) => {
+      if (required !== true) return false;
 
-    const answer = String(item.Answer || "").trim();
-    const descriptionEmpty = String(item.Description || "").trim() === "";
+      const description = String(
+        formValues[uID]?.[index]?.Description ?? ""
+      ).trim();
 
-    if (answer === "OK") return false;
+      return description === "";
+    })
+);
 
-    const isMeasureOutOfRange =
-      item?.Method?.toString() === "Measure" &&
-      answer !== "" &&
-      (Number(answer) < Number(item.Criteria_LL) ||
-        Number(answer) > Number(item.Criteria_HH));
-
-    return (
-      (answer !== "" && descriptionEmpty) ||
-      (isMeasureOutOfRange && descriptionEmpty)
-    );
-  });
-
-  if (hasMissingDescription) {
-    Toast.error("Lütfen gerekli açıklamaları giriniz.");
-    return;
-  }
+if (hasMissingDescription) {
+  Alert.alert(
+    "Açıklama gerekli",
+    "Açıklama gerekli seçeneğini açtığınız maddeler için açıklama giriniz."
+  );
+  return;
+}
 
   if (flatList.length === 0) {
     Toast.error("Lütfen maddeleri doldurunuz");
@@ -263,6 +264,7 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
 
     if (finalResponse.data?.status === "Success") {
       setFormValues({});
+    setDescriptionRequired({});
       Toast.success("Başarılı");
       navigation.goBack();
     } else {
@@ -298,7 +300,7 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
       if (res.data && res.data.status === "Success") {
         const newData = res.data.data || [];
 
-        // Eğer 20'den az veri geldiyse, backend'de başka veri kalmamıştır
+        // Eğer 10'dan az veri geldiyse, backend'de başka veri kalmamıştır
         if (newData.length < 10) {
           setHasMore(false);
         }
@@ -331,6 +333,40 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
     getQuestionList(1);
     getUser();
   }, [selectedQrCodeZone]);
+
+useEffect(() => {
+  let timer;
+
+  const subscription = Keyboard.addListener("keyboardDidHide", () => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      const list = flatListRef.current;
+      const offset = scrollOffset.current;
+
+      if (!list || !Number.isFinite(offset) || offset < 0) {
+        return;
+      }
+
+     if (typeof list.scrollToOffset === "function") {
+  list.scrollToOffset({
+    offset,
+    animated: false,
+  });
+} else if (typeof list.scrollTo === "function") {
+  list.scrollTo({
+    y: offset,
+    animated: false,
+  });
+}
+    }, 100);
+  });
+
+  return () => {
+    clearTimeout(timer);
+    subscription.remove();
+  };
+}, []);
 
 
   const loadMoreData = () => {
@@ -382,7 +418,10 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
               <View key={index2} style={{ marginBottom: 16 }}>
                 {item2 && (
                   <View style={{ flex: 1, flexDirection: "column", alignItems: "flex-start", justifyContent: "flex-start" }}>
-                    <Text style={styles.title}>{item2}</Text>
+                    <TouchableOpacity onPress={()=>navigation.navigate("ChecklistDetails",item)}>
+   <Text style={styles.title}>{item2}</Text>
+                    </TouchableOpacity>
+                 
                     
                     <View style={{marginBottom:5  }}>
                       {/* ✅ Kontrol kaldırıldı: Her CheckItem'ın kendi fotoğraf yükleme butonu var */}
@@ -429,6 +468,9 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
                     disabled={item.IsValid === 1}
                     mode="outlined"
                     style={styles.input}
+                      onSubmitEditing={()=>{
+                      Keyboard.dismiss();
+                  }}
                     value={formValues[item.uID]?.[index2]?.Answer || ""}
                     onChangeText={(text) =>
                       handleAnswerChange(
@@ -472,22 +514,58 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
                   </View>
                 )}
 
-                <TextInput
-                  mode="outlined"
-                  style={styles.descriptionInput}
-                  disabled={item.IsValid === 1}
-                  value={formValues[item.uID]?.[index2]?.Description || ""}
-                  onChangeText={(text) =>
-                    handleAnswerChange(
-                      item.uID, index2, formValues[item.uID]?.[index2]?.Answer, item.WBS, item.Wo_Path, item2,
-                      text, formValues[item.uID]?.[index2]?.filePath
-                    )
-                  }
-                  label={t("description")}
-                  multiline
-                  numberOfLines={3}
-                  outlineStyle={styles.inputOutline}
-                />
+            <View
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+  }}
+>
+  <Text>{t("careSystem.isDescriptionRequired")}</Text>
+
+  <Switch
+    disabled={item.IsValid === 1}
+    value={descriptionRequired[item.uID]?.[index2] === true}
+    onValueChange={(required) => {
+      setDescriptionRequired((prev) => ({
+        ...prev,
+        [item.uID]: {
+          ...prev[item.uID],
+          [index2]: required,
+        },
+      }));
+    }}
+    trackColor={{ false: "#d1d5db", true: "#0B337C" }}
+    thumbColor="#fff"
+  />
+</View>
+
+{descriptionRequired[item.uID]?.[index2] === true && (
+  <TextInput
+    mode="outlined"
+    style={styles.descriptionInput}
+    onSubmitEditing={() => Keyboard.dismiss()}
+    disabled={item.IsValid === 1}
+    value={formValues[item.uID]?.[index2]?.Description ?? ""}
+    onChangeText={(text) =>
+      handleAnswerChange(
+        item.uID,
+        index2,
+        formValues[item.uID]?.[index2]?.Answer,
+        item.WBS,
+        item.Wo_Path,
+        item2,
+        text,
+        formValues[item.uID]?.[index2]?.filePath
+      )
+    }
+    label={`${t("description")} *`}
+    multiline
+    numberOfLines={3}
+    outlineStyle={styles.inputOutline}
+  />
+)}
               </View>
             ))}
             {/* ❌ DIŞARIDAKİ HATALI FOTOĞRAF BUTONU BURADAN KALDIRILDI */}
@@ -520,7 +598,7 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
         <Icon name="angle-left" size={22} color="#000" style={{ marginLeft: 10 }} />
         <Text style={styles.backText}>{t("goBack")}</Text>
       </TouchableOpacity>
-       <Text style={{fontWeight:"bold",textAlign:"center"}}>!!GÖRSEL EKLEMEK ZORUNLU DEĞİLDİR!!</Text>
+       <Text style={{fontWeight:"bold",textAlign:"center"}}>!!{t("careSystem.addingImageNotMandatory")}!!</Text>
       {loading   ? (
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <ActivityIndicator size="large" />
@@ -530,27 +608,32 @@ formData.append("fileMap", JSON.stringify(finalFileMap));
           <Text style={{ textAlign: "center" }}>{t("careSystem.relatedAreaNotFound")}</Text>
         </View>
       ) : (
-        <KeyboardAwareFlatList
-          style={{marginBottom:50}}
-          enableOnAndroid={true}
-          
-          extraScrollHeight={100}
-          keyboardShouldPersistTaps="handled"
-          
-          // 🔥 FLATLIST PROPS
-          data={questionList}
-       keyExtractor={(item, index) => `${item.uID}_${index}`}
-          renderItem={renderItem}
-          
-          // 🔥 PAGINATION PROPS
-          onEndReached={loadMoreData}
-          onEndReachedThreshold={1} 
-          ListFooterComponent={renderFooter}
-        />
+     <KeyboardAwareFlatList
+  ref={flatListRef}
+  style={{ marginBottom: 80 }}
+  enableOnAndroid={true}
+  enableAutomaticScroll={true}
+  extraScrollHeight={20}
+  extraData={{ formValues, descriptionRequired }}
+  extraHeight={20}
+  keyboardOpeningTime={0}
+  keyboardShouldPersistTaps="handled"
+  data={questionList}
+  keyExtractor={(item, index) => `${item.uID}_${index}`}
+  renderItem={renderItem}
+  onEndReached={loadMoreData}
+  onEndReachedThreshold={0.5}
+ onScroll={(event) => {
+    scrollOffset.current = event.nativeEvent.contentOffset.y;
+  }}
+  scrollEventThrottle={16}
+  ListFooterComponent={renderFooter}
+  removeClippedSubviews={false}
+/>
       )}
 
       {questionList.length > 0 && !loading ? (
-        <View style={{ backgroundColor: "#fff", position: "absolute", bottom: 0, paddingBottom: 30, flex: 1, left: 0, right: 0 }}>
+        <View style={{ backgroundColor: "#fff", position: "absolute", bottom: 0, paddingBottom: 50, flex: 1, left: 0, right: 0 }}>
           <Button
             style={{
               marginHorizontal: 40,

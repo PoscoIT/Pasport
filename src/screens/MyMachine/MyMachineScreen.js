@@ -1,27 +1,26 @@
 import {
-  Alert,
-  Animated,
-  Dimensions,
-  PermissionsAndroid,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
   View,
-  TouchableWithoutFeedback,
-  Keyboard,
+  Text,
+  TextInput as NativeTextInput,
+  Image,
+  ScrollView,
   KeyboardAvoidingView,
-  Linking,
+  Keyboard,
+  Platform,
+  StyleSheet,
+  Dimensions
 } from "react-native";
-import TextInput from "../../components/TextInput";
+
 import {
-  ActivityIndicator,
-  Button,
-  Portal,
   Provider,
+  Portal,
   Dialog,
+  Button as PaperButton,
+    ActivityIndicator,
   DefaultTheme,
 } from "react-native-paper";
+
+
 import { theme } from "../../core/theme";
 import React, { useEffect, useRef, useState } from "react";
 import PickerModal from "react-native-picker-modal-view";
@@ -453,281 +452,510 @@ const MyMachineScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <KeyboardAvoidingView>
-      <ScrollView ref={scrollViewRef}>
-        <Provider>
-          <View style={styles.container}>
-            <View style={styles.form}>
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View>
-                  <View>
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>Kategori
-                    </Text>
-                  </View>
-                  <PickerModal
-                    style={{ width: "100%", color: "black" }}
-                    Autocomplete={false}
-                    items={categoryList}
-                    sortingLanguage={"tr"}
-                    showToTopButton={true}
-                    selected={selectedCategory}
-                    showAlphabeticalIndex={true}
-                    autoGenerateAlphabeticalIndex={true}
-                    selectPlaceholderText={<Text>Kategori Seçiniz</Text>}
-                    searchPlaceholderText={"Kategori Seçiniz"}
-                    requireSelection={false}
-                    autoSort={true}
-                    onSelected={(item) => {
-                      setSelectedCategory(item);
-                    }}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View>
-                  <Text>
-                    <Text style={{ color: "red" }}> *</Text>
-                    Ekipman
-                  </Text>
-                  <TextInput
-                    placeholder="Ekipman Yazınız"
-                    theme={DefaultTheme}
-                    onChangeText={(text) => {
-                      setEquipmentText(text);
-                    }}
-                    value={equipmentText}
-                    onFocus={() => scrollViewRef.current?.scrollToEnd()}
-                    returnKeyType="next"
-                    autoCapitalize="none"
-                  />
+  <Provider>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.form}>
+          <View style={styles.header}>
+            <View style={styles.headerAccent} />
 
-                  <PickerModal
-                    style={{ width: "100%", backgroundColor: "black" }}
-                    Autocomplete={false}
-                    items={mainOperatorList}
-                    sortingLanguage={"tr"}
-                    showToTopButton={true}
-                    showAlphabeticalIndex={true}
-                    selected={selectedMainOperator}
-                    autoGenerateAlphabeticalIndex={true}
-                    selectPlaceholderText={<Text>Main Operator Seçiniz</Text>}
-                    searchPlaceholderText={"Main Operator Seçiniz"}
-                    requireSelection={false}
-                    autoSort={true}
-                    onSelected={(item) => setSelectedMainOperator(item)}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
+            <Text style={styles.title}>Aksiyon Kaydı</Text>
+            <Text style={styles.subtitle}>
+              Mevcut sorunu ve uyguladığınız aksiyonu belirtin.
+            </Text>
+          </View>
 
-              <TextInput
-                theme={DefaultTheme}
-                onChangeText={(text) => {
-                  setErrorCurrentProblem(text ? "" : "Bu alan zorunludur");
-                  setCurrentProblem(text);
-                }}
-                value={currentProblem}
-                onFocus={() => scrollViewRef.current?.scrollToEnd()}
-                label={
-                  <Text>
-                    <Text style={{ color: "red" }}> *</Text>
-                    Mevcut Durum/Sorun
-                  </Text>
-                }
-                returnKeyType="next"
-                autoCapitalize="none"
-              />
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Ekipman Bilgileri</Text>
 
-              {filePath?.uri ? (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                    flexDirection: "row",
+            <View style={styles.field}>
+              <Text style={styles.label}>
+                Kategori <Text style={styles.required}>*</Text>
+              </Text>
+
+              <View style={styles.pickerContainer}>
+                <PickerModal
+                  style={styles.picker}
+                  Autocomplete={false}
+                  items={categoryList}
+                  sortingLanguage="tr"
+                  showToTopButton
+                  selected={selectedCategory}
+                  showAlphabeticalIndex
+                  autoGenerateAlphabeticalIndex
+                  selectPlaceholderText={<Text>Kategori Seçiniz</Text>}
+                  searchPlaceholderText="Kategori Seçiniz"
+                  requireSelection={false}
+                  autoSort
+                  onSelected={(item) => {
+                    Keyboard.dismiss();
+                    setSelectedCategory(item);
                   }}
-                >
-                  <View style={{ width: action === 0 ? "100%" : "50%" }}>
-                    <Animated.Image
-                      source={{ uri: filePath.uri }}
-                      style={{ height: 150, resizeMode: "stretch" }}
-                    />
-                  </View>
-                </View>
-              ) : null}
-              <View
-                style={{
-                  flex: 1,
-                  width: "100%",
-
-                  marginVertical: 5,
-                }}
-              >
-                <Icon.Button
-                  name="image"
-                  backgroundColor={"#69b5fa"}
-                  onPress={() => setVisible(true)}
-                >
-                  <Text style={styles.textStyle}>Öncesi</Text>
-                </Icon.Button>
-
-                <Portal>
-                  <Dialog visible={visible} onDismiss={hideDialog}>
-                    <Dialog.Content>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => chooseFile("photo")}
-                      >
-                        <Icon name={"image"} />
-                        Galeri
-                      </Button>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => captureImage("photo")}
-                      >
-                        <Icon name={"camera"} />
-                        Kamera
-                      </Button>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                      <Button onPress={hideDialog}>Kapat</Button>
-                    </Dialog.Actions>
-                  </Dialog>
-                </Portal>
-                <Portal>
-                  <Dialog visible={visible2} onDismiss={hideDialog2}>
-                    <Dialog.Content>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => chooseFile2("photo")}
-                      >
-                        <Icon name={"image"} />
-                        Galeri
-                      </Button>
-                      <Button
-                        name="image"
-                        backgroundColor={"#69b5fa"}
-                        onPress={() => captureImage2("photo")}
-                      >
-                        <Icon name={"camera"} />
-                        Kamera
-                      </Button>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                      <Button onPress={hideDialog2}>Kapat</Button>
-                    </Dialog.Actions>
-                  </Dialog>
-                </Portal>
-              </View>
-
-              <>
-                <TextInput
-                  theme={DefaultTheme}
-                  onChangeText={(text) => setFinishAction(text)}
-                  value={finishAction}
-                  onFocus={() => scrollViewRef.current?.scrollToEnd()}
-                  label={
-                    <Text>
-                      <Text style={{ color: "red" }}> *</Text>
-                      Alınan Aksiyon
-                    </Text>
-                  }
-                  returnKeyType="next"
-                  autoCapitalize="none"
                 />
-                <View style={{ width: "100%" }}>
-                  <Icon.Button
-                    name="image"
-                    backgroundColor={"#69b5fa"}
-                    onPress={() => setVisible2(true)}
-                  >
-                    <Text style={styles.textStyle}>Sonrası Fotoğraf</Text>
-                  </Icon.Button>
-                </View>
-                {filePath2?.uri ? (
-                  <View style={{ width: "100%", marginHorizontal: 5 }}>
-                    <Animated.Image
-                      source={{ uri: filePath2.uri }}
-                      style={{ height: 150, resizeMode: "stretch" }}
-                    />
-                  </View>
-                ) : null}
-              </>
+              </View>
+            </View>
 
-              <View
-                style={{ flex: 1, alignItems: "center", marginVertical: 10 }}
-              >
-                {loading ? (
-                  <ActivityIndicator
-                    animating={true}
-                    color={theme.colors.primary}
-                  />
-                ) : (
-                  <Button
-                    style={styles.button}
-                    disabled={loading}
-                    onPress={sendForm}
-                    mode="contained"
-                  >
-                    Oluştur
-                  </Button>
-                )}
+            <View style={styles.field}>
+              <Text style={styles.label}>
+                Ekipman <Text style={styles.required}>*</Text>
+              </Text>
+
+              <NativeTextInput
+                placeholder="Ekipman yazınız"
+                placeholderTextColor="#94A3B8"
+                style={styles.input}
+                value={equipmentText}
+                onChangeText={setEquipmentText}
+                autoCapitalize="none"
+                accessibilityLabel="Ekipman"
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Main Operator</Text>
+
+              <View style={styles.pickerContainer}>
+                <PickerModal
+                  style={styles.picker}
+                  Autocomplete={false}
+                  items={mainOperatorList}
+                  sortingLanguage="tr"
+                  showToTopButton
+                  showAlphabeticalIndex
+                  selected={selectedMainOperator}
+                  autoGenerateAlphabeticalIndex
+                  selectPlaceholderText={
+                    <Text>Main Operator Seçiniz</Text>
+                  }
+                  searchPlaceholderText="Main Operator Seçiniz"
+                  requireSelection={false}
+                  autoSort
+                  onSelected={(item) => {
+                    Keyboard.dismiss();
+                    setSelectedMainOperator(item);
+                  }}
+                />
               </View>
             </View>
           </View>
-        </Provider>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepText}>1</Text>
+              </View>
+
+              <Text style={styles.sectionHeading}>
+                Mevcut Durum / Sorun
+                <Text style={styles.required}> *</Text>
+              </Text>
+            </View>
+
+            <NativeTextInput
+              multiline
+              numberOfLines={5}
+              style={[styles.input, styles.textArea]}
+              value={currentProblem}
+              onChangeText={(text) => {
+                setErrorCurrentProblem(text ? "" : "Bu alan zorunludur");
+                setCurrentProblem(text);
+              }}
+              placeholder="Mevcut durumu veya tespit edilen sorunu yazınız."
+              placeholderTextColor="#94A3B8"
+              autoCapitalize="sentences"
+              accessibilityLabel="Mevcut Durum / Sorun"
+            />
+
+            {!!filePath?.uri && (
+              <View style={styles.photoContainer}>
+                <Text style={styles.photoLabel}>ÖNCESİ</Text>
+                <Image
+                  source={{ uri: filePath.uri }}
+                  style={styles.photo}
+                  resizeMode="contain"
+                  accessibilityLabel="Aksiyon öncesi fotoğraf"
+                />
+              </View>
+            )}
+
+            <PaperButton
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.photoButton}
+              contentStyle={styles.buttonContent}
+              onPress={() => {
+                Keyboard.dismiss();
+                setVisible(true);
+              }}
+            >
+              {filePath?.uri
+                ? "Öncesi Fotoğrafını Değiştir"
+                : "Öncesi Fotoğrafı Ekle"}
+            </PaperButton>
+          </View>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepText}>2</Text>
+              </View>
+
+              <Text style={styles.sectionHeading}>
+                Alınan Aksiyon
+                <Text style={styles.required}> *</Text>
+              </Text>
+            </View>
+
+            <NativeTextInput
+              multiline
+              numberOfLines={5}
+              style={[styles.input, styles.textArea]}
+              value={finishAction}
+              onChangeText={setFinishAction}
+              placeholder="Sorunu gidermek için yapılan işlemleri yazınız."
+              placeholderTextColor="#94A3B8"
+              autoCapitalize="sentences"
+              accessibilityLabel="Alınan Aksiyon"
+            />
+
+            {!!filePath2?.uri && (
+              <View style={styles.photoContainer}>
+                <Text style={styles.photoLabel}>SONRASI</Text>
+                <Image
+                  source={{ uri: filePath2.uri }}
+                  style={styles.photo}
+                  resizeMode="contain"
+                  accessibilityLabel="Aksiyon sonrası fotoğraf"
+                />
+              </View>
+            )}
+
+            <PaperButton
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.photoButton}
+              contentStyle={styles.buttonContent}
+              onPress={() => {
+                Keyboard.dismiss();
+                setVisible2(true);
+              }}
+            >
+              {filePath2?.uri
+                ? "Sonrası Fotoğrafını Değiştir"
+                : "Sonrası Fotoğrafı Ekle"}
+            </PaperButton>
+          </View>
+
+          <PaperButton
+            mode="contained"
+            buttonColor="#0B337C"
+            textColor="#FFFFFF"
+            style={styles.submitButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.submitLabel}
+            loading={loading}
+            disabled={loading}
+            onPress={sendForm}
+          >
+            Oluştur
+          </PaperButton>
+        </View>
       </ScrollView>
+
+      <Portal>
+        <Dialog
+          visible={visible}
+          onDismiss={hideDialog}
+          style={styles.dialog}
+        >
+          <Dialog.Title style={styles.dialogTitle}>
+            Öncesi Fotoğrafı
+          </Dialog.Title>
+
+          <Dialog.Content>
+            <PaperButton
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.dialogOption}
+              contentStyle={styles.buttonContent}
+              onPress={() => chooseFile("photo")}
+            >
+              Galeri
+            </PaperButton>
+
+            <PaperButton
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.dialogOption}
+              contentStyle={styles.buttonContent}
+              onPress={() => captureImage("photo")}
+            >
+              Kamera
+            </PaperButton>
+          </Dialog.Content>
+
+          <Dialog.Actions>
+            <PaperButton textColor="#64748B" onPress={hideDialog}>
+              Kapat
+            </PaperButton>
+          </Dialog.Actions>
+        </Dialog>
+
+        <Dialog
+          visible={visible2}
+          onDismiss={hideDialog2}
+          style={styles.dialog}
+        >
+          <Dialog.Title style={styles.dialogTitle}>
+            Sonrası Fotoğrafı
+          </Dialog.Title>
+
+          <Dialog.Content>
+            <PaperButton
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.dialogOption}
+              contentStyle={styles.buttonContent}
+              onPress={() => chooseFile2("photo")}
+            >
+              Galeri
+            </PaperButton>
+
+            <PaperButton
+              mode="outlined"
+              textColor="#0B337C"
+              style={styles.dialogOption}
+              contentStyle={styles.buttonContent}
+              onPress={() => captureImage2("photo")}
+            >
+              Kamera
+            </PaperButton>
+          </Dialog.Content>
+
+          <Dialog.Actions>
+            <PaperButton textColor="#64748B" onPress={hideDialog2}>
+              Kapat
+            </PaperButton>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </KeyboardAvoidingView>
-  );
+  </Provider>
+);
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e3e7e8",
-    width: "100%",
-    alignItems: "flex-start",
-    marginBottom: 40,
+    backgroundColor: "#F3F6FC",
   },
-  select: {
-    margin: 5,
-    height: 60,
-    width: width - 10,
-  },
-  form: {
-    backgroundColor: "white",
-    width: width,
-    padding: 10,
 
+  scrollContent: {
+    flexGrow: 1,
+    paddingTop: 24,
+    paddingBottom: 40,
+  },
+
+  form: {
+    width: "100%",
+    maxWidth: 680,
+    alignSelf: "center",
+    paddingHorizontal: 16,
+  },
+
+  header: {
+    paddingHorizontal: 4,
+    marginBottom: 24,
+  },
+
+  headerAccent: {
+    width: 32,
+    height: 4,
     borderRadius: 2,
+    backgroundColor: "#0B337C",
+    marginBottom: 16,
   },
-  buttonStyle: {
+
+  title: {
+    color: "#172B4D",
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 33,
+    marginBottom: 8,
+  },
+
+  subtitle: {
+    color: "#64748B",
+    fontSize: 14,
+    lineHeight: 23,
+  },
+
+  section: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    padding: 18,
+    marginBottom: 16,
+  },
+
+  sectionTitle: {
+    color: "#172B4D",
+    fontSize: 17,
+    fontWeight: "700",
+    lineHeight: 25,
+    marginBottom: 4,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#69b5fa",
-    borderRadius: 10,
+    marginBottom: 18,
+  },
+
+  stepBadge: {
+    minWidth: 30,
+    minHeight: 30,
+    borderRadius: 9,
     padding: 5,
-    color: "white",
-    marginVertical: 10,
-  },
-  textStyle: {
-    padding: 10,
-    color: "white",
-    textAlign: "center",
-  },
-  button: {
+    backgroundColor: "#EAF0FA",
     alignItems: "center",
-    backgroundColor: theme.colors.primary,
-    borderRadius: 10,
-    width: "60%",
-    padding: 5,
-    color: "white",
+    justifyContent: "center",
+    marginRight: 10,
   },
-  buttonText: {
-    textAlign: "center",
+
+  stepText: {
+    color: "#0B337C",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
+  sectionHeading: {
+    flex: 1,
+    color: "#172B4D",
+    fontSize: 16,
+    fontWeight: "700",
+    lineHeight: 24,
+  },
+
+  field: {
+    marginTop: 18,
+  },
+
+  label: {
+    color: "#475569",
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+
+  required: {
+    color: "#DC2626",
+  },
+
+  pickerContainer: {
+    minHeight: 52,
+    justifyContent: "center",
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+
+  picker: {
+    width: "100%",
+    color: "#334155",
+  },
+
+  input: {
+    minHeight: 52,
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#DCE5F3",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: "#334155",
+    fontSize: 14,
+  },
+
+  textArea: {
+    minHeight: 140,
+    textAlignVertical: "top",
+    lineHeight: 23,
+  },
+
+  photoContainer: {
+    marginTop: 16,
+    backgroundColor: "#F8FAFD",
+    borderWidth: 1,
+    borderColor: "#E3EAF4",
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+
+  photoLabel: {
+    color: "#64748B",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  photo: {
+    width: "100%",
+    height: 210,
+  },
+
+  photoButton: {
+    marginTop: 16,
+    borderRadius: 10,
+    borderColor: "#CBD8EE",
+  },
+
+  buttonContent: {
+    minHeight: 52,
+    paddingVertical: 5,
+  },
+
+  submitButton: {
+    borderRadius: 12,
+    marginTop: 6,
+  },
+
+  submitLabel: {
     fontSize: 15,
-    color: "#fff",
+    fontWeight: "700",
+    letterSpacing: 0,
+  },
+
+  dialog: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+  },
+
+  dialogTitle: {
+    color: "#172B4D",
+    fontSize: 19,
+    fontWeight: "700",
+  },
+
+  dialogOption: {
+    borderRadius: 10,
+    borderColor: "#DCE5F3",
+    marginTop: 12,
   },
 });
 export default MyMachineScreen;
