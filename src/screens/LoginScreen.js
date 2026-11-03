@@ -149,7 +149,7 @@ const LoginScreen = ({ navigation }) => {
       <View style={loginStyles.footer}>
         <View style={loginStyles.footerLine} />
         <Text style={loginStyles.versionText}>
-          {t("loginScreen.version")} 59
+          {t("loginScreen.version")} 62
         </Text>
         <View style={loginStyles.footerLine} />
       </View>

@@ -116,7 +116,7 @@ return (
           <View style={styles.footerLine} />
 
           <Text style={styles.versionText}>
-            {t("loginScreen.version")} 59
+            {t("loginScreen.version")} 62
           </Text>
 
           <View style={styles.footerLine} />

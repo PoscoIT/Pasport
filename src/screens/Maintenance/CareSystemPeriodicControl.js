@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { Toast } from "toastify-react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { sendUserInfoName } from "../../api/auth-api";
+import { sendUserInfoName, sendUserInfoNameWithApi } from "../../api/auth-api";
 import { useTranslation } from "react-i18next";
 
 const CareSystemPeriodicControl = () => {
@@ -92,9 +92,10 @@ const CareSystemPeriodicControl = () => {
   };
 
   const getUser = async () => {
-    await sendUserInfoName((sendResponse) => {
-      setEmployeeID(sendResponse.empSicil);
-    });
+  
+ const user= await sendUserInfoNameWithApi()
+setEmployeeID(user?.EmployeeID)
+  
   };
 
   const toggleItem = (uID,CheckTime) => {
@@ -178,7 +179,10 @@ const CareSystemPeriodicControl = () => {
 
 
   const getChecklistByZone = async (pageNumber = 1) => {
-    if (!employeeID) return; 
+    
+    if (!employeeID) {
+        getUser()
+    }; 
 
     if (pageNumber === 1) {
       setLoading(true);
@@ -244,7 +248,7 @@ if (loading || !loadingMore) return <View style={{ height: 40 }} />;
 
   useEffect(() => {
     getUser(); 
-  }, []);
+  }, [employeeID]);
 
   useEffect(() => {
 
@@ -253,7 +257,7 @@ if (loading || !loadingMore) return <View style={{ height: 40 }} />;
       setHasMore(true);
       getChecklistByZone(1);
     }
-  }, [isFocused, employeeID]);
+  }, [isFocused,employeeID]);
 
   if (loading && page === 1) {
     return (

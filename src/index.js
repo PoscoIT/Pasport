@@ -38,13 +38,13 @@ import ITAuthStack from "./navigation/ITAuthStack";
 import BodyShowerChecklist from "./screens/Safety/BodyShowerChecklist";
 import { signOut } from "@react-native-firebase/auth";
 import { createStackNavigator } from "@react-navigation/stack";
-import { CheckListScreen, LoginScreen } from "./screens";
-import Checklist from "./screens/Production/Checklist";
+
 import CraneChecklist from "./screens/Production/CraneChecklist";
 import SleeveCount from "./screens/Production/SleeveCount";
 import CoilCarChecklist from "./screens/Production/CoilCarChecklist";
 import PaperTrackingSecond from "./screens/Production/PaperTrackingSecond";
 import EmergencyAreaChecklist from "./screens/Safety/EmergencyAreaChecklist";
+import EmergencyCabinet from "./screens/Safety/EmergencyCabinet"
 
 const Index = ({ navigation }) => {
   const { user, loading } = useAuth();
@@ -141,7 +141,7 @@ const Index = ({ navigation }) => {
             marginTop: 10,
           }}
         >
-          {t("loginScreen.version")} 59
+          {t("loginScreen.version")} 62
         </Text>
       </View>
     </View>
@@ -151,7 +151,7 @@ const Index = ({ navigation }) => {
   const checkUser = async () => {
     if (user) {
       await getVersionNo(async (responsee) => {
-        if (responsee.version > 59) {
+        if (responsee.version > 62) {
           setVersionStatus(true);
           setIsLoading(false);
           Linking.openURL("https://poscoassan.com.tr/download.html").catch(
@@ -259,8 +259,8 @@ const Index = ({ navigation }) => {
                 unmountOnBlur: true,
               }}
             />
-            <Drawer.Screen name="Canlı Beyaz Kağıt" component={PaperTracking} />
-             <Drawer.Screen name="ZRM Kağıt Stok Durumu" component={PaperTrackingSecond} />
+            <Drawer.Screen name="Paper Tracking" component={PaperTracking} />
+             <Drawer.Screen name="Canlı Beyaz Kağıt & ZRM stok durumu" component={PaperTrackingSecond} />
 
             {/*<Drawer.Screen options={{*/}
 
@@ -269,6 +269,11 @@ const Index = ({ navigation }) => {
             {/*<Drawer.Screen options={{*/}
             {/*    drawerItemStyle: { display: 'none' }*/}
             {/*}}  name="Forklift Reservation Viewer"  component={ForkliftReservationViewer}     />*/}
+
+             <Drawer.Screen
+              name={"Acil Durum Dolapları"}
+              component={EmergencyCabinet}
+            />
             <Drawer.Screen
               name={t("fireEquipment")}
               component={FireEquipmentChecklist}

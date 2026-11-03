@@ -14,7 +14,7 @@ import {  TextInput } from "react-native-paper";
 import { useEffect, useRef, useState } from "react";
 import { Button, Radio, RadioGroup } from "@ui-kitten/components";
 import axios from "axios";
-import { sendUserInfoName } from "../../api/auth-api";
+import { sendUserInfoName, sendUserInfoNameWithApi } from "../../api/auth-api";
 import { REACT_APP_SECRET_KEY } from "@env";
 import { Toast } from "toastify-react-native";
 import { useTranslation } from "react-i18next";
@@ -150,10 +150,10 @@ const requestCameraPermission = async () => {
   };
 
   const getUser = async () => {
-    await sendUserInfoName((sendResponse) => {
-      setEmployeeId(sendResponse.empSicil);
-      setEmployeeName(sendResponse.uname);
-    });
+    const user = sendUserInfoNameWithApi()
+    setEmployeeId(user?.EmployeeID)
+    setEmployeeName(user?.NameSurname)
+   
   };
 
 const onSubmit = async () => {

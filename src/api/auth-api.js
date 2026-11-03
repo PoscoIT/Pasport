@@ -267,59 +267,87 @@ export const getFcmToken = async (callback) => {
 //-----------------*******************-----------------*******************-----------------*******************
 // ✅ RNFB'YE ÇEVRİLDİ
 export const sendUserInfoName = async (callback) => {
-  let uname = "d";
-  let empSicil = "2";
-  let manager = 0;
-  let line = "a";
-  let credit = "0";
-  let uemail = "0";
-
-  // 'sendUserInfo' artık modüler versiyonu çağıracak
-  await sendUserInfo(async (responsed) => {
+  // sendUserInfo callback ile çalışsa bile sonucu bekle.
+  const responsed = await new Promise((resolve, reject) => {
     try {
-      // Sadece 'uemail' varsa sorgulama yap
-      if (responsed.uemail) {
-        // HATA: database().ref(...) (eski v8 API)
-        // DOĞRUSU: Modüler fonksiyonları kullan:
-
-        // 1. Veritabanı referansını oluştur
-        const dbRef = ref(database, "0");
-
-        const dbQuery = query(
-          dbRef,
-          orderByChild("MailAdd"),
-          equalTo(responsed.uemail),
-        );
-
-        const snapshot = await get(dbQuery);
-
-        if (snapshot.exists()) {
-          snapshot.forEach(function (childSnapshot) {
-            const val = childSnapshot.val();
-
-            uname = val.AdSoyad;
-            empSicil = val.SicilNo;
-            line = val.Line;
-            credit = val.Credit;
-            uemail = val.MailAdd;
-            //   disabled = val?.Disabled;
-          });
-        }
-      }
-    } catch (err) {
-      console.error("sendUserInfoName Hatası:", err);
+      Promise.resolve(sendUserInfo(resolve)).catch(reject);
+    } catch (error) {
+      reject(error);
     }
-
-    await callback({
-      uname: uname,
-      empSicil: empSicil,
-      line: line,
-      //  Disabled: disabled,
-      credit: credit,
-      uemail: uemail,
-    });
   });
+
+  const email = responsed?.uemail;
+
+  if (typeof email !== "string" || !email.trim()) {
+    throw new Error("Kullanıcı e-posta bilgisi alınamadı.");
+  }
+
+  const dbRef = ref(database, "0");
+
+  const dbQuery = query(
+    dbRef,
+    orderByChild("MailAdd"),
+    equalTo(email.trim()),
+  );
+
+
+  const snapshot = await get(dbQuery);
+
+  if (!snapshot.exists()) {
+    throw new Error("E-posta adresiyle eşleşen kullanıcı bulunamadı.");
+  }
+
+  let user = null;
+
+  snapshot.forEach((childSnapshot) => {
+    const val = childSnapshot.val();
+
+    user = {
+      uname: val.AdSoyad,
+      empSicil: val.SicilNo,
+      line: val.Line,
+      credit: val.Credit,
+      uemail: val.MailAdd,
+    };
+
+    return true; // İlk eşleşen kaydı al.
+  });
+
+  if (typeof callback === "function") {
+    await callback(user);
+  }
+
+  return user;
 };
+
+export const sendUserInfoNameWithApi = async() =>{
+   try {
+    const responsed = await new Promise((resolve, reject) => {
+      try {
+        Promise.resolve(sendUserInfo(resolve)).catch(reject);
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    const email = responsed?.uemail;
+  
+
+    if (!email) return null;
+
+    const res = await axios.get(`https://tstapp.poscoassan.com.tr:8443/UserAccount/ListUserMainDepartment?Email=${email}`, { headers: {
+          "auth-token": REACT_APP_SECRET_KEY,
+        },});
+
+   
+
+    return res.data?.[0] ?? null;
+  } catch (error) {
+    console.error("sendUserInfoNameWithApi hata:", error);
+    return null;
+  }
+
+}
 //-----------------*******************-----------------*******************-----------------*******************
 // ✅ RNFB'YE ÇEVRİLDİ
 export const sendUserInfo = async (callback) => {

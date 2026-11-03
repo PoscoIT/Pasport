@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "prefabPath": "/Users/fatih/.gradle/caches/modules-2/files-2.1/com.google.prefab/cli/2.1.0/aa32fec809c44fa531f01dcfb739b5b3304d3050/cli-2.1.0-all.jar",
+  "packages": [
+    "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-reanimated/android/build/intermediates/prefab_package/debug/prefab",
+    "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-vision-camera/android/build/intermediates/prefab_package/debug/prefab",
+    "/Users/fatih/WebstormProjects/TSTApp/TSTApp/node_modules/react-native-worklets/android/build/intermediates/prefab_package/debug/prefab",
+    "/Users/fatih/.gradle/caches/9.3.1/transforms/845487fe6ddfe5c2233880a65171aefd/transformed/jetified-react-android-0.85.3-debug/prefab",
+    "/Users/fatih/.gradle/caches/9.3.1/transforms/78275b9d5c2c99272a3c863b85b03913/transformed/jetified-hermes-android-250829098.0.10-debug/prefab",
+    "/Users/fatih/.gradle/caches/9.3.1/transforms/bd2343647684f52f41ea914673e8e633/transformed/jetified-fbjni-0.7.0/prefab"
+  ]
+}
